@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vokabel Fun</title>
+  <style>
+    :root {
+      --bg: #0f1c2e;
+      --panel: #13253a;
+      --accent: #3cdfff;
+      --accent-2: #ff7ac3;
+      --good: #6df2a4;
+      --warn: #ffb347;
+      --text: #e9f2ff;
+      --muted: #9eb4d1;
+      --glow: 0 8px 20px rgba(60, 223, 255, 0.35);
+      --shadow: 0 15px 40px rgba(0, 0, 0, 0.35);
+      --radius: 18px;
+      --speed: 220ms;
+      font-family: "Baloo 2", "Comic Neue", "Trebuchet MS", system-ui, sans-serif;
+      background: radial-gradient(circle at 20% 20%, #1a3150, #0f1c2e 55%), radial-gradient(circle at 80% 10%, #16304c, transparent 45%), #0f1c2e;
+      color: var(--text);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 16px;
+      gap: 16px;
+    }
+
+    header {
+      background: rgba(19, 37, 58, 0.8);
+      backdrop-filter: blur(6px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr auto;
+      gap: 12px;
+      align-items: center;
+      box-shadow: var(--shadow);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.4rem;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    h1 span.logo-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: 0 0 14px rgba(255, 122, 195, 0.8);
+      display: inline-block;
+    }
+
+    .select-wrap, .controls {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    label {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    select, button, input {
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: #0d1828;
+      color: var(--text);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 1rem;
+      transition: all var(--speed) ease;
+    }
+
+    select:focus, button:focus, input:focus {
+      outline: 2px solid var(--accent);
+      outline-offset: 1px;
+      box-shadow: var(--glow);
+    }
+
+    button {
+      cursor: pointer;
+      background: linear-gradient(135deg, var(--accent), #48d6ff);
+      color: #062033;
+      font-weight: 700;
+      border: none;
+      box-shadow: var(--glow);
+    }
+
+    button:disabled {
+      background: #18293f;
+      color: #6c82a3;
+      cursor: not-allowed;
+      box-shadow: none;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    button.secondary {
+      background: #1f3351;
+      color: var(--text);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: none;
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 16px;
+    }
+
+    .card {
+      background: rgba(19, 37, 58, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card h2 {
+      margin: 0 0 8px;
+      font-size: 1.2rem;
+    }
+
+    .question {
+      font-size: 1.6rem;
+      font-weight: 800;
+      margin: 12px 0 4px;
+      letter-spacing: 0.5px;
+    }
+
+    .prompt-lang {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 10px;
+      margin: 12px 0;
+      flex-wrap: wrap;
+    }
+
+    .input-wrap {
+      position: relative;
+      flex: 1;
+      min-width: 240px;
+    }
+
+    .input-row input {
+      width: 100%;
+      padding-right: 38px;
+    }
+
+    .status-icon {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      opacity: 0;
+      pointer-events: none;
+      font-weight: 800;
+      transition: opacity var(--speed) ease;
+    }
+
+    .status-icon.show { opacity: 1; }
+    .status-icon.wrong { color: #ff8585; }
+    .status-icon.correct { color: var(--good); }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(60, 223, 255, 0.15), rgba(255, 122, 195, 0.15));
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .badge small {
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .side-panel {
+      display: grid;
+      gap: 12px;
+    }
+
+    .pill {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      border-radius: var(--radius);
+      background: #102033;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    .pill strong {
+      font-size: 1.05rem;
+    }
+
+    .completed {
+      color: var(--good);
+      font-weight: 800;
+    }
+
+    .chip {
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: rgba(60, 223, 255, 0.1);
+      border: 1px solid rgba(60, 223, 255, 0.4);
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .fireworks {
+      pointer-events: none;
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      z-index: 10;
+    }
+
+    .spark {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: pop 900ms ease-out forwards;
+      filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.7));
+    }
+
+    @keyframes pop {
+      0% { transform: translate(0, 0) scale(1); opacity: 1; }
+      70% { opacity: 1; }
+      100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
+    }
+
+    .menu-note {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .hint {
+      color: var(--muted);
+      margin-top: 6px;
+      margin-bottom: 10px;
+      display: block;
+      font-size: 0.95rem;
+    }
+
+    .solution-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .solution-box {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 10px;
+      background: rgba(60, 223, 255, 0.12);
+      border: 1px solid rgba(60, 223, 255, 0.35);
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .solution-label {
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    @media (max-width: 900px) {
+      header { grid-template-columns: 1fr; }
+      main { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1><span class="logo-dot"></span>Vokabel Fun</h1>
+    <div class="select-wrap">
+      <label for="pageSelect">Seite:</label>
+      <select id="pageSelect"></select>
+    </div>
+    <div class="select-wrap">
+      <label for="directionSelect">Richtung:</label>
+      <select id="directionSelect">
+        <option value="en-de">Englisch → Deutsch</option>
+        <option value="de-en">Deutsch → Englisch</option>
+      </select>
+    </div>
+    <div class="controls">
+      <button id="resetBtn" class="secondary">Neu anfangen</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="card">
+      <div class="question" id="questionText"></div>
+      <div class="input-row">
+        <div class="input-wrap">
+          <input id="answerInput" type="text" placeholder="Deine Antwort..." autocomplete="off">
+          <span id="inputStatus" class="status-icon"></span>
+        </div>
+        <button id="submitBtn">Check!</button>
+        <button id="showBtn" class="secondary">Lösung zeigen</button>
+      </div>
+      <div class="hint" id="hintArea"></div>
+      <div class="badge" id="progressBadge"></div>
+    </section>
+
+    <aside class="side-panel">
+      <div class="card">
+        <h2>Dein Status</h2>
+        <div class="pill"><span>Aktuelle Seite</span><strong id="currentPageLabel"></strong></div>
+        <div class="pill"><span>Richtung</span><span id="directionLabel" class="chip"></span></div>
+        <div class="pill"><span>Richtig beantwortet</span><span id="correctCount" class="completed">0</span></div>
+        <div class="pill"><span>Gesamt auf Seite</span><span id="totalCount">0</span></div>
+        <div class="menu-note">Alle Antworten richtig? Schau nach dem grünen Haken im Dropdown!</div>
+      </div>
+    </aside>
+  </main>
+
+  <div class="fireworks" id="fireworks"></div>
+
+  <script src="vocab_data.js"></script>
+  <script>
+    const db = window.openDatabase ? openDatabase('vokabeln_fun', '1.0', 'Vocabulary progress', 2 * 1024 * 1024) : null;
+    const localStore = window.localStorage;
+
+    const state = {
+      currentPage: null,
+      direction: 'en-de',
+      asked: 0,
+      correct: 0,
+      answeredCorrect: new Set(),
+      currentWord: null,
+      completedPages: new Set(),
+    };
+
+    const pageSelect = document.getElementById('pageSelect');
+    const directionSelect = document.getElementById('directionSelect');
+    const questionText = document.getElementById('questionText');
+    const answerInput = document.getElementById('answerInput');
+    const inputStatus = document.getElementById('inputStatus');
+    const submitBtn = document.getElementById('submitBtn');
+    const showBtn = document.getElementById('showBtn');
+    const hintArea = document.getElementById('hintArea');
+    const badge = document.getElementById('progressBadge');
+    const currentPageLabel = document.getElementById('currentPageLabel');
+    const directionLabel = document.getElementById('directionLabel');
+    const correctCount = document.getElementById('correctCount');
+    const totalCount = document.getElementById('totalCount');
+    const fireworks = document.getElementById('fireworks');
+    const resetBtn = document.getElementById('resetBtn');
+    let showingSolution = false;
+    let statusTimer = null;
+
+    function runSql(sql, params = []) {
+      return new Promise((resolve, reject) => {
+        if (!db) { resolve(); return; }
+        db.transaction(tx => {
+          tx.executeSql(sql, params, (_, res) => resolve(res), (_, err) => reject(err));
+        });
+      });
+    }
+
+    async function setupDb() {
+      if (!db) return;
+      await runSql('CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT)');
+      await runSql('CREATE TABLE IF NOT EXISTS progress (page TEXT PRIMARY KEY, asked INTEGER, correct INTEGER, answered TEXT, completed INTEGER)');
+    }
+
+    async function loadSettings() {
+      if (!db) {
+        try { return JSON.parse(localStore.getItem('settings') || '{}'); } catch { return {}; }
+      }
+      const res = await runSql('SELECT key, value FROM settings');
+      const out = {};
+      for (let i = 0; i < res.rows.length; i++) {
+        out[res.rows.item(i).key] = res.rows.item(i).value;
+      }
+      return out;
+    }
+
+    async function saveSetting(key, value) {
+      if (!db) {
+        const current = await loadSettings();
+        current[key] = value;
+        localStore.setItem('settings', JSON.stringify(current));
+        return;
+      }
+      await runSql('REPLACE INTO settings (key, value) VALUES (?, ?)', [key, value]);
+    }
+
+    async function loadProgress(page) {
+      if (!db) {
+        try {
+          const all = JSON.parse(localStore.getItem('progress') || '{}');
+          return all[page] || null;
+        } catch {
+          return null;
+        }
+      }
+      const res = await runSql('SELECT * FROM progress WHERE page = ?', [page]);
+      if (res.rows.length) return res.rows.item(0);
+      return null;
+    }
+
+    async function saveProgress(page) {
+      const answeredArr = Array.from(state.answeredCorrect);
+      const payload = {
+        page,
+        asked: state.asked,
+        correct: state.correct,
+        answered: JSON.stringify(answeredArr),
+        completed: state.completedPages.has(page) ? 1 : 0,
+      };
+      if (!db) {
+        const all = JSON.parse(localStore.getItem('progress') || '{}');
+        all[page] = payload;
+        localStore.setItem('progress', JSON.stringify(all));
+        return;
+      }
+      await runSql('REPLACE INTO progress (page, asked, correct, answered, completed) VALUES (?, ?, ?, ?, ?)', [
+        page,
+        payload.asked,
+        payload.correct,
+        payload.answered,
+        payload.completed,
+      ]);
+    }
+
+    async function loadCompletedPages() {
+      if (!db) {
+        try {
+          const all = JSON.parse(localStore.getItem('progress') || '{}');
+          Object.values(all).forEach(entry => {
+            if (entry.completed) state.completedPages.add(entry.page);
+          });
+        } catch { /* ignore */ }
+        return;
+      }
+      const res = await runSql('SELECT page FROM progress WHERE completed = 1');
+      if (!res) return;
+      for (let i = 0; i < res.rows.length; i++) {
+        state.completedPages.add(res.rows.item(i).page);
+      }
+    }
+
+    function populateDropdowns() {
+      pageSelect.innerHTML = '';
+      Object.keys(vocabData).forEach(page => {
+        const opt = document.createElement('option');
+        opt.value = page;
+        opt.textContent = page;
+        pageSelect.appendChild(opt);
+      });
+    }
+
+    function updateLabels() {
+      currentPageLabel.textContent = state.currentPage;
+      directionLabel.textContent = state.direction === 'en-de' ? 'Englisch → Deutsch' : 'Deutsch → Englisch';
+      correctCount.textContent = state.correct;
+      totalCount.textContent = vocabData[state.currentPage]?.length || 0;
+      badge.innerHTML = `<small>Fortschritt</small> ${state.correct} richtig · ${state.asked} Versuche · ${totalCount.textContent} Wörter`;
+      markCompletedPages();
+    }
+
+    function pickWord() {
+      const list = vocabData[state.currentPage] || [];
+      const remaining = list.filter(item => !state.answeredCorrect.has(item.en + '|' + item.de));
+      if (!remaining.length) {
+        if (!state.completedPages.has(state.currentPage)) {
+          triggerCelebration();
+        }
+        return null;
+      }
+      const idx = Math.floor(Math.random() * remaining.length);
+      return remaining[idx];
+    }
+
+    function presentWord() {
+      state.currentWord = pickWord();
+      if (!state.currentWord) {
+        questionText.textContent = 'Mega! Alles richtig auf dieser Seite.';
+        return;
+      }
+      questionText.textContent = state.direction === 'en-de' ? state.currentWord.en : state.currentWord.de;
+      hintArea.textContent = '';
+      answerInput.value = '';
+      answerInput.focus();
+      showingSolution = false;
+      answerInput.disabled = false;
+      submitBtn.disabled = false;
+      showBtn.textContent = 'Lösung zeigen';
+      clearStatus();
+    }
+
+    function normalize(str) {
+      return str
+        .toLowerCase()
+        .replace(/…/g, '')         /* remove ellipsis char */
+        .replace(/\.{3}/g, ' ')     /* also remove three-dot ellipsis */
+        .replace(/[,.;:!?]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    function isCorrect(user, expected) {
+      const userClean = normalize(user);
+      // Split only on separators that indicate alternatives, not commas inside phrases
+      const parts = expected.split(/;|\/|\(|\)/).map(normalize).filter(Boolean);
+      return parts.some(p => p && userClean === p);
+    }
+
+    async function handleSubmit() {
+      if (!state.currentWord || showingSolution) return;
+      const rawAnswer = answerInput.value.trim();
+      if (!rawAnswer) return;
+
+      state.asked += 1;
+      const expected = state.direction === 'en-de' ? state.currentWord.de : state.currentWord.en;
+      const correct = isCorrect(rawAnswer, expected);
+
+      if (correct) {
+        state.correct += 1;
+        const key = state.currentWord.en + '|' + state.currentWord.de;
+        state.answeredCorrect.add(key);
+        setStatus('correct');
+        await saveProgress(state.currentPage);
+        updateLabels();
+        setTimeout(() => {
+          presentWord();
+        }, 500);
+      } else {
+        setStatus('wrong');
+        await saveProgress(state.currentPage);
+      }
+      updateLabels();
+    }
+
+    async function showSolution() {
+      if (showingSolution) {
+        showingSolution = false;
+        showBtn.textContent = 'Lösung zeigen';
+        answerInput.disabled = false;
+        submitBtn.disabled = false;
+        presentWord();
+        return;
+      }
+      if (!state.currentWord) return;
+      state.asked += 1; // counts as unsuccessful try
+      const solution = state.direction === 'en-de' ? state.currentWord.de : state.currentWord.en;
+      hintArea.innerHTML = `<div class="solution-row"><span class="solution-box"><span class="solution-label">Lösung:</span><span>${solution}</span></span></div>`;
+      showingSolution = true;
+      showBtn.textContent = 'Weiter';
+      answerInput.disabled = true;
+      submitBtn.disabled = true;
+      await saveProgress(state.currentPage);
+      updateLabels();
+    }
+
+    function clearStatus() {
+      if (statusTimer) {
+        clearTimeout(statusTimer);
+        statusTimer = null;
+      }
+      inputStatus.className = 'status-icon';
+      inputStatus.textContent = '';
+    }
+
+    function setStatus(type) {
+      clearStatus();
+      if (type === 'correct') {
+        inputStatus.classList.add('show', 'correct');
+        inputStatus.textContent = '✓';
+        statusTimer = setTimeout(() => clearStatus(), 2000);
+      }
+      if (type === 'wrong') {
+        inputStatus.classList.add('show', 'wrong');
+        inputStatus.textContent = '✗';
+      }
+    }
+
+    function triggerCelebration() {
+      if (!state.completedPages.has(state.currentPage)) {
+        state.completedPages.add(state.currentPage);
+        launchFireworks();
+      }
+      markCompletedPages();
+      saveProgress(state.currentPage);
+    }
+
+    function launchFireworks() {
+      const colors = ['#ff8fb1', '#6df2a4', '#3cdfff', '#ffd66d', '#b18fff'];
+      let bursts = 0;
+      const timer = setInterval(() => {
+        bursts += 1;
+        const count = 25;
+        const originX = Math.random() * window.innerWidth;
+        const originY = (0.2 + Math.random() * 0.5) * window.innerHeight;
+        for (let i = 0; i < count; i++) {
+          const spark = document.createElement('span');
+          spark.className = 'spark';
+          const angle = (Math.PI * 2 * i) / count;
+          const distance = 80 + Math.random() * 70;
+          spark.style.left = originX + 'px';
+          spark.style.top = originY + 'px';
+          spark.style.background = colors[Math.floor(Math.random() * colors.length)];
+          spark.style.setProperty('--dx', `${Math.cos(angle) * distance}px`);
+          spark.style.setProperty('--dy', `${Math.sin(angle) * distance}px`);
+          fireworks.appendChild(spark);
+          setTimeout(() => spark.remove(), 900);
+        }
+        if (bursts > 5) clearInterval(timer);
+      }, 350);
+    }
+
+    async function changePage(newPage) {
+      state.currentPage = newPage;
+      const saved = await loadProgress(newPage);
+      if (saved) {
+        state.asked = saved.asked || 0;
+        state.correct = saved.correct || 0;
+        try {
+          const arr = JSON.parse(saved.answered || '[]');
+          state.answeredCorrect = new Set(arr);
+        } catch {
+          state.answeredCorrect = new Set();
+        }
+        if (saved.completed) state.completedPages.add(newPage);
+      } else {
+        state.asked = 0;
+        state.correct = 0;
+        state.answeredCorrect = new Set();
+      }
+      await saveSetting('currentPage', newPage);
+      updateLabels();
+      presentWord();
+    }
+
+    async function changeDirection(dir) {
+      state.direction = dir;
+      await saveSetting('direction', dir);
+      updateLabels();
+      if (state.currentPage) presentWord();
+    }
+
+    function markCompletedPages() {
+      Array.from(pageSelect.options).forEach(opt => {
+        const mark = state.completedPages.has(opt.value) ? ' ✅' : '';
+        const base = opt.value.replace(' ✅', '');
+        opt.textContent = base + mark;
+      });
+    }
+
+    async function resetAll() {
+      if (!confirm('Fortschritt wirklich löschen?')) return;
+      state.completedPages.clear();
+      if (db) {
+        await runSql('DELETE FROM progress');
+        await runSql('DELETE FROM settings');
+      } else {
+        localStore.removeItem('progress');
+        localStore.removeItem('settings');
+      }
+      state.asked = 0;
+      state.correct = 0;
+      state.answeredCorrect = new Set();
+      populateDropdowns();
+      pageSelect.value = Object.keys(vocabData)[0];
+      await changePage(pageSelect.value);
+      await changeDirection('en-de');
+    }
+
+    async function init() {
+      await setupDb();
+      await loadCompletedPages();
+      populateDropdowns();
+      const settings = await loadSettings();
+      const defaultPage = settings.currentPage || Object.keys(vocabData)[0];
+      const defaultDir = settings.direction || 'en-de';
+      pageSelect.value = defaultPage;
+      directionSelect.value = defaultDir;
+      await changePage(defaultPage);
+      await changeDirection(defaultDir);
+      answerInput.addEventListener('keypress', e => {
+        if (e.key === 'Enter') handleSubmit();
+      });
+      answerInput.addEventListener('input', clearStatus);
+      submitBtn.addEventListener('click', handleSubmit);
+      showBtn.addEventListener('click', showSolution);
+      pageSelect.addEventListener('change', e => changePage(e.target.value));
+      directionSelect.addEventListener('change', e => changeDirection(e.target.value));
+      resetBtn.addEventListener('click', resetAll);
+      updateLabels();
+    }
+
+    init();
+  </script>
+</body>
+</html>

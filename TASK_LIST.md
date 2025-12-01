@@ -1,0 +1,13 @@
+- Erzeuge eine Vokabel-Lern-Web-App die für 11 jährige Schüler ansprechend gestaltet ist
+- Die englisch/deutschen Vokabeln sind in der vocab_data.js nach Pages/Seiten gegliedert
+- Es werden Vokabeln geübt, die zu einer Page/Seite gehören.
+- Es gibt ein Menu im Header wo die zu übende Page/Seite in einem DropDown ausgewählt werden kann
+- Im Menu kann man auch die Abfrage Richtung aus wählen, also Deutsch->Englisch oder Englisch->Deutsch
+- Es wird nach eine Vokabel gefragt und es gibt ein Inmput Feld für die Eingabe
+- Nach der Eingabe wird angezeigt ob die Eingabe richtig oder falsch ist. Wenn die Eingabe richtig war, wird die nächste Vokabel abgefragt. Wenn sie falsch ist, kann man es nocheinmal versuchen oder sich die Lösung anzeigen lassen
+- der Fortschritt wird in einem Badge angezeigt: also Wieviele Vokabeln schon abgefragt wurden und wieviele davon richtig waren. Das Badge zeigt auch die Gesamtzahl der Vokabeln für die Seite an
+- der Fortschritt und die aktuell ausgewählte Seite wird in einer sqlite Datenbank gespeichert
+- Wenn alle Vokabeln einer Page/Seite korrekt beantwortet waren kommt ein animiertes fancy Feuerwerk als Belohnung über die ganze Seite
+- Wenn alle Vokabeln einer Page/Seite korrekt beantwortet wurden, wird dies auch im Menu bei dem Page/Seiten dropdown angezeigt als grünes checkmark
+- Im Menu kann auch ein Datenbank reset des Fortschrittes ausgeführt werden
+
