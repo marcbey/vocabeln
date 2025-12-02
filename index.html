@@ -368,29 +368,6 @@
       font-weight: 800;
     }
 
-    .log-card {
-      padding: 14px 16px;
-    }
-
-    .sql-log {
-      max-height: 180px;
-      overflow-y: auto;
-      display: grid;
-      gap: 6px;
-      font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
-      font-size: 0.85rem;
-      margin-top: 6px;
-    }
-
-    .sql-log-line {
-      padding: 6px 8px;
-      border-radius: 10px;
-      background: #0d1828;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      color: var(--muted);
-      word-break: break-word;
-    }
-
     @media (max-width: 900px) {
       header { grid-template-columns: 1fr; }
       .select-group { justify-content: flex-start; flex-wrap: wrap; }
@@ -453,11 +430,6 @@
     </aside>
   </main>
 
-  <footer class="card log-card">
-    <h2>SQL Log</h2>
-    <div id="sqlLog" class="sql-log"></div>
-  </footer>
-
   <div class="fireworks" id="fireworks"></div>
 
   <script src="vocab_data.js"></script>
@@ -498,23 +470,8 @@
     const totalCount = document.getElementById('totalCount');
     const fireworks = document.getElementById('fireworks');
     const resetBtn = document.getElementById('resetBtn');
-    const sqlLog = document.getElementById('sqlLog');
     let showingSolution = false;
     let statusTimer = null;
-    const SQL_LOG_LIMIT = 80;
-
-    function appendSqlLog(sql, params) {
-      if (!sqlLog) return;
-      const row = document.createElement('div');
-      row.className = 'sql-log-line';
-      const time = new Date().toLocaleTimeString();
-      row.textContent = `[${time}] ${sql} | ${JSON.stringify(params || [])}`;
-      sqlLog.appendChild(row);
-      while (sqlLog.children.length > SQL_LOG_LIMIT) {
-        sqlLog.removeChild(sqlLog.firstChild);
-      }
-      sqlLog.scrollTop = sqlLog.scrollHeight;
-    }
 
     function syncCorrectCount() {
       state.correct = state.answeredCorrect.size;
@@ -532,7 +489,6 @@
     }
 
     function runSql(sql, params = []) {
-      appendSqlLog(sql, params);
       return new Promise((resolve, reject) => {
         if (!db) { resolve(); return; }
         console.log('[SQL]', sql, params);
