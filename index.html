@@ -152,6 +152,19 @@
       font-weight: 800;
       margin: 12px 0 4px;
       letter-spacing: 0.5px;
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .board-translation {
+      font-size: 1.1rem;
+      color: var(--muted);
+      padding: 4px 10px;
+      border-radius: 10px;
+      border: 1px dashed rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.04);
     }
 
     .prompt-lang {
@@ -299,9 +312,83 @@
       font-weight: 700;
     }
 
+    .board-controls {
+      display: none;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 10px 0 4px;
+    }
+
+    .board-controls.show {
+      display: flex;
+    }
+
+    .board-controls button {
+      flex: 1;
+      min-width: 120px;
+      font-size: 1.1rem;
+    }
+
+    .board-correct {
+      background: linear-gradient(135deg, var(--good), #8ef7be);
+      color: #063621;
+    }
+
+    .board-wrong {
+      background: linear-gradient(135deg, #ff8585, #ffb4b4);
+      color: #3a0d0d;
+    }
+
+    .toggle {
+      background: #1f3351;
+      color: var(--text);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .toggle.active {
+      background: linear-gradient(135deg, var(--accent-2), var(--accent));
+      color: #031524;
+      box-shadow: var(--glow);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
     .solution-label {
       color: var(--muted);
       font-weight: 600;
+    }
+
+    .retry-btn {
+      width: 100%;
+      margin-top: 10px;
+      background: linear-gradient(135deg, var(--accent-2), var(--accent));
+      color: #031524;
+      font-weight: 800;
+    }
+
+    .log-card {
+      padding: 14px 16px;
+    }
+
+    .sql-log {
+      max-height: 180px;
+      overflow-y: auto;
+      display: grid;
+      gap: 6px;
+      font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+      font-size: 0.85rem;
+      margin-top: 6px;
+    }
+
+    .sql-log-line {
+      padding: 6px 8px;
+      border-radius: 10px;
+      background: #0d1828;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--muted);
+      word-break: break-word;
     }
 
     @media (max-width: 900px) {
@@ -326,14 +413,18 @@
       </div>
     </div>
     <div class="controls">
+      <button id="boardModeBtn" class="toggle">Tafel-Modus</button>
       <button id="resetBtn" class="secondary">Neu anfangen</button>
     </div>
   </header>
 
   <main>
     <section class="card">
-      <div class="question" id="questionText"></div>
-      <div class="input-row">
+      <div class="question">
+        <span id="questionText"></span>
+        <span id="boardTranslation" class="board-translation hidden"></span>
+      </div>
+      <div class="input-row" id="entryControls">
         <div class="input-wrap">
           <input id="answerInput" type="text" placeholder="Deine Antwort..." autocomplete="off">
           <span id="inputStatus" class="status-icon"></span>
@@ -341,6 +432,11 @@
         <button id="submitBtn">Check!</button>
         <button id="showBtn" class="secondary">Lösung zeigen</button>
       </div>
+      <div class="board-controls" id="boardControls">
+        <button id="boardCorrectBtn" class="board-correct">✓ Richtig</button>
+        <button id="boardWrongBtn" class="board-wrong">✗ Falsch</button>
+      </div>
+      <button id="retryPageBtn" class="retry-btn hidden">Diese Seite nochmal üben</button>
       <div class="hint" id="hintArea"></div>
       <div class="badge" id="progressBadge"></div>
     </section>
@@ -357,6 +453,11 @@
     </aside>
   </main>
 
+  <footer class="card log-card">
+    <h2>SQL Log</h2>
+    <div id="sqlLog" class="sql-log"></div>
+  </footer>
+
   <div class="fireworks" id="fireworks"></div>
 
   <script src="vocab_data.js"></script>
@@ -372,15 +473,23 @@
       answeredCorrect: new Set(),
       currentWord: null,
       completedPages: new Set(),
+      boardMode: false,
     };
 
     const pageSelect = document.getElementById('pageSelect');
     const directionSelect = document.getElementById('directionSelect');
     const questionText = document.getElementById('questionText');
+    const boardTranslation = document.getElementById('boardTranslation');
     const answerInput = document.getElementById('answerInput');
     const inputStatus = document.getElementById('inputStatus');
     const submitBtn = document.getElementById('submitBtn');
     const showBtn = document.getElementById('showBtn');
+    const boardModeBtn = document.getElementById('boardModeBtn');
+    const boardControls = document.getElementById('boardControls');
+    const boardCorrectBtn = document.getElementById('boardCorrectBtn');
+    const boardWrongBtn = document.getElementById('boardWrongBtn');
+    const entryControls = document.getElementById('entryControls');
+    const retryPageBtn = document.getElementById('retryPageBtn');
     const hintArea = document.getElementById('hintArea');
     const badge = document.getElementById('progressBadge');
     const currentPageLabel = document.getElementById('currentPageLabel');
@@ -389,12 +498,44 @@
     const totalCount = document.getElementById('totalCount');
     const fireworks = document.getElementById('fireworks');
     const resetBtn = document.getElementById('resetBtn');
+    const sqlLog = document.getElementById('sqlLog');
     let showingSolution = false;
     let statusTimer = null;
+    const SQL_LOG_LIMIT = 80;
+
+    function appendSqlLog(sql, params) {
+      if (!sqlLog) return;
+      const row = document.createElement('div');
+      row.className = 'sql-log-line';
+      const time = new Date().toLocaleTimeString();
+      row.textContent = `[${time}] ${sql} | ${JSON.stringify(params || [])}`;
+      sqlLog.appendChild(row);
+      while (sqlLog.children.length > SQL_LOG_LIMIT) {
+        sqlLog.removeChild(sqlLog.firstChild);
+      }
+      sqlLog.scrollTop = sqlLog.scrollHeight;
+    }
+
+    function syncCorrectCount() {
+      state.correct = state.answeredCorrect.size;
+    }
+
+    function isPageComplete() {
+      const list = vocabData[state.currentPage] || [];
+      return list.length > 0 && state.answeredCorrect.size >= list.length;
+    }
+
+    function checkCompletion() {
+      if (isPageComplete()) {
+        triggerCelebration();
+      }
+    }
 
     function runSql(sql, params = []) {
+      appendSqlLog(sql, params);
       return new Promise((resolve, reject) => {
         if (!db) { resolve(); return; }
+        console.log('[SQL]', sql, params);
         db.transaction(tx => {
           tx.executeSql(sql, params, (_, res) => resolve(res), (_, err) => reject(err));
         });
@@ -501,6 +642,39 @@
       totalCount.textContent = vocabData[state.currentPage]?.length || 0;
       badge.innerHTML = `<small>Fortschritt</small> ${state.correct} richtig · ${state.asked} Versuche · ${totalCount.textContent} Wörter`;
       markCompletedPages();
+      setModeUI();
+    }
+
+    function setModeUI() {
+      if (isPageComplete()) {
+        entryControls.classList.add('hidden');
+        boardControls.classList.remove('show');
+        retryPageBtn.classList.remove('hidden');
+        showBtn.disabled = true;
+        submitBtn.disabled = true;
+        answerInput.disabled = true;
+        boardTranslation.classList.add('hidden');
+        return;
+      } else {
+        retryPageBtn.classList.add('hidden');
+      }
+      if (state.boardMode) {
+        entryControls.classList.add('hidden');
+        boardControls.classList.add('show');
+        boardModeBtn.classList.add('active');
+        showBtn.disabled = true;
+        submitBtn.disabled = true;
+        answerInput.disabled = true;
+        boardTranslation.classList.remove('hidden');
+      } else {
+        entryControls.classList.remove('hidden');
+        boardControls.classList.remove('show');
+        boardModeBtn.classList.remove('active');
+        showBtn.disabled = false;
+        submitBtn.disabled = false;
+        answerInput.disabled = false;
+        boardTranslation.classList.add('hidden');
+      }
     }
 
     function pickWord() {
@@ -520,17 +694,34 @@
       state.currentWord = pickWord();
       if (!state.currentWord) {
         questionText.textContent = 'Mega! Alles richtig auf dieser Seite.';
+        retryPageBtn.classList.remove('hidden');
+        entryControls.classList.add('hidden');
+        boardControls.classList.remove('show');
+        hintArea.textContent = '';
+        answerInput.disabled = true;
+        submitBtn.disabled = true;
+        showBtn.disabled = true;
         return;
       }
       questionText.textContent = state.direction === 'en-de' ? state.currentWord.en : state.currentWord.de;
+      boardTranslation.textContent = state.direction === 'en-de' ? state.currentWord.de : state.currentWord.en;
       hintArea.textContent = '';
       answerInput.value = '';
-      answerInput.focus();
-      showingSolution = false;
-      answerInput.disabled = false;
-      submitBtn.disabled = false;
-      showBtn.textContent = 'Lösung zeigen';
+      retryPageBtn.classList.add('hidden');
+      if (state.boardMode) {
+        answerInput.disabled = true;
+        submitBtn.disabled = true;
+        showBtn.disabled = true;
+      } else {
+        answerInput.focus();
+        showingSolution = false;
+        answerInput.disabled = false;
+        submitBtn.disabled = false;
+        showBtn.textContent = 'Lösung zeigen';
+        showBtn.disabled = false;
+      }
       clearStatus();
+      setModeUI();
     }
 
     function normalize(str) {
@@ -551,6 +742,7 @@
     }
 
     async function handleSubmit() {
+      if (state.boardMode) return;
       if (!state.currentWord || showingSolution) return;
       const rawAnswer = answerInput.value.trim();
       if (!rawAnswer) return;
@@ -560,12 +752,13 @@
       const correct = isCorrect(rawAnswer, expected);
 
       if (correct) {
-        state.correct += 1;
         const key = state.currentWord.en + '|' + state.currentWord.de;
         state.answeredCorrect.add(key);
+        syncCorrectCount();
         setStatus('correct');
         await saveProgress(state.currentPage);
         updateLabels();
+        checkCompletion();
         setTimeout(() => {
           presentWord();
         }, 500);
@@ -576,7 +769,29 @@
       updateLabels();
     }
 
+    async function handleBoardResult(isCorrect) {
+      if (!state.currentWord) return;
+      state.asked += 1;
+      if (isCorrect) {
+        const key = state.currentWord.en + '|' + state.currentWord.de;
+        state.answeredCorrect.add(key);
+        syncCorrectCount();
+        setStatus('correct');
+        await saveProgress(state.currentPage);
+        updateLabels();
+        checkCompletion();
+        setTimeout(() => presentWord(), 400);
+      } else {
+        setStatus('wrong');
+        await saveProgress(state.currentPage);
+        updateLabels();
+        const delay = state.boardMode ? 200 : 500;
+        setTimeout(() => presentWord(), delay);
+      }
+    }
+
     async function showSolution() {
+      if (state.boardMode) return;
       if (showingSolution) {
         showingSolution = false;
         showBtn.textContent = 'Lösung zeigen';
@@ -658,13 +873,13 @@
       const saved = await loadProgress(newPage);
       if (saved) {
         state.asked = saved.asked || 0;
-        state.correct = saved.correct || 0;
         try {
           const arr = JSON.parse(saved.answered || '[]');
           state.answeredCorrect = new Set(arr);
         } catch {
           state.answeredCorrect = new Set();
         }
+        syncCorrectCount();
         if (saved.completed) state.completedPages.add(newPage);
       } else {
         state.asked = 0;
@@ -681,6 +896,16 @@
       await saveSetting('direction', dir);
       updateLabels();
       if (state.currentPage) presentWord();
+    }
+
+    async function toggleBoardMode() {
+      state.boardMode = !state.boardMode;
+      await saveSetting('boardMode', state.boardMode ? '1' : '0');
+      setModeUI();
+      if (!state.boardMode) {
+        showingSolution = false;
+        showBtn.textContent = 'Lösung zeigen';
+      }
     }
 
     function markCompletedPages() {
@@ -710,6 +935,19 @@
       await changeDirection('en-de');
     }
 
+    async function resetCurrentPageProgress() {
+      if (!state.currentPage) return;
+      state.completedPages.delete(state.currentPage);
+      state.asked = 0;
+      state.answeredCorrect = new Set();
+      syncCorrectCount();
+      showingSolution = false;
+      hintArea.textContent = '';
+      await saveProgress(state.currentPage);
+      updateLabels();
+      presentWord();
+    }
+
     async function init() {
       await setupDb();
       await loadCompletedPages();
@@ -717,10 +955,12 @@
       const settings = await loadSettings();
       const defaultPage = settings.currentPage || Object.keys(vocabData)[0];
       const defaultDir = settings.direction || 'en-de';
+      state.boardMode = settings.boardMode === '1' || settings.boardMode === true || settings.boardMode === 'true';
       pageSelect.value = defaultPage;
       directionSelect.value = defaultDir;
       await changePage(defaultPage);
       await changeDirection(defaultDir);
+      setModeUI();
       answerInput.addEventListener('keypress', e => {
         if (e.key === 'Enter') handleSubmit();
       });
@@ -729,6 +969,10 @@
       showBtn.addEventListener('click', showSolution);
       pageSelect.addEventListener('change', e => changePage(e.target.value));
       directionSelect.addEventListener('change', e => changeDirection(e.target.value));
+      boardModeBtn.addEventListener('click', toggleBoardMode);
+      boardCorrectBtn.addEventListener('click', () => handleBoardResult(true));
+      boardWrongBtn.addEventListener('click', () => handleBoardResult(false));
+      retryPageBtn.addEventListener('click', resetCurrentPageProgress);
       resetBtn.addEventListener('click', resetAll);
       updateLabels();
     }
