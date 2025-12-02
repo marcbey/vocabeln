@@ -165,6 +165,25 @@
       border-radius: 10px;
       border: 1px dashed rgba(255, 255, 255, 0.2);
       background: rgba(255, 255, 255, 0.04);
+      display: none;
+    }
+
+    .board-translation.show {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .question-arrow {
+      display: none;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .question-arrow.show {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .prompt-lang {
@@ -215,6 +234,7 @@
       border: 1px solid rgba(255, 255, 255, 0.08);
       font-weight: 700;
       color: var(--text);
+      margin-top: 10px;
     }
 
     .badge small {
@@ -285,14 +305,6 @@
       color: var(--muted);
     }
 
-    .hint {
-      color: var(--muted);
-      margin-top: 6px;
-      margin-bottom: 10px;
-      display: block;
-      font-size: 0.95rem;
-    }
-
     .solution-row {
       display: flex;
       align-items: center;
@@ -343,6 +355,7 @@
       background: #1f3351;
       color: var(--text);
       border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: none;
     }
 
     .toggle.active {
@@ -387,6 +400,7 @@
           <option value="en-de">Englisch → Deutsch</option>
           <option value="de-en">Deutsch → Englisch</option>
           <option value="mixed">Englisch ↔ Deutsch</option>
+          <option value="irregular">Irreguläre Verben</option>
         </select>
       </div>
     </div>
@@ -400,7 +414,8 @@
     <section class="card">
       <div class="question">
         <span id="questionText"></span>
-        <span id="boardTranslation" class="board-translation hidden"></span>
+        <span id="questionArrow" class="question-arrow">→</span>
+        <span id="boardTranslation" class="board-translation"></span>
       </div>
       <div class="input-row" id="entryControls">
         <div class="input-wrap">
@@ -415,7 +430,6 @@
         <button id="boardWrongBtn" class="board-wrong">✗ Falsch</button>
       </div>
       <button id="retryPageBtn" class="retry-btn hidden">Diese Seite nochmal üben</button>
-      <div class="hint" id="hintArea"></div>
       <div class="badge" id="progressBadge"></div>
     </section>
 
@@ -433,9 +447,13 @@
   <div class="fireworks" id="fireworks"></div>
 
   <script src="vocab_data.js"></script>
+  <script src="irregular_vocab_data.js"></script>
   <script>
     const db = window.openDatabase ? openDatabase('vokabeln_fun', '1.0', 'Vocabulary progress', 2 * 1024 * 1024) : null;
     const localStore = window.localStorage;
+    const IRREGULAR_PAGE_KEY = 'Irreguläre Verben';
+    const DIRECTIONS = ['en-de', 'de-en'];
+    let lastRegularPage = null;
 
     const state = {
       currentPage: null,
@@ -452,6 +470,7 @@
     const pageSelect = document.getElementById('pageSelect');
     const directionSelect = document.getElementById('directionSelect');
     const questionText = document.getElementById('questionText');
+    const questionArrow = document.getElementById('questionArrow');
     const boardTranslation = document.getElementById('boardTranslation');
     const answerInput = document.getElementById('answerInput');
     const inputStatus = document.getElementById('inputStatus');
@@ -463,7 +482,6 @@
     const boardWrongBtn = document.getElementById('boardWrongBtn');
     const entryControls = document.getElementById('entryControls');
     const retryPageBtn = document.getElementById('retryPageBtn');
-    const hintArea = document.getElementById('hintArea');
     const badge = document.getElementById('progressBadge');
     const currentPageLabel = document.getElementById('currentPageLabel');
     const directionLabel = document.getElementById('directionLabel');
@@ -474,10 +492,8 @@
     let showingSolution = false;
     let statusTimer = null;
 
-    const DIRECTIONS = ['en-de', 'de-en'];
-
     function keyFor(word) {
-      return `${word.en}|${word.de}`;
+      return `${word.en || word.infinitive}|${word.de || word.german || ''}`;
     }
 
     function answeredKey(word, dir) {
@@ -485,11 +501,9 @@
     }
 
     function matchesDir(entry, dir) {
-      if (entry.endsWith('|en-de') || entry.endsWith('|de-en')) {
-        return entry.endsWith('|' + dir);
-      }
-      // legacy entries without direction are treated as en-de
-      return dir === 'en-de';
+      const parts = entry.split('|');
+      const entryDir = parts[2] || 'en-de'; // legacy entries without dir
+      return entryDir === dir;
     }
 
     function isAnswered(word, dir) {
@@ -510,17 +524,23 @@
     function syncCorrectCount() {
       if (state.direction === 'mixed') {
         state.correct = countAnswered('en-de') + countAnswered('de-en');
+      } else if (state.direction === 'irregular') {
+        state.correct = countAnswered('irregular');
       } else {
         state.correct = countAnswered(state.direction);
       }
     }
 
     function totalQuestionsForCurrentPage() {
+      if (state.direction === 'irregular') return irregular.length;
       const list = vocabData[state.currentPage] || [];
       return list.length * (state.direction === 'mixed' ? 2 : 1);
     }
 
     function isPageComplete() {
+      if (state.direction === 'irregular') {
+        return countAnswered('irregular') >= irregular.length;
+      }
       const list = vocabData[state.currentPage] || [];
       if (!list.length) return false;
       if (state.direction === 'mixed') {
@@ -594,7 +614,9 @@
         asked: state.asked,
         correct: state.direction === 'mixed'
           ? countAnswered('en-de') + countAnswered('de-en')
-          : countAnswered(state.direction),
+          : state.direction === 'irregular'
+            ? countAnswered('irregular')
+            : countAnswered(state.direction),
         answered: JSON.stringify(answeredArr),
         completed: state.completedPages.has(page) ? 1 : 0,
       };
@@ -644,6 +666,8 @@
       currentPageLabel.textContent = state.currentPage;
       if (state.direction === 'mixed') {
         directionLabel.textContent = 'Englisch ↔ Deutsch';
+      } else if (state.direction === 'irregular') {
+        directionLabel.textContent = 'Unregelmäßige Verben';
       } else {
         directionLabel.textContent = state.direction === 'en-de' ? 'Englisch → Deutsch' : 'Deutsch → Englisch';
       }
@@ -657,6 +681,7 @@
     }
 
     function setModeUI() {
+      pageSelect.disabled = state.direction === 'irregular';
       if (isPageComplete()) {
         entryControls.classList.add('hidden');
         boardControls.classList.remove('show');
@@ -665,9 +690,24 @@
         submitBtn.disabled = true;
         answerInput.disabled = true;
         boardTranslation.classList.add('hidden');
+        questionArrow.classList.remove('show');
         return;
       } else {
         retryPageBtn.classList.add('hidden');
+      }
+      if (!showingSolution && !state.boardMode && state.direction !== 'irregular') {
+        boardTranslation.textContent = '';
+        boardTranslation.classList.remove('show');
+        questionArrow.classList.remove('show');
+      }
+      boardTranslation.classList.remove('hidden'); // keep box visible
+      if (showingSolution && !state.boardMode) {
+        answerInput.disabled = true;
+        submitBtn.disabled = true;
+        showBtn.disabled = false;
+        boardTranslation.classList.add('show');
+        questionArrow.classList.add('show');
+        return;
       }
       if (state.boardMode) {
         entryControls.classList.add('hidden');
@@ -676,7 +716,8 @@
         showBtn.disabled = true;
         submitBtn.disabled = true;
         answerInput.disabled = true;
-        boardTranslation.classList.remove('hidden');
+        boardTranslation.classList.add('show');
+        questionArrow.classList.add('show');
       } else {
         entryControls.classList.remove('hidden');
         boardControls.classList.remove('show');
@@ -684,11 +725,22 @@
         showBtn.disabled = false;
         submitBtn.disabled = false;
         answerInput.disabled = false;
-        boardTranslation.classList.add('hidden');
+        if (!showingSolution) questionArrow.classList.remove('show');
       }
     }
 
     function pickWord() {
+      if (state.direction === 'irregular') {
+        const remainingIrregular = irregular.filter(item => !isAnswered(item, 'irregular'));
+        if (!remainingIrregular.length) {
+          if (!state.completedPages.has(state.currentPage)) {
+            triggerCelebration();
+          }
+          return null;
+        }
+        state.currentQuestionDir = 'irregular';
+        return remainingIrregular[Math.floor(Math.random() * remainingIrregular.length)];
+      }
       const list = vocabData[state.currentPage] || [];
       const dirs = state.direction === 'mixed' ? DIRECTIONS : [state.direction];
       const candidates = [];
@@ -714,19 +766,31 @@
       state.currentWord = pickWord();
       if (!state.currentWord) {
         questionText.textContent = 'Mega! Alles richtig auf dieser Seite.';
+        boardTranslation.textContent = '';
+        boardTranslation.classList.remove('show');
+        questionArrow.classList.remove('show');
         retryPageBtn.classList.remove('hidden');
         entryControls.classList.add('hidden');
         boardControls.classList.remove('show');
-        hintArea.textContent = '';
         answerInput.disabled = true;
         submitBtn.disabled = true;
         showBtn.disabled = true;
         return;
       }
       const dir = state.direction === 'mixed' ? state.currentQuestionDir : state.direction;
-      questionText.textContent = dir === 'en-de' ? state.currentWord.en : state.currentWord.de;
-      boardTranslation.textContent = dir === 'en-de' ? state.currentWord.de : state.currentWord.en;
-      hintArea.textContent = '';
+      if (dir === 'irregular') {
+        questionText.textContent = state.currentWord.german;
+        boardTranslation.textContent = `${state.currentWord.infinitive} · ${state.currentWord.simplePast} · ${state.currentWord.pastParticiple}`;
+        boardTranslation.classList.remove('show');
+        questionArrow.classList.remove('show');
+        answerInput.placeholder = 'Infinitive, Simple Past, Past Participle';
+      } else {
+        questionText.textContent = dir === 'en-de' ? state.currentWord.en : state.currentWord.de;
+        boardTranslation.textContent = dir === 'en-de' ? state.currentWord.de : state.currentWord.en;
+        boardTranslation.classList.remove('show');
+        questionArrow.classList.remove('show');
+        answerInput.placeholder = 'Deine Antwort...';
+      }
       answerInput.value = '';
       retryPageBtn.classList.add('hidden');
       if (state.boardMode) {
@@ -755,6 +819,36 @@
         .trim();
     }
 
+    function normalizeIrregularPart(str) {
+      return str
+        .toLowerCase()
+        .replace(/…/g, '')
+        .replace(/[.,;:!?]/g, ' ')
+        .replace(/[()]/g, '')
+        .replace(/\//g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    function splitIrregularAnswer(raw) {
+      const primary = raw.split(/\s*[;,|]\s*/).filter(Boolean);
+      if (primary.length >= 3) return primary.slice(0, 3);
+      const secondary = raw.split(/\s{2,}/).filter(Boolean);
+      if (secondary.length >= 3) return secondary.slice(0, 3);
+      return raw.split(/\s+/).filter(Boolean).slice(0, 3);
+    }
+
+    function isCorrectIrregular(user, verb) {
+      const parts = splitIrregularAnswer(user).map(normalizeIrregularPart);
+      if (parts.length < 3) return false;
+      const expected = [verb.infinitive, verb.simplePast, verb.pastParticiple];
+      return expected.every((exp, idx) => {
+        const alts = exp.split('/').map(normalizeIrregularPart).filter(Boolean);
+        alts.push(normalizeIrregularPart(exp)); // combined form accepted
+        return alts.some(alt => parts[idx] === alt);
+      });
+    }
+
     function isCorrect(user, expected) {
       const userClean = normalize(user);
       // Split only on separators that indicate alternatives, not commas inside phrases
@@ -770,8 +864,9 @@
 
       state.asked += 1;
       const dir = state.direction === 'mixed' ? state.currentQuestionDir : state.direction;
-      const expected = dir === 'en-de' ? state.currentWord.de : state.currentWord.en;
-      const correct = isCorrect(rawAnswer, expected);
+      const correct = dir === 'irregular'
+        ? isCorrectIrregular(rawAnswer, state.currentWord)
+        : isCorrect(rawAnswer, dir === 'en-de' ? state.currentWord.de : state.currentWord.en);
 
       if (correct) {
         const key = answeredKey(state.currentWord, dir);
@@ -825,9 +920,13 @@
       if (!state.currentWord) return;
       state.asked += 1; // counts as unsuccessful try
       const dir = state.direction === 'mixed' ? state.currentQuestionDir : state.direction;
-      const solution = dir === 'en-de' ? state.currentWord.de : state.currentWord.en;
-      hintArea.innerHTML = `<div class="solution-row"><span class="solution-box"><span class="solution-label">Lösung:</span><span>${solution}</span></span></div>`;
+      const solution = dir === 'irregular'
+        ? `${state.currentWord.infinitive}, ${state.currentWord.simplePast}, ${state.currentWord.pastParticiple}`
+        : (dir === 'en-de' ? state.currentWord.de : state.currentWord.en);
+      boardTranslation.textContent = solution;
       showingSolution = true;
+      boardTranslation.classList.add('show');
+      questionArrow.classList.add('show');
       showBtn.textContent = 'Weiter';
       answerInput.disabled = true;
       submitBtn.disabled = true;
@@ -892,6 +991,16 @@
     }
 
     async function changePage(newPage) {
+      if (newPage === IRREGULAR_PAGE_KEY && state.direction !== 'irregular') {
+        directionSelect.value = 'irregular';
+        await changeDirection('irregular');
+        return;
+      }
+      if (state.direction === 'irregular' && newPage !== IRREGULAR_PAGE_KEY) {
+        directionSelect.value = 'en-de';
+        await changeDirection('en-de');
+        return;
+      }
       state.currentPage = newPage;
       const saved = await loadProgress(newPage);
       if (saved) {
@@ -917,6 +1026,22 @@
     async function changeDirection(dir) {
       state.direction = dir;
       await saveSetting('direction', dir);
+      if (dir === 'irregular') {
+        lastRegularPage = state.currentPage !== IRREGULAR_PAGE_KEY ? state.currentPage : lastRegularPage;
+        pageSelect.disabled = true;
+        if (state.currentPage !== IRREGULAR_PAGE_KEY) {
+          await changePage(IRREGULAR_PAGE_KEY);
+          return;
+        }
+      } else {
+        pageSelect.disabled = false;
+        if (state.currentPage === IRREGULAR_PAGE_KEY) {
+          const restore = lastRegularPage || Object.keys(vocabData)[0];
+          pageSelect.value = restore;
+          await changePage(restore);
+          return;
+        }
+      }
       updateLabels();
       if (state.currentPage) presentWord();
     }
