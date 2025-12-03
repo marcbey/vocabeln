@@ -9,7 +9,7 @@ const vocabData = {
             "de": "Hallo"
         },
         {
-            "en": "I'm (= I am)",
+            "en": "I'm; I am",
             "de": "ich bin"
         },
         {
@@ -25,7 +25,7 @@ const vocabData = {
             "de": "Nett, dich kennen zu lernen."
         },
         {
-            "en": "What's your name?",
+            "en": "What's your name?; What is your name?",
             "de": "Wie heißt du?"
         },
         {
@@ -199,7 +199,7 @@ const vocabData = {
             "de": "etwas"
         },
         {
-            "en": "it's (= it is)",
+            "en": "it's; it is",
             "de": "es ist"
         },
         {
@@ -301,7 +301,7 @@ const vocabData = {
             "de": "Wie alt bist du?"
         },
         {
-            "en": "he's (= he is)",
+            "en": "he's; he is",
             "de": "er ist"
         },
         {
@@ -319,7 +319,7 @@ const vocabData = {
             "de": "England"
         },
         {
-            "en": "that's (= that is)",
+            "en": "that's; that is",
             "de": "das ist"
         },
         {
@@ -331,7 +331,7 @@ const vocabData = {
             "de": "Haustier"
         },
         {
-            "en": "they're (= they are)",
+            "en": "they're; they are",
             "de": "sie sind"
         },
         {
@@ -417,7 +417,7 @@ const vocabData = {
             "de": "mit"
         },
         {
-            "en": "we're (= we are)",
+            "en": "we're; we are",
             "de": "wir sind"
         },
         {
@@ -429,7 +429,7 @@ const vocabData = {
             "de": "nett; schön"
         },
         {
-            "en": "she's (= she is)",
+            "en": "she's; she is",
             "de": "sie ist"
         },
         {
@@ -489,7 +489,7 @@ const vocabData = {
     ],
     "Page 17": [
         {
-            "en": "you're (= you are)",
+            "en": "you're; you are",
             "de": "du bist; ihr seid"
         },
         {
@@ -635,7 +635,7 @@ const vocabData = {
             "de": "Welche Farbe hat ...?"
         },
         {
-            "en": "there's (= there is)",
+            "en": "there's; there is",
             "de": "da ist; dort ist; es gibt"
         },
         {
@@ -667,7 +667,7 @@ const vocabData = {
             "de": "Unordnung; Durcheinander"
         },
         {
-            "en": "what's (= what is)",
+            "en": "what's; what is",
             "de": "was ist"
         }
     ],
@@ -871,7 +871,7 @@ const vocabData = {
             "de": "Esszimmer"
         },
         {
-            "en": "let's (= let us)",
+            "en": "let's; let us",
             "de": "lass uns"
         }
     ],
@@ -2033,7 +2033,7 @@ const vocabData = {
             "de": "überall"
         },
         {
-            "en": "we'll (= we will)",
+            "en": "we'll; we will",
             "de": "wir werden"
         },
         {
@@ -3485,7 +3485,7 @@ const vocabData = {
             "de": "Möchtest du …?"
         },
         {
-            "en": "I'd like (to) … (= I would like to)",
+            "en": "I'd like (to) …; I would like to",
             "de": "Ich möchte …; Ich würde gerne …"
         },
         {
