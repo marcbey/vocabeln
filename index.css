@@ -146,6 +146,8 @@ main {
   box-shadow: var(--shadow);
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .card h2 {
@@ -165,7 +167,6 @@ main {
   letter-spacing: 0.5px;
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 10px;
   flex-wrap: wrap;
   min-height: 86px; /* avoids jumping when solutions appear */
@@ -266,6 +267,7 @@ main {
   font-weight: 700;
   color: var(--text);
   margin-top: 10px;
+  align-self: flex-end;
 }
 
 .badge small {

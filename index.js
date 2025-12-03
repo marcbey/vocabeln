@@ -200,7 +200,6 @@ function setModeUI() {
     retryPageBtn.classList.add('hidden');
   }
   if (!showingSolution && !state.boardMode && state.direction !== 'irregular') {
-    boardTranslation.textContent = '';
     boardTranslation.classList.remove('show');
     questionArrow.classList.remove('show');
   }
