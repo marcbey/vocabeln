@@ -40,6 +40,7 @@ const resetBtn = document.getElementById('resetBtn');
 let showingSolution = false;
 let statusTimer = null;
 let flashTimer = null;
+let focusTimer = null;
 
 function keyFor(word) {
   return `${word.en || word.infinitive}|${word.de || word.german || ''}`;
@@ -222,6 +223,7 @@ function setModeUI() {
     submitBtn.disabled = false;
     answerInput.disabled = false;
     if (!showingSolution) questionArrow.classList.remove('show');
+    if (!showingSolution && !isPageComplete()) refocusAnswer(10);
   }
 }
 
@@ -442,9 +444,27 @@ function clearStatus() {
     clearTimeout(statusTimer);
     statusTimer = null;
   }
+  if (flashTimer) {
+    clearTimeout(flashTimer);
+    flashTimer = null;
+  }
+  if (focusTimer) {
+    clearTimeout(focusTimer);
+    focusTimer = null;
+  }
   inputStatus.className = 'status-icon';
   inputStatus.textContent = '';
   document.querySelector('.card')?.classList.remove('flash-correct', 'flash-wrong');
+}
+
+function refocusAnswer(delay = 0) {
+  if (state.boardMode || showingSolution || !answerInput || answerInput.disabled) return;
+  if (focusTimer) clearTimeout(focusTimer);
+  focusTimer = setTimeout(() => {
+    answerInput.focus();
+    const len = answerInput.value.length;
+    answerInput.setSelectionRange(len, len);
+  }, delay);
 }
 
 function setStatus(type) {
@@ -454,11 +474,13 @@ function setStatus(type) {
     inputStatus.textContent = '✓';
     statusTimer = setTimeout(() => clearStatus(), 2000);
     document.querySelector('.card')?.classList.add('flash-correct');
+    refocusAnswer(30);
   }
   if (type === 'wrong') {
     inputStatus.classList.add('show', 'wrong');
     inputStatus.textContent = '✗';
     document.querySelector('.card')?.classList.add('flash-wrong');
+    refocusAnswer(30);
   }
   flashTimer = setTimeout(() => {
     document.querySelector('.card')?.classList.remove('flash-correct', 'flash-wrong');
@@ -562,6 +584,7 @@ async function toggleBoardMode() {
   if (!state.boardMode) {
     showingSolution = false;
     showBtn.textContent = 'Lösung zeigen';
+    refocusAnswer(30);
   }
 }
 
