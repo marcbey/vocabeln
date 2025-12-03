@@ -526,23 +526,23 @@ export default function App() {
 
         <div className="hidden md:flex flex-1 items-center gap-3">
           <div className="flex gap-3 items-center justify-end md:ml-auto">
-          <div className={classNames('flex items-center', { 'opacity-50 pointer-events-none': isIrregular })}>
-            <select
-              value={page}
-              onChange={handlePageChange}
-              aria-label="Seite"
-              className="mr-2 pr-6 w-[120px] sm:w-[140px] truncate"
-              disabled={isIrregular}
-            >
-              {pages.map((p) => (
-                <option key={p} value={p}>
-                  {p}{completedPages.has(p) ? ' ✅' : ''}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="flex items-center">
-            <select value={direction} onChange={handleDirectionChange} aria-label="Richtung" className="mr-2 pr-7 w-[170px] sm:w-[200px]">
+            <div className={classNames('flex items-center', { 'opacity-50 pointer-events-none': isIrregular })}>
+              <select
+                value={page}
+                onChange={handlePageChange}
+                aria-label="Seite"
+                className="pr-6 w-[120px] sm:w-[140px] truncate"
+                disabled={isIrregular}
+              >
+                {pages.map((p) => (
+                  <option key={p} value={p}>
+                    {p}{completedPages.has(p) ? ' ✅' : ''}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="flex items-center">
+              <select value={direction} onChange={handleDirectionChange} aria-label="Richtung" className="pr-7 w-[190px] sm:w-[210px]">
                 <option value="en-de">Englisch → Deutsch</option>
                 <option value="de-en">Deutsch → Englisch</option>
                 <option value="mixed">Englisch ↔ Deutsch</option>
@@ -550,10 +550,10 @@ export default function App() {
               </select>
             </div>
           </div>
-          <div className="hidden md:flex items-center pr-5 pl-2">
+          <div className="hidden md:flex items-center px-3">
             <span className="w-px h-10 bg-white/20" aria-hidden />
           </div>
-          <div className="flex items-center gap-2 justify-end">
+          <div className="flex items-center gap-3 justify-end">
             <button
               className={classNames('toggle px-4 py-2 rounded-xl border', { active: boardMode })}
               onClick={() => {
@@ -575,8 +575,8 @@ export default function App() {
 
         {mobileMenuOpen && (
           <div className="md:hidden flex flex-col gap-3 bg-panel/90 border border-white/10 rounded-xl p-3 shadow-deep">
-            <div className="flex gap-2 items-center justify-between">
-              <div className={classNames('flex items-center min-w-[150px] max-w-[220px] flex-1', { 'opacity-50 pointer-events-none': isIrregular })}>
+            <div className="flex gap-3 items-center justify-between">
+              <div className={classNames('flex items-center flex-1 min-w-[150px] max-w-[200px]', { 'opacity-50 pointer-events-none': isIrregular })}>
                 <select
                   value={page}
                   onChange={handlePageChange}
@@ -600,7 +600,7 @@ export default function App() {
                 </select>
               </div>
             </div>
-            <div className="flex gap-2 justify-end">
+            <div className="flex gap-3 justify-end">
               <button
                 className={classNames('toggle px-4 py-2 rounded-xl border w-full', { active: boardMode })}
                 onClick={() => {
@@ -640,7 +640,7 @@ export default function App() {
 
           {!pageComplete && !boardMode && (
             <>
-              <div className="flex flex-wrap md:flex-nowrap gap-3 items-stretch mt-2">
+              <div className="flex flex-wrap md:flex-nowrap gap-3 items-stretch mt-2 md:items-center">
                 <div className="relative flex-1 min-w-[240px]">
                   <input
                     ref={inputRef}
