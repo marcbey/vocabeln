@@ -550,7 +550,9 @@ export default function App() {
               </select>
             </div>
           </div>
-          <span className="hidden md:block w-px h-10 bg-white/15 mx-2" aria-hidden />
+          <div className="hidden md:flex items-center pr-5 pl-2">
+            <span className="w-px h-10 bg-white/20" aria-hidden />
+          </div>
           <div className="flex items-center gap-2 justify-end">
             <button
               className={classNames('toggle px-4 py-2 rounded-xl border', { active: boardMode })}
@@ -579,7 +581,7 @@ export default function App() {
                   value={page}
                   onChange={handlePageChange}
                   aria-label="Seite"
-                  className="mr-2 pr-7 w-full"
+                  className="pr-7 w-full md:mr-2"
                   disabled={isIrregular}
                 >
                   {pages.map((p) => (
@@ -590,7 +592,7 @@ export default function App() {
                 </select>
               </div>
               <div className="flex items-center flex-1">
-                <select value={direction} onChange={handleDirectionChange} aria-label="Richtung" className="mr-2 pr-7 w-full">
+                <select value={direction} onChange={handleDirectionChange} aria-label="Richtung" className="pr-7 w-full md:mr-2">
                   <option value="en-de">Englisch → Deutsch</option>
                   <option value="de-en">Deutsch → Englisch</option>
                   <option value="mixed">Englisch ↔ Deutsch</option>
@@ -643,8 +645,8 @@ export default function App() {
                   <input
                     ref={inputRef}
                     type="text"
-                    placeholder={direction === 'irregular' ? 'Infinitive, Simple Past, Past Participle' : 'Deine Antwort...'}
-                    className="w-full pr-10"
+                  placeholder={direction === 'irregular' ? 'Infinitive, Simple Past, Past Participle' : 'Deine Antwort...'}
+                    className="w-full pr-14 py-4.5 text-xl font-semibold rounded-2xl shadow-glow border-2 border-white/20 bg-[#0f1f33]/90 focus:ring-2 focus:ring-accent focus:border-accent"
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') handleSubmit();
                     }}
