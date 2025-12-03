@@ -39,6 +39,7 @@ const fireworks = document.getElementById('fireworks');
 const resetBtn = document.getElementById('resetBtn');
 let showingSolution = false;
 let statusTimer = null;
+let flashTimer = null;
 
 function keyFor(word) {
   return `${word.en || word.infinitive}|${word.de || word.german || ''}`;
@@ -444,6 +445,7 @@ function clearStatus() {
   }
   inputStatus.className = 'status-icon';
   inputStatus.textContent = '';
+  document.querySelector('.card')?.classList.remove('flash-correct', 'flash-wrong');
 }
 
 function setStatus(type) {
@@ -452,11 +454,16 @@ function setStatus(type) {
     inputStatus.classList.add('show', 'correct');
     inputStatus.textContent = '✓';
     statusTimer = setTimeout(() => clearStatus(), 2000);
+    document.querySelector('.card')?.classList.add('flash-correct');
   }
   if (type === 'wrong') {
     inputStatus.classList.add('show', 'wrong');
     inputStatus.textContent = '✗';
+    document.querySelector('.card')?.classList.add('flash-wrong');
   }
+  flashTimer = setTimeout(() => {
+    document.querySelector('.card')?.classList.remove('flash-correct', 'flash-wrong');
+  }, 450);
 }
 
 function triggerCelebration() {

@@ -245,6 +245,16 @@ main {
 .status-icon.wrong { color: #ff8585; }
 .status-icon.correct { color: var(--good); }
 
+.card.flash-correct {
+  box-shadow: var(--shadow), 0 0 0 2px var(--good), 0 0 22px rgba(109, 242, 164, 0.6);
+  background: linear-gradient(135deg, rgba(109, 242, 164, 0.18), rgba(19, 37, 58, 0.9));
+}
+
+.card.flash-wrong {
+  box-shadow: var(--shadow), 0 0 0 2px #ff8585, 0 0 22px rgba(255, 133, 133, 0.55);
+  background: linear-gradient(135deg, rgba(255, 133, 133, 0.18), rgba(19, 37, 58, 0.9));
+}
+
 .badge {
   display: inline-flex;
   align-items: center;
