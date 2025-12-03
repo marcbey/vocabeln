@@ -130,7 +130,7 @@ function Fireworks({ bursts }) {
 export default function App() {
   const pages = useMemo(() => getPages(), []);
   const inputRef = useRef(null);
-  const cardRef = useRef(null);
+  const flashTimerRef = useRef(null);
   const [page, setPage] = useState(pages[0]);
   const [direction, setDirection] = useState('mixed');
   const [lastRegularPage, setLastRegularPage] = useState(null);
@@ -144,6 +144,7 @@ export default function App() {
   const [status, setStatusState] = useState(null);
   const [bursts, setBursts] = useState([]);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [flash, setFlash] = useState(null);
 
   const focusAnswer = (delay = 0) => {
     if (boardMode || showingSolution || pageComplete) return;
@@ -253,16 +254,13 @@ export default function App() {
 
   function setStatusFlash(type) {
     setStatusState(type);
-    if (cardRef.current) {
-      cardRef.current.classList.remove('flash-correct', 'flash-wrong');
-      if (type === 'correct') cardRef.current.classList.add('flash-correct');
-      if (type === 'wrong') cardRef.current.classList.add('flash-wrong');
-      setTimeout(() => {
-        cardRef.current?.classList.remove('flash-correct', 'flash-wrong');
-      }, 450);
-    }
+    if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
     if (type) {
+      setFlash(type === 'correct' ? 'flash-correct' : 'flash-wrong');
+      flashTimerRef.current = setTimeout(() => setFlash(null), 450);
       setTimeout(() => setStatusState(null), 2000);
+    } else {
+      setFlash(null);
     }
     if (type && !boardMode && !showingSolution) {
       focusAnswer(30);
@@ -505,6 +503,12 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, direction]);
 
+  useEffect(() => {
+    return () => {
+      if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
+    };
+  }, []);
+
   return (
     <div className="flex flex-col items-center gap-5">
       <header className="w-full max-w-[1100px] bg-panel/80 backdrop-blur-md border border-white/10 rounded-xl2 px-4 py-3 md:px-5 md:py-3.5 flex flex-col md:flex-row md:items-center md:gap-4 gap-3 shadow-deep">
@@ -625,8 +629,7 @@ export default function App() {
 
       <main className="w-full max-w-[1100px] grid grid-cols-1 gap-4">
         <section
-          ref={cardRef}
-          className="bg-panel/90 border border-white/10 rounded-xl2 p-5 shadow-deep relative overflow-hidden flex flex-col"
+          className={`bg-panel/90 border border-white/10 rounded-xl2 p-5 shadow-deep relative overflow-hidden flex flex-col ${flash || ''}`}
         >
           <div className="text-2xl font-extrabold mt-2 mb-3 px-4 py-3 bg-white/5 border border-white/10 rounded-xl shadow-inner flex flex-wrap gap-2 items-center text-center min-h-[86px]">
             <span className="flex items-center text-left">{questionText}</span>

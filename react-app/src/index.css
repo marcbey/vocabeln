@@ -25,6 +25,12 @@ select, button, input {
   @apply border border-white/10 bg-[#0d1828] text-text rounded-xl px-3.5 py-3 text-base leading-tight min-h-[44px] transition-all duration-200;
 }
 
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: none;
+}
+
 button {
   @apply cursor-pointer font-bold text-[#062033] shadow-glow border-none;
   background: linear-gradient(135deg, theme('colors.accent'), #48d6ff);
