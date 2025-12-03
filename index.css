@@ -98,8 +98,8 @@ select, button, input {
 }
 
 select {
-  padding-right: 18px; /* arrow sits closer to text */
-  margin-right: 6px;   /* still a small buffer to the edge */
+  padding-right: 26px; /* extra space on the right for arrow */
+  margin-right: 10px;  /* more breathing room after the arrow */
 }
 
 select:focus, button:focus, input:focus {

@@ -71,19 +71,17 @@ function countAnswered(dir) {
 }
 
 function syncCorrectCount() {
-  if (state.direction === 'mixed') {
-    state.correct = countAnswered('en-de') + countAnswered('de-en');
-  } else if (state.direction === 'irregular') {
+  if (state.direction === 'irregular') {
     state.correct = countAnswered('irregular');
   } else {
-    state.correct = countAnswered(state.direction);
+    state.correct = countAnswered('en-de') + countAnswered('de-en');
   }
 }
 
 function totalQuestionsForCurrentPage() {
   if (state.direction === 'irregular') return irregular.length;
   const list = vocabData[state.currentPage] || [];
-  return list.length * (state.direction === 'mixed' ? 2 : 1);
+  return list.length * 2;
 }
 
 function isPageComplete() {
@@ -92,10 +90,7 @@ function isPageComplete() {
   }
   const list = vocabData[state.currentPage] || [];
   if (!list.length) return false;
-  if (state.direction === 'mixed') {
-    return countAnswered('en-de') + countAnswered('de-en') >= list.length * 2;
-  }
-  return countAnswered(state.direction) >= list.length;
+  return countAnswered('en-de') + countAnswered('de-en') >= list.length * 2;
 }
 
 function checkCompletion() {
@@ -128,11 +123,9 @@ async function saveProgress(page) {
   const payload = {
     page,
     asked: state.asked,
-    correct: state.direction === 'mixed'
-      ? countAnswered('en-de') + countAnswered('de-en')
-      : state.direction === 'irregular'
-        ? countAnswered('irregular')
-        : countAnswered(state.direction),
+    correct: state.direction === 'irregular'
+      ? countAnswered('irregular')
+      : countAnswered('en-de') + countAnswered('de-en'),
     answered: JSON.stringify(answeredArr),
     completed: state.completedPages.has(page) ? 1 : 0,
   };
@@ -236,7 +229,7 @@ function pickWord() {
   if (state.direction === 'irregular') {
     const remainingIrregular = irregular.filter(item => !isAnswered(item, 'irregular'));
     if (!remainingIrregular.length) {
-      if (!state.completedPages.has(state.currentPage)) {
+      if (!state.completedPages.has(state.currentPage) && isPageComplete()) {
         triggerCelebration();
       }
       return null;
@@ -255,7 +248,7 @@ function pickWord() {
     });
   });
   if (!candidates.length) {
-    if (!state.completedPages.has(state.currentPage)) {
+    if (!state.completedPages.has(state.currentPage) && isPageComplete()) {
       triggerCelebration();
     }
     return null;
@@ -268,11 +261,18 @@ function pickWord() {
 function presentWord() {
   state.currentWord = pickWord();
   if (!state.currentWord) {
+    const allDone = isPageComplete();
+    if (!allDone && state.direction !== 'irregular') {
+      const nextDir = state.direction === 'en-de' ? 'de-en' : 'en-de';
+      directionSelect.value = nextDir;
+      changeDirection(nextDir);
+      return;
+    }
     questionText.textContent = 'Mega! Alles richtig auf dieser Seite.';
     boardTranslation.textContent = '';
     boardTranslation.classList.remove('show');
     questionArrow.classList.remove('show');
-    retryPageBtn.classList.remove('hidden');
+    retryPageBtn.classList.toggle('hidden', !allDone ? true : false);
     entryControls.classList.add('hidden');
     boardControls.classList.remove('show');
     answerInput.disabled = true;
