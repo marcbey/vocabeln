@@ -588,7 +588,6 @@ async function resetCurrentPageProgress() {
   state.answeredCorrect = new Set();
   syncCorrectCount();
   showingSolution = false;
-  hintArea.textContent = '';
   await saveProgress(state.currentPage);
   updateLabels();
   presentWord();
@@ -631,4 +630,3 @@ if ('serviceWorker' in navigator) {
     });
   });
 }
-
