@@ -69,7 +69,7 @@ export default function Header({
       <div className="flex items-center justify-between gap-3">
         <h1 className="m-0 text-xl tracking-tight flex items-center gap-2 font-extrabold">
           <span className="w-3.5 h-3.5 rounded-full inline-block" style={{ background: 'linear-gradient(135deg, #3cdfff, #ff7ac3)', boxShadow: '0 0 14px rgba(255, 122, 195, 0.8)' }}></span>
-          Orange Line 1 for Unit 1 - 6
+          Orange Line 1 - Unit 1-6
         </h1>
         <button
           className="md:hidden secondary px-2 py-2 rounded-lg border flex flex-col items-end gap-1 min-w-[38px]"
