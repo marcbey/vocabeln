@@ -52,7 +52,7 @@ export default function Header({
               boxShadow: '0 0 14px rgba(255, 122, 195, 0.8)',
             }}
           />
-          Orange Line 1 - Unit 1-6
+          Vokabel Trainer
         </h1>
 
         <MobileMenuButton

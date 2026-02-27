@@ -1,14 +1,13 @@
 import Header from './components/Header.jsx';
 import FireworksOverlay from './components/FireworksOverlay.jsx';
 import QuestionCard from './components/QuestionCard.jsx';
-import irregular from './data/irregular_vocab_data.json';
-import vocabData from './data/vocab_data.json';
+import { irregularData, vocabData } from './data/index.js';
 import { useQuizController } from './hooks/useQuizController.js';
 
 export default function App() {
   const quiz = useQuizController({
     vocabData,
-    irregularData: irregular,
+    irregularData,
   });
 
   return (

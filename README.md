@@ -1,11 +1,13 @@
 # Vokabeltrainer (React)
 
-A React version of the Orange Line vocab trainer with the same UX as the vanilla prototype.
+A React vocab trainer with the same UX as the vanilla prototype.
 
 ## Lokal entwickeln
 - `npm ci`
 - `npm run dev` (Vite auf Port 5173)
+- `npm run lint` (ESLint)
 - `npm run test` (Vitest Test-Suite)
+- `npm run check` (Lint + Tests + Build)
 
 ## Build
 - `npm run build` → schreibt nach `dist`
