@@ -12,7 +12,7 @@ import {
 import { useQuizState } from './quiz/useQuizState.js';
 import { useQuizStatusFlash } from './quiz/useQuizStatusFlash.js';
 
-export function useQuizController({ vocabData, irregularData }) {
+export function useQuizController({ classId, vocabData, irregularData }) {
   const pages = useMemo(() => getPages(vocabData), [vocabData]);
   const inputRef = useRef(null);
 
@@ -69,6 +69,7 @@ export function useQuizController({ vocabData, irregularData }) {
   );
 
   const persistence = useQuizPersistence({
+    classId,
     page,
     direction,
     boardMode,

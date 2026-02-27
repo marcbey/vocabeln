@@ -32,6 +32,7 @@ function getCompletedPages(progressMap) {
 }
 
 export function useQuizPersistence({
+  classId,
   page,
   direction,
   boardMode,
@@ -49,25 +50,28 @@ export function useQuizPersistence({
         currentPage: nextPage,
         direction: nextDirection,
         boardMode: nextBoardMode,
-      });
+      }, classId);
     },
-    [boardMode, direction, page]
+    [boardMode, classId, direction, page]
   );
 
-  const loadPageProgress = useCallback((nextPage, progressMap = loadProgressMap()) => {
-    const entry = progressMap[nextPage];
-    if (!entry) {
-      return {
-        asked: 0,
-        answeredCorrect: new Set(),
-      };
-    }
+  const loadPageProgress = useCallback(
+    (nextPage, progressMap = loadProgressMap(classId)) => {
+      const entry = progressMap[nextPage];
+      if (!entry) {
+        return {
+          asked: 0,
+          answeredCorrect: new Set(),
+        };
+      }
 
-    return {
-      asked: entry.asked || 0,
-      answeredCorrect: parseAnsweredSet(entry),
-    };
-  }, []);
+      return {
+        asked: entry.asked || 0,
+        answeredCorrect: parseAnsweredSet(entry),
+      };
+    },
+    [classId]
+  );
 
   const hydrateSession = useCallback(
     (pages) => {
@@ -75,8 +79,8 @@ export function useQuizPersistence({
         return null;
       }
 
-      const settings = loadSettings();
-      const progressMap = loadProgressMap();
+      const settings = loadSettings(classId);
+      const progressMap = loadProgressMap(classId);
 
       const savedDirection = settings.direction || 'mixed';
       const savedPage = pages.includes(settings.currentPage)
@@ -94,7 +98,7 @@ export function useQuizPersistence({
         pageProgress: loadPageProgress(initialPage, progressMap),
       };
     },
-    [loadPageProgress]
+    [classId, loadPageProgress]
   );
 
   const persistProgress = useCallback(
@@ -105,7 +109,7 @@ export function useQuizPersistence({
       nextAsked = asked,
       completed = pageComplete,
     } = {}) => {
-      const progress = loadProgressMap();
+      const progress = loadProgressMap(classId);
 
       const regularCorrect =
         countAnswered(nextAnswered, DIRECTIONS[0]) +
@@ -122,14 +126,14 @@ export function useQuizPersistence({
         completed: completed ? 1 : 0,
       };
 
-      saveProgressMap(progress);
+      saveProgressMap(progress, classId);
     },
-    [answeredCorrect, asked, direction, page, pageComplete]
+    [answeredCorrect, asked, classId, direction, page, pageComplete]
   );
 
   const clearStoredProgress = useCallback(() => {
-    clearAllProgress();
-  }, []);
+    clearAllProgress(classId);
+  }, [classId]);
 
   return {
     persistSettings,

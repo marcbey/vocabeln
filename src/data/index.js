@@ -1,5 +1,7 @@
-import irregularRaw from './class5_irregular_vocab_data.json';
-import vocabRaw from './class5_vocab_data.json';
+import class5IrregularRaw from './class5_irregular_vocab_data.json';
+import class5VocabRaw from './class5_vocab_data.json';
+import class6IrregularRaw from './class6_irregular_vocab_data.json';
+import class6VocabRaw from './class6_vocab_data.json';
 import { parseIrregularData, parseVocabData } from './schema.js';
 
 function mapVocabToAppShape(vocabData) {
@@ -14,5 +16,33 @@ function mapVocabToAppShape(vocabData) {
   );
 }
 
-export const vocabData = mapVocabToAppShape(parseVocabData(vocabRaw));
-export const irregularData = parseIrregularData(irregularRaw);
+function createDataset(vocabRaw, irregularRaw) {
+  return {
+    vocabData: mapVocabToAppShape(parseVocabData(vocabRaw)),
+    irregularData: parseIrregularData(irregularRaw),
+  };
+}
+
+export const DEFAULT_CLASS_ID = 'class5';
+
+export const CLASS_OPTIONS = [
+  {
+    id: 'class5',
+    label: 'Klasse 5',
+    headline: 'Vokabeln für die Klasse 5',
+  },
+  {
+    id: 'class6',
+    label: 'Klasse 6',
+    headline: 'Vokabeln für die Klasse 6',
+  },
+];
+
+export const CLASS_DATASETS = {
+  class5: createDataset(class5VocabRaw, class5IrregularRaw),
+  class6: createDataset(class6VocabRaw, class6IrregularRaw),
+};
+
+// Backwards-compatible exports used by a few tests and utility imports.
+export const vocabData = CLASS_DATASETS[DEFAULT_CLASS_ID].vocabData;
+export const irregularData = CLASS_DATASETS[DEFAULT_CLASS_ID].irregularData;

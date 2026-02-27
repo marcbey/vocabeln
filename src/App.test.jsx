@@ -3,17 +3,47 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 vi.mock('./data/index.js', () => ({
-  vocabData: {
-    'Seite 1': [{ en: 'cat', de: 'Katze' }],
-  },
-  irregularData: [
+  DEFAULT_CLASS_ID: 'class5',
+  CLASS_OPTIONS: [
     {
-      german: 'sein',
-      infinitive: 'be',
-      simplePast: 'was',
-      pastParticiple: 'been',
+      id: 'class5',
+      label: 'Klasse 5',
+      headline: 'Vokabeln für die Klasse 5',
+    },
+    {
+      id: 'class6',
+      label: 'Klasse 6',
+      headline: 'Vokabeln für die Klasse 6',
     },
   ],
+  CLASS_DATASETS: {
+    class5: {
+      vocabData: {
+        'Class 5 - Page 1': [{ en: 'cat', de: 'Katze' }],
+      },
+      irregularData: [
+        {
+          german: 'sein',
+          infinitive: 'be',
+          simplePast: 'was',
+          pastParticiple: 'been',
+        },
+      ],
+    },
+    class6: {
+      vocabData: {
+        'Class 6 - Page 1': [{ en: 'dog', de: 'Hund' }],
+      },
+      irregularData: [
+        {
+          german: 'gehen',
+          infinitive: 'go',
+          simplePast: 'went',
+          pastParticiple: 'gone',
+        },
+      ],
+    },
+  },
 }));
 
 import App from './App.jsx';
@@ -68,6 +98,38 @@ describe('App', () => {
 
     const progressBadges = await screen.findAllByText(
       /1 richtig · 1 Versuche · 1 Fragen/i
+    );
+    expect(progressBadges.length).toBeGreaterThan(0);
+  });
+
+  it('stores progress per class and restores it on class switch', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    expect(screen.getByText('Vokabeln für die Klasse 5')).toBeInTheDocument();
+
+    const classSelect = screen.getByLabelText('Klasse');
+    const answerInput = screen.getByPlaceholderText('Deine Antwort...');
+
+    await user.type(answerInput, 'Katze');
+    await user.click(screen.getAllByRole('button', { name: 'Check!' })[0]);
+
+    expect(localStorage.getItem('progress:class5')).toBeTruthy();
+
+    await user.selectOptions(classSelect, 'class6');
+    expect(await screen.findByText('Vokabeln für die Klasse 6')).toBeInTheDocument();
+    expect(await screen.findByText('dog')).toBeInTheDocument();
+
+    const class6Input = screen.getByPlaceholderText('Deine Antwort...');
+    await user.type(class6Input, 'Hund');
+    await user.click(screen.getAllByRole('button', { name: 'Check!' })[0]);
+    expect(localStorage.getItem('progress:class6')).toBeTruthy();
+
+    await user.selectOptions(classSelect, 'class5');
+    expect(await screen.findByText('Vokabeln für die Klasse 5')).toBeInTheDocument();
+
+    const progressBadges = await screen.findAllByText(
+      /1 richtig · 1 Versuche · 2 Fragen/i
     );
     expect(progressBadges.length).toBeGreaterThan(0);
   });
