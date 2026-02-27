@@ -1,4 +1,5 @@
 import classNames from 'classnames';
+import { useEffect } from 'react';
 import { useSpeechInput } from '../../hooks/audio/useSpeechInput.js';
 import QuestionActions from './QuestionActions.jsx';
 
@@ -15,12 +16,17 @@ export default function AnswerInputSection({
   onSubmit,
   onSubmitSpokenAnswer,
   onShowSolution,
+  onSpeechInputErrorChange,
 }) {
   const { isRecording, isSubmitting, error, startRecording, stopRecording } =
     useSpeechInput({
       language: answerLanguage,
       onAnswerReady: onSubmitSpokenAnswer,
     });
+
+  useEffect(() => {
+    onSpeechInputErrorChange?.(error);
+  }, [error, onSpeechInputErrorChange]);
 
   const speechDisabled = disableSubmit || showingSolution || isSubmitting;
 
@@ -68,7 +74,15 @@ export default function AnswerInputSection({
               ? 'Infinitive, Simple Past, Past Participle'
               : 'Deine Antwort...'
           }
-          className="w-full pr-14 py-4.5 text-xl font-semibold rounded-2xl shadow-glow border-2 border-white/20 bg-[#0f1f33]/90 focus:ring-2 focus:ring-accent focus:border-accent"
+          className={classNames(
+            'w-full pr-14 py-4.5 text-xl font-semibold rounded-2xl shadow-glow border-2 border-white/20 bg-[#0f1f33]/90 focus:ring-2 focus:ring-accent focus:border-accent transition-all duration-200',
+            {
+              'border-good/80 bg-[rgba(109,242,164,0.10)] shadow-[0_0_0_2px_rgba(109,242,164,0.40)]':
+                status === 'correct',
+              'border-[#ff8585]/80 bg-[rgba(255,133,133,0.10)] shadow-[0_0_0_2px_rgba(255,133,133,0.40)]':
+                status === 'wrong',
+            }
+          )}
           onKeyDown={(event) => {
             if (event.key === 'Enter') {
               onSubmit();
@@ -120,8 +134,6 @@ export default function AnswerInputSection({
         onShowSolution={onShowSolution}
         className="hidden md:flex gap-3 w-full md:w-auto md:items-center md:justify-end"
       />
-
-      {error && <p className="w-full text-[11px] text-muted/90 mt-1">{error}</p>}
     </div>
   );
 }

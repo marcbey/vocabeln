@@ -12,6 +12,7 @@ export function useSpeechPlayback() {
   const audioRef = useRef(null);
   const audioUrlRef = useRef(null);
   const hintTimerRef = useRef(null);
+  const playRequestRef = useRef(0);
   const [isLoading, setIsLoading] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [error, setError] = useState('');
@@ -36,6 +37,8 @@ export function useSpeechPlayback() {
 
   const cleanupAudio = useCallback(() => {
     if (audioRef.current) {
+      audioRef.current.onended = null;
+      audioRef.current.onerror = null;
       audioRef.current.pause();
       audioRef.current.src = '';
       audioRef.current = null;
@@ -55,6 +58,8 @@ export function useSpeechPlayback() {
         return;
       }
 
+      const requestId = playRequestRef.current + 1;
+      playRequestRef.current = requestId;
       cleanupAudio();
       setHint('');
       setIsLoading(true);
@@ -82,17 +87,30 @@ export function useSpeechPlayback() {
         const audio = new Audio(audioUrl);
         audioRef.current = audio;
         audio.onended = () => {
+          if (playRequestRef.current !== requestId) {
+            return;
+          }
           setIsPlaying(false);
         };
         audio.onerror = () => {
+          if (playRequestRef.current !== requestId) {
+            return;
+          }
           setIsPlaying(false);
           setHint('Audio konnte nicht abgespielt werden.');
         };
+
+        if (playRequestRef.current !== requestId) {
+          return;
+        }
 
         setIsLoading(false);
         setIsPlaying(true);
         await audio.play();
       } catch (fetchError) {
+        if (playRequestRef.current !== requestId) {
+          return;
+        }
         setIsLoading(false);
         setIsPlaying(false);
         setHint(fetchError.message || 'Sprachausgabe fehlgeschlagen.');

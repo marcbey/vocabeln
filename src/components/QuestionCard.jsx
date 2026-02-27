@@ -27,6 +27,8 @@ export default function QuestionCard({
   onBoardResult,
   onAnswerChange,
   onRetry,
+  onSpeechPlaybackErrorChange,
+  onSpeechInputErrorChange,
 }) {
   const showTranslation = showingSolution || boardMode;
   const disableSubmit = boardMode || showingSolution || !currentWord;
@@ -45,6 +47,7 @@ export default function QuestionCard({
         canSpeak={Boolean(currentWord)}
         translation={translation}
         showTranslation={showTranslation}
+        onSpeechPlaybackErrorChange={onSpeechPlaybackErrorChange}
       />
 
       {!pageComplete && !boardMode && (
@@ -61,6 +64,7 @@ export default function QuestionCard({
           onSubmit={onSubmit}
           onSubmitSpokenAnswer={onSubmitSpokenAnswer}
           onShowSolution={onShowSolution}
+          onSpeechInputErrorChange={onSpeechInputErrorChange}
         />
       )}
 

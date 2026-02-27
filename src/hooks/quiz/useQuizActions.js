@@ -210,12 +210,12 @@ export function useQuizActions({
 
     setCurrentWord(nextWord);
     setShowingSolution(false);
-    clearStatusFlash();
+    clearStatusOnly();
     setAnswerValue('');
   }, [
     answeredCorrect,
     autoSwitchDirectionIfNeeded,
-    clearStatusFlash,
+    clearStatusOnly,
     direction,
     irregularData,
     page,

@@ -1,4 +1,5 @@
 import classNames from 'classnames';
+import { useEffect } from 'react';
 import { useSpeechPlayback } from '../../hooks/audio/useSpeechPlayback.js';
 
 export default function QuestionPrompt({
@@ -7,10 +8,15 @@ export default function QuestionPrompt({
   canSpeak,
   translation,
   showTranslation,
+  onSpeechPlaybackErrorChange,
 }) {
   const { isLoading, isPlaying, error, playVocabulary } = useSpeechPlayback();
 
   const disabled = !canSpeak || isLoading;
+
+  useEffect(() => {
+    onSpeechPlaybackErrorChange?.(error);
+  }, [error, onSpeechPlaybackErrorChange]);
 
   return (
     <div className="text-2xl font-extrabold mt-2 mb-3 px-4 py-3 bg-white/5 border border-white/10 rounded-xl shadow-inner flex flex-wrap gap-2 items-center text-center min-h-[86px]">
@@ -53,10 +59,6 @@ export default function QuestionPrompt({
       >
         {translation}
       </span>
-
-      {error && (
-        <span className="w-full text-[11px] text-muted/90 text-left">{error}</span>
-      )}
     </div>
   );
 }

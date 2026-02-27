@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import Header from './components/Header.jsx';
 import FireworksOverlay from './components/FireworksOverlay.jsx';
 import QuestionCard from './components/QuestionCard.jsx';
@@ -28,12 +28,22 @@ export default function App() {
   );
 
   const activeDataset = CLASS_DATASETS[activeClassId] ?? CLASS_DATASETS[DEFAULT_CLASS_ID];
+  const [speechPlaybackError, setSpeechPlaybackError] = useState('');
+  const [speechInputError, setSpeechInputError] = useState('');
 
   const quiz = useQuizController({
     classId: activeClassId,
     vocabData: activeDataset.vocabData,
     irregularData: activeDataset.irregularData,
   });
+
+  const handleSpeechPlaybackErrorChange = useCallback((nextError) => {
+    setSpeechPlaybackError(nextError || '');
+  }, []);
+
+  const handleSpeechInputErrorChange = useCallback((nextError) => {
+    setSpeechInputError(nextError || '');
+  }, []);
 
   return (
     <div className="flex flex-col items-center gap-5">
@@ -76,8 +86,21 @@ export default function App() {
           onBoardResult={quiz.applyBoardResult}
           onAnswerChange={quiz.handleAnswerChange}
           onRetry={quiz.retryPage}
+          onSpeechPlaybackErrorChange={handleSpeechPlaybackErrorChange}
+          onSpeechInputErrorChange={handleSpeechInputErrorChange}
         />
       </main>
+
+      <section className="w-full max-w-[1100px] min-h-[14px] -mt-2">
+        {speechPlaybackError && (
+          <p className="text-[11px] text-muted/80 leading-tight">
+            {speechPlaybackError}
+          </p>
+        )}
+        {speechInputError && (
+          <p className="text-[11px] text-muted/80 leading-tight">{speechInputError}</p>
+        )}
+      </section>
 
       <FireworksOverlay bursts={quiz.bursts} />
     </div>
