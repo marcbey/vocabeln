@@ -1,4 +1,4 @@
-export const irregular = [
+[
   {
     "infinitive": "be",
     "simplePast": "was/were",
@@ -570,5 +570,3 @@ export const irregular = [
     "german": "schreiben"
   }
 ]
-
-export default irregular;

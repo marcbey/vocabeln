@@ -2,14 +2,14 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-vi.mock('./data/vocab_data.js', () => ({
-  vocabData: {
+vi.mock('./data/vocab_data.json', () => ({
+  default: {
     'Seite 1': [{ en: 'cat', de: 'Katze' }],
   },
 }));
 
-vi.mock('./data/irregular_vocab_data.js', () => ({
-  irregular: [
+vi.mock('./data/irregular_vocab_data.json', () => ({
+  default: [
     {
       german: 'sein',
       infinitive: 'be',
