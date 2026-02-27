@@ -1,0 +1,10 @@
+render_owner_id = "tea-xxxxxxxxxxxxxxxx"
+
+# Optional overrides
+# service_name      = "vocabeln-app"
+# repo_url          = "https://github.com/marcbey/vocabeln"
+# repo_branch       = "main"
+# plan              = "starter"
+# region            = "oregon"
+# openai_tts_model  = "gpt-4o-mini-tts"
+# openai_stt_model  = "gpt-4o-mini-transcribe"
