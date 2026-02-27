@@ -227,85 +227,120 @@ export function useQuizActions({
     vocabData,
   ]);
 
+  const submitRawAnswer = useCallback(
+    (rawInput, { preserveInput = true } = {}) => {
+      if (boardMode || showingSolution || !currentWord) {
+        return;
+      }
+
+      const rawAnswer = rawInput.trim();
+      if (!rawAnswer) {
+        return;
+      }
+
+      if (preserveInput) {
+        setAnswerValue(rawInput);
+      }
+
+      const questionDirection = getQuestionDirection(direction, currentQuestionDir);
+
+      const correct =
+        questionDirection === 'irregular'
+          ? isCorrectIrregular(rawAnswer, currentWord)
+          : isCorrect(
+              rawAnswer,
+              questionDirection === DIRECTIONS[0] ? currentWord.de : currentWord.en
+            );
+
+      const nextAsked = asked + 1;
+      const nextAnswered = new Set(answeredCorrect);
+      setAsked(nextAsked);
+
+      if (correct) {
+        nextAnswered.add(answeredKey(currentWord, questionDirection));
+        setAnsweredCorrect(nextAnswered);
+        setStatusFlash('correct');
+        setAnswerValue('');
+
+        const completedNow = computePageComplete(
+          nextAnswered,
+          page,
+          direction,
+          vocabData,
+          irregularData
+        );
+
+        persistProgress({
+          nextAnswered,
+          nextAsked,
+          completed: completedNow,
+        });
+
+        handleCompletion(nextAnswered);
+        return;
+      }
+
+      setStatusFlash('wrong');
+      persistProgress({
+        nextAnswered,
+        nextAsked,
+        completed: computePageComplete(
+          nextAnswered,
+          page,
+          direction,
+          vocabData,
+          irregularData
+        ),
+      });
+    },
+    [
+      answeredCorrect,
+      asked,
+      boardMode,
+      currentQuestionDir,
+      currentWord,
+      direction,
+      handleCompletion,
+      irregularData,
+      page,
+      persistProgress,
+      setAnswerValue,
+      setAnsweredCorrect,
+      setAsked,
+      setStatusFlash,
+      showingSolution,
+      vocabData,
+    ]
+  );
+
   const submitAnswer = useCallback(() => {
     if (boardMode || showingSolution || !currentWord) {
       return;
     }
 
-    const rawAnswer = answerValue.trim();
-    if (!rawAnswer) {
+    if (!answerValue.trim()) {
       return;
     }
 
-    const questionDirection = getQuestionDirection(direction, currentQuestionDir);
-
-    const correct =
-      questionDirection === 'irregular'
-        ? isCorrectIrregular(rawAnswer, currentWord)
-        : isCorrect(
-            rawAnswer,
-            questionDirection === DIRECTIONS[0] ? currentWord.de : currentWord.en
-          );
-
-    const nextAsked = asked + 1;
-    const nextAnswered = new Set(answeredCorrect);
-    setAsked(nextAsked);
-
-    if (correct) {
-      nextAnswered.add(answeredKey(currentWord, questionDirection));
-      setAnsweredCorrect(nextAnswered);
-      setStatusFlash('correct');
-      setAnswerValue('');
-
-      const completedNow = computePageComplete(
-        nextAnswered,
-        page,
-        direction,
-        vocabData,
-        irregularData
-      );
-
-      persistProgress({
-        nextAnswered,
-        nextAsked,
-        completed: completedNow,
-      });
-
-      handleCompletion(nextAnswered);
-      return;
-    }
-
-    setStatusFlash('wrong');
-    persistProgress({
-      nextAnswered,
-      nextAsked,
-      completed: computePageComplete(
-        nextAnswered,
-        page,
-        direction,
-        vocabData,
-        irregularData
-      ),
-    });
+    submitRawAnswer(answerValue, { preserveInput: false });
   }, [
     answerValue,
-    answeredCorrect,
-    asked,
     boardMode,
-    currentQuestionDir,
     currentWord,
-    direction,
-    handleCompletion,
-    irregularData,
-    page,
-    persistProgress,
-    setAnswerValue,
-    setAnsweredCorrect,
-    setAsked,
-    setStatusFlash,
+    submitRawAnswer,
     showingSolution,
-    vocabData,
   ]);
+
+  const submitSpokenAnswer = useCallback(
+    (spokenAnswer) => {
+      if (!spokenAnswer) {
+        return;
+      }
+
+      submitRawAnswer(spokenAnswer, { preserveInput: true });
+    },
+    [submitRawAnswer]
+  );
 
   const applyBoardResult = useCallback(
     (isAnswerCorrect) => {
@@ -527,6 +562,7 @@ export function useQuizActions({
     changeDirection,
     changePage,
     submitAnswer,
+    submitSpokenAnswer,
     applyBoardResult,
     showOrAdvanceSolution,
     handleAnswerChange,

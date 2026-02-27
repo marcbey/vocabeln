@@ -50,3 +50,21 @@ export function getQuestionText(currentWord, direction, currentQuestionDir) {
   const questionDirection = getQuestionDirection(direction, currentQuestionDir);
   return questionDirection === DIRECTIONS[0] ? currentWord.en : currentWord.de;
 }
+
+export function getQuestionLanguage(direction, currentQuestionDir) {
+  if (direction === 'irregular' || currentQuestionDir === 'irregular') {
+    return 'de';
+  }
+
+  const questionDirection = getQuestionDirection(direction, currentQuestionDir);
+  return questionDirection === DIRECTIONS[0] ? 'en' : 'de';
+}
+
+export function getAnswerLanguage(direction, currentQuestionDir) {
+  if (direction === 'irregular' || currentQuestionDir === 'irregular') {
+    return 'en';
+  }
+
+  const questionDirection = getQuestionDirection(direction, currentQuestionDir);
+  return questionDirection === DIRECTIONS[0] ? 'de' : 'en';
+}

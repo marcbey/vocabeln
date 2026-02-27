@@ -8,6 +8,8 @@ import RetryButton from './question/RetryButton.jsx';
 
 export default function QuestionCard({
   questionText,
+  questionLanguage,
+  answerLanguage,
   translation,
   showingSolution,
   boardMode,
@@ -20,6 +22,7 @@ export default function QuestionCard({
   inputRef,
   counts,
   onSubmit,
+  onSubmitSpokenAnswer,
   onShowSolution,
   onBoardResult,
   onAnswerChange,
@@ -38,6 +41,8 @@ export default function QuestionCard({
     >
       <QuestionPrompt
         questionText={questionText}
+        questionLanguage={questionLanguage}
+        canSpeak={Boolean(currentWord)}
         translation={translation}
         showTranslation={showTranslation}
       />
@@ -48,11 +53,13 @@ export default function QuestionCard({
           value={answerValue}
           status={status}
           isIrregular={isIrregular}
+          answerLanguage={answerLanguage}
           disableSubmit={disableSubmit}
           disableShowSolution={disableShowSolution}
           showingSolution={showingSolution}
           onChange={onAnswerChange}
           onSubmit={onSubmit}
+          onSubmitSpokenAnswer={onSubmitSpokenAnswer}
           onShowSolution={onShowSolution}
         />
       )}

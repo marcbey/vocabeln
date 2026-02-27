@@ -4,24 +4,50 @@ A React vocab trainer with the same UX as the vanilla prototype.
 
 ## Lokal entwickeln
 - `npm ci`
-- `npm run dev` (Vite auf Port 5173)
+- `npm run dev:full` (Frontend + Backend parallel)
+- Optional getrennt:
+  - `npm run dev` (Vite auf Port 5173)
+  - `npm run dev:server` (API auf Port 8787)
 - `npm run lint` (ESLint)
 - `npm run test` (Vitest Test-Suite)
 - `npm run check` (Lint + Tests + Build)
 
 ## Build
 - `npm run build` → schreibt nach `dist`
-- Optionaler Base-Pfad: `VITE_BASE_PATH=/mein/pfad npm run build`
+- `npm run start` startet den Produktionsserver (API + statische App)
 
-## Deployment auf GitHub Pages
-Dieser Ordner wird per Workflow `/.github/workflows/deploy.yml` als GitHub Page gebaut und veröffentlicht.
+## OpenAI Konfiguration
 
-So funktioniert es:
-- Pages-Quelle in den Repo-Einstellungen auf **GitHub Actions** stellen.
-- Jeder Push auf `main` (oder manuell) baut das Projekt im Repo-Root mit `VITE_BASE_PATH="/<repo-name>/"`, lädt `dist` als Artifact hoch und deployed mit `actions/deploy-pages`.
-- Der Vite-Base-Pfad wird damit automatisch korrekt gesetzt: `https://<user>.github.io/<repo>/`.
+Folgende Environment Variablen werden im Backend verwendet:
+- `OPENAI_API_KEY` (Pflicht)
+- `OPENAI_TTS_MODEL` (optional, default: `gpt-4o-mini-tts`)
+- `OPENAI_STT_MODEL` (optional, default: `gpt-4o-mini-transcribe`)
 
-Checkliste bei Fehlern:
-- Läuft der Build lokal? (`npm run build`)
-- Ist der Pages-Branch/Workflow in den Repo-Settings aktiviert?
-- Stimmen die Repo-Berechtigungen für Pages (write) im Workflow?
+Der API-Key darf nicht in `VITE_*` Variablen liegen.
+
+Lokal:
+- `.env` im Projektroot anlegen
+- Beispiel:
+  - `OPENAI_API_KEY=sk-...`
+  - `OPENAI_TTS_MODEL=gpt-4o-mini-tts`
+  - `OPENAI_STT_MODEL=gpt-4o-mini-transcribe`
+- `npm run dev:full` laedt `.env` automatisch, falls vorhanden.
+
+## Deployment auf Render
+
+Das Deployment ist auf Render als Web Service ausgelegt (Frontend + Backend in einem Service).
+
+- Blueprint: `render.yaml`
+- Build Command: `npm ci && npm run build`
+- Start Command: `npm run start`
+- Benoetigte Env Vars auf Render:
+  - `OPENAI_API_KEY`
+  - `NODE_ENV=production`
+
+### Render Setup Checkliste
+
+1. In Render: `New +` -> `Blueprint` waehlen und Repo verbinden.
+2. `render.yaml` bestaetigen und Service erstellen.
+3. Unter Service `Environment` den Secret `OPENAI_API_KEY` setzen.
+4. Optional `OPENAI_TTS_MODEL` und `OPENAI_STT_MODEL` setzen.
+5. Deploy starten und auf `.../api/health` pruefen (`{"status":"ok"}`).

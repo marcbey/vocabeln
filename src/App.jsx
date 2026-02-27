@@ -57,6 +57,8 @@ export default function App() {
       <main className="w-full max-w-[1100px] grid grid-cols-1 gap-4">
         <QuestionCard
           questionText={quiz.questionText}
+          questionLanguage={quiz.questionLanguage}
+          answerLanguage={quiz.answerLanguage}
           translation={quiz.translation}
           showingSolution={quiz.showingSolution}
           boardMode={quiz.boardMode}
@@ -69,6 +71,7 @@ export default function App() {
           inputRef={quiz.inputRef}
           counts={quiz.counts}
           onSubmit={quiz.submitAnswer}
+          onSubmitSpokenAnswer={quiz.submitSpokenAnswer}
           onShowSolution={quiz.showOrAdvanceSolution}
           onBoardResult={quiz.applyBoardResult}
           onAnswerChange={quiz.handleAnswerChange}

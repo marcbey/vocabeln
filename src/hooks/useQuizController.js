@@ -4,7 +4,9 @@ import { useFireworks } from './useFireworks.js';
 import { useQuizActions } from './quiz/useQuizActions.js';
 import { useQuizPersistence } from './quiz/useQuizPersistence.js';
 import {
+  getAnswerLanguage,
   getCorrectCount,
+  getQuestionLanguage,
   getQuestionText,
   getTotalCount,
   getTranslation,
@@ -127,6 +129,7 @@ export function useQuizController({ classId, vocabData, irregularData }) {
     changeDirection,
     toggleBoardMode,
     submitAnswer,
+    submitSpokenAnswer,
     showOrAdvanceSolution,
     applyBoardResult,
     handleAnswerChange,
@@ -153,6 +156,16 @@ export function useQuizController({ classId, vocabData, irregularData }) {
   const questionText = useMemo(
     () => getQuestionText(currentWord, direction, currentQuestionDir),
     [currentQuestionDir, currentWord, direction]
+  );
+
+  const questionLanguage = useMemo(
+    () => getQuestionLanguage(direction, currentQuestionDir),
+    [currentQuestionDir, direction]
+  );
+
+  const answerLanguage = useMemo(
+    () => getAnswerLanguage(direction, currentQuestionDir),
+    [currentQuestionDir, direction]
   );
 
   useEffect(() => {
@@ -212,6 +225,8 @@ export function useQuizController({ classId, vocabData, irregularData }) {
     currentWord,
     showingSolution,
     questionText,
+    questionLanguage,
+    answerLanguage,
     translation,
     status,
     flash,
@@ -226,6 +241,7 @@ export function useQuizController({ classId, vocabData, irregularData }) {
     changeDirection,
     toggleBoardMode,
     submitAnswer,
+    submitSpokenAnswer,
     showOrAdvanceSolution,
     applyBoardResult,
     handleAnswerChange,

@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: vocabeln-app
+    env: node
+    plan: starter
+    buildCommand: npm ci && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_TTS_MODEL
+        value: gpt-4o-mini-tts
+      - key: OPENAI_STT_MODEL
+        value: gpt-4o-mini-transcribe
