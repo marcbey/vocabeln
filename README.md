@@ -3,12 +3,12 @@
 A React version of the Orange Line vocab trainer with the same UX as the vanilla prototype.
 
 ## Lokal entwickeln
-- `cd react-app`
 - `npm ci`
 - `npm run dev` (Vite auf Port 5173)
+- `npm run test` (Vitest Test-Suite)
 
 ## Build
-- `npm run build` → schreibt nach `react-app/dist`
+- `npm run build` → schreibt nach `dist`
 - Optionaler Base-Pfad: `VITE_BASE_PATH=/mein/pfad npm run build`
 
 ## Deployment auf GitHub Pages
@@ -16,7 +16,7 @@ Dieser Ordner wird per Workflow `/.github/workflows/deploy.yml` als GitHub Page 
 
 So funktioniert es:
 - Pages-Quelle in den Repo-Einstellungen auf **GitHub Actions** stellen.
-- Jede Push auf `main` (oder manuell) baut `react-app` mit `VITE_BASE_PATH="/<repo-name>/"`, lädt `dist` als Artifact hoch und deployed mit `actions/deploy-pages`.
+- Jeder Push auf `main` (oder manuell) baut das Projekt im Repo-Root mit `VITE_BASE_PATH="/<repo-name>/"`, lädt `dist` als Artifact hoch und deployed mit `actions/deploy-pages`.
 - Der Vite-Base-Pfad wird damit automatisch korrekt gesetzt: `https://<user>.github.io/<repo>/`.
 
 Checkliste bei Fehlern:

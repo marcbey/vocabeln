@@ -1,63 +1,15 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="de">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#0f1c2e">
-  <title>Orange Line 1 - Unit 1-6</title>
-  <link rel="stylesheet" href="index.css">
-</head>
-<body>
-  <header>
-    <h1><span class="logo-dot"></span>Orange Line 1 - Unit 1-6</h1>
-    <div class="select-group">
-      <div class="select-wrap">
-        <select id="directionSelect" aria-label="Richtung">
-          <option value="en-de">Englisch → Deutsch</option>
-          <option value="de-en">Deutsch → Englisch</option>
-          <option value="mixed">Englisch ↔ Deutsch</option>
-          <option value="irregular">Irreguläre Verben</option>
-        </select>
-      </div>
-      <div class="select-wrap">
-        <select id="pageSelect" aria-label="Seite"></select>
-      </div>
-    </div>
-    <div class="controls">
-      <button id="boardModeBtn" class="toggle">Tafel-Modus</button>
-      <button id="resetBtn" class="secondary">Neu anfangen</button>
-    </div>
-  </header>
-
-  <main>
-    <section class="card">
-      <div class="question">
-        <span id="questionText"></span>
-        <span id="questionArrow" class="question-arrow">→</span>
-        <span id="boardTranslation" class="board-translation"></span>
-      </div>
-      <div class="input-row" id="entryControls">
-        <div class="input-wrap">
-          <input id="answerInput" type="text" placeholder="Deine Antwort..." autocomplete="off">
-          <span id="inputStatus" class="status-icon"></span>
-        </div>
-        <button id="submitBtn">Check!</button>
-        <button id="showBtn" class="secondary">Lösung zeigen</button>
-      </div>
-      <div class="board-controls" id="boardControls">
-        <button id="boardCorrectBtn" class="board-correct">✓ Richtig</button>
-        <button id="boardWrongBtn" class="board-wrong">✗ Falsch</button>
-      </div>
-      <button id="retryPageBtn" class="retry-btn hidden">Diese Seite nochmal üben</button>
-      <div class="badge" id="progressBadge"></div>
-    </section>
-  </main>
-
-  <div class="fireworks" id="fireworks"></div>
-
-  <script src="vocab_data.js"></script>
-  <script src="irregular_vocab_data.js"></script>
-  <script src="index.js"></script>
-
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vokabeltrainer React</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Comic+Neue:wght@400;600;700&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
 </html>
