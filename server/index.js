@@ -32,8 +32,9 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-const port = Number(process.env.PORT || process.env.API_PORT || 8787);
+const host = process.env.HOST || '0.0.0.0';
+const port = Number(process.env.PORT || process.env.API_PORT || 10000);
 
-app.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
+app.listen(port, host, () => {
+  console.log(`Server listening on ${host}:${port}`);
 });

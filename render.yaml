@@ -4,10 +4,8 @@ services:
     env: node
     plan: starter
     buildCommand: npm ci && npm run build
-    startCommand: npm run start
+    startCommand: NODE_ENV=production npm run start
     envVars:
-      - key: NODE_ENV
-        value: production
       - key: OPENAI_API_KEY
         sync: false
       - key: OPENAI_TTS_MODEL

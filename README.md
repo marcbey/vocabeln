@@ -39,10 +39,9 @@ Das Deployment ist auf Render als Web Service ausgelegt (Frontend + Backend in e
 
 - Blueprint: `render.yaml`
 - Build Command: `npm ci && npm run build`
-- Start Command: `npm run start`
+- Start Command: `NODE_ENV=production npm run start`
 - Benoetigte Env Vars auf Render:
   - `OPENAI_API_KEY`
-  - `NODE_ENV=production`
 
 ### Render Setup Checkliste
 

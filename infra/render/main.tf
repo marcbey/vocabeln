@@ -21,7 +21,7 @@ resource "render_web_service" "vocabeln" {
   plan              = var.plan
   region            = var.region
   health_check_path = "/api/health"
-  start_command     = "npm run start"
+  start_command     = "NODE_ENV=production npm run start"
 
   runtime_source = {
     native_runtime = {
@@ -34,7 +34,6 @@ resource "render_web_service" "vocabeln" {
   }
 
   env_vars = {
-    NODE_ENV         = { value = "production" }
     OPENAI_API_KEY   = { value = var.openai_api_key }
     OPENAI_TTS_MODEL = { value = var.openai_tts_model }
     OPENAI_STT_MODEL = { value = var.openai_stt_model }
