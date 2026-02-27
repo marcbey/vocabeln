@@ -10,9 +10,34 @@ export default function QuestionPrompt({
   showTranslation,
   onSpeechPlaybackErrorChange,
 }) {
-  const { isLoading, isPlaying, error, playVocabulary } = useSpeechPlayback();
+  const {
+    isLoading,
+    isPlaying,
+    activePlaybackType,
+    error,
+    playVocabulary,
+    playExampleSentence,
+  } = useSpeechPlayback();
 
   const disabled = !canSpeak || isLoading;
+  const isVocabularyActive = activePlaybackType === 'vocabulary';
+  const isExampleActive = activePlaybackType === 'example';
+
+  const vocabularyButtonLabel = isVocabularyActive
+    ? isLoading
+      ? 'Lade Audio...'
+      : isPlaying
+        ? 'Spielt...'
+        : 'Vorlesen'
+    : 'Vorlesen';
+
+  const exampleButtonLabel = isExampleActive
+    ? isLoading
+      ? 'Lade Satz...'
+      : isPlaying
+        ? 'Spielt Satz...'
+        : 'Beispielsatz'
+    : 'Beispielsatz';
 
   useEffect(() => {
     onSpeechPlaybackErrorChange?.(error);
@@ -27,19 +52,35 @@ export default function QuestionPrompt({
           </span>
         </div>
 
-        <button
-          type="button"
-          className="secondary px-3 py-2 text-sm whitespace-nowrap ml-auto shrink-0"
-          onClick={() =>
-            playVocabulary({
-              text: questionText,
-              language: questionLanguage,
-            })
-          }
-          disabled={disabled}
-        >
-          {isLoading ? 'Lade Audio...' : isPlaying ? 'Spielt...' : 'Vorlesen'}
-        </button>
+        <div className="ml-auto shrink-0 flex items-center gap-2">
+          <button
+            type="button"
+            className="secondary px-3 py-2 text-sm whitespace-nowrap"
+            onClick={() =>
+              playVocabulary({
+                text: questionText,
+                language: questionLanguage,
+              })
+            }
+            disabled={disabled}
+          >
+            {vocabularyButtonLabel}
+          </button>
+
+          <button
+            type="button"
+            className="secondary px-3 py-2 text-sm whitespace-nowrap"
+            onClick={() =>
+              playExampleSentence({
+                text: questionText,
+                language: questionLanguage,
+              })
+            }
+            disabled={disabled}
+          >
+            {exampleButtonLabel}
+          </button>
+        </div>
       </div>
 
       <div className="w-full flex flex-wrap gap-2 items-center justify-center text-center">

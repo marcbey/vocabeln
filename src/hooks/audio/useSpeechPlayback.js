@@ -15,6 +15,7 @@ export function useSpeechPlayback() {
   const playRequestRef = useRef(0);
   const [isLoading, setIsLoading] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [activePlaybackType, setActivePlaybackType] = useState(null);
   const [error, setError] = useState('');
 
   const setHint = useCallback((message, ttlMs = 2200) => {
@@ -50,10 +51,11 @@ export function useSpeechPlayback() {
     }
 
     setIsPlaying(false);
+    setActivePlaybackType(null);
   }, []);
 
-  const playVocabulary = useCallback(
-    async ({ text, language }) => {
+  const playFromEndpoint = useCallback(
+    async ({ text, language, endpoint, playbackType }) => {
       if (!text) {
         return;
       }
@@ -62,10 +64,11 @@ export function useSpeechPlayback() {
       playRequestRef.current = requestId;
       cleanupAudio();
       setHint('');
+      setActivePlaybackType(playbackType);
       setIsLoading(true);
 
       try {
-        const response = await fetch('/api/tts', {
+        const response = await fetch(endpoint, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -91,12 +94,14 @@ export function useSpeechPlayback() {
             return;
           }
           setIsPlaying(false);
+          setActivePlaybackType(null);
         };
         audio.onerror = () => {
           if (playRequestRef.current !== requestId) {
             return;
           }
           setIsPlaying(false);
+          setActivePlaybackType(null);
           setHint('Audio konnte nicht abgespielt werden.');
         };
 
@@ -113,10 +118,35 @@ export function useSpeechPlayback() {
         }
         setIsLoading(false);
         setIsPlaying(false);
+        setActivePlaybackType(null);
         setHint(fetchError.message || 'Sprachausgabe fehlgeschlagen.');
       }
     },
     [cleanupAudio, setHint]
+  );
+
+  const playVocabulary = useCallback(
+    async ({ text, language }) => {
+      await playFromEndpoint({
+        text,
+        language,
+        endpoint: '/api/tts',
+        playbackType: 'vocabulary',
+      });
+    },
+    [playFromEndpoint]
+  );
+
+  const playExampleSentence = useCallback(
+    async ({ text, language }) => {
+      await playFromEndpoint({
+        text,
+        language,
+        endpoint: '/api/tts/example',
+        playbackType: 'example',
+      });
+    },
+    [playFromEndpoint]
   );
 
   useEffect(
@@ -132,7 +162,9 @@ export function useSpeechPlayback() {
   return {
     isLoading,
     isPlaying,
+    activePlaybackType,
     error,
     playVocabulary,
+    playExampleSentence,
   };
 }

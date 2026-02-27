@@ -32,6 +32,7 @@
 7. Die App prueft dieses Ergebnis identisch zur Texteingabe:
    - falsch => gleicher Fehlerstatus wie beim manuellen Tippen
    - richtig => gleicher Erfolgspfad, inklusive Sprung zur naechsten Vokabel
+8. Zusaetzlich gibt es einen Button, der einen kurzen Beispielsatz mit der abgefragten Vokabel per TTS vorliest.
 
 ## 3) Empfohlene Architektur
 
@@ -51,6 +52,7 @@
   - Haltet `OPENAI_API_KEY` geheim.
   - Stellt Endpunkte bereit:
     - `POST /api/tts` (liefert Audio fuer die abgefragte Vokabel)
+    - `POST /api/tts/example` (liefert Audio fuer einen generierten Beispielsatz)
     - `POST /api/stt/check` (nimmt Audio nach Loslassen entgegen und gibt den String zurueck)
     - `GET /api/health` (Healthcheck fuer Render)
   - Optional spaeter:
@@ -130,12 +132,14 @@ Akzeptanzkriterien:
 ## Phase 2 - TTS im Frontend
 
 - In `QuestionPrompt.jsx` einen "Vorlesen"-Button ergaenzen.
+- In `QuestionPrompt.jsx` einen zusaetzlichen "Beispielsatz"-Button ergaenzen.
 - Audio-Hook integrieren (`useSpeechPlayback`).
 - Sprach-/Akzentwahl an Frage-Sprache koppeln (`de`/`en`).
 - States fuer loading/error/playing sichtbar machen.
 
 Akzeptanzkriterien:
 - Aktuelle Vokabel wird auf Klick vorgelesen.
+- Ein Beispielsatz mit der aktuellen Vokabel wird auf Klick vorgelesen.
 - Englische Fragen werden mit englischem Akzent, deutsche Fragen mit deutschem Akzent vorgelesen.
 - UI bleibt bedienbar, auch wenn Audio fehlschlaegt.
 

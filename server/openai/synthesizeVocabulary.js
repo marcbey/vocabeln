@@ -14,7 +14,7 @@ const INSTRUCTIONS_BY_LANGUAGE = {
   en: 'Speak naturally with a clear English accent. Pronounce the input exactly as written.',
 };
 
-function removeParentheticalSegments(text) {
+export function sanitizeVocabularyText(text) {
   const withoutParentheses = text.replace(/\s*\([^)]*\)/g, ' ');
   const normalized = withoutParentheses.replace(/\s+/g, ' ').trim();
 
@@ -24,6 +24,15 @@ function removeParentheticalSegments(text) {
 
   // Fallback for edge cases where the whole value was parenthesized.
   return text.replace(/[()]/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+function normalizeSpeechText(text, stripParenthetical) {
+  const normalized = text.trim();
+  if (!stripParenthetical) {
+    return normalized;
+  }
+
+  return sanitizeVocabularyText(normalized);
 }
 
 function cacheKey(text, language) {
@@ -46,7 +55,23 @@ function pruneCache() {
 }
 
 export async function synthesizeVocabulary({ text, language }) {
-  const cleanText = removeParentheticalSegments(text.trim());
+  return synthesizeSpeech({
+    text,
+    language,
+    stripParenthetical: true,
+  });
+}
+
+export async function synthesizeSpeech({
+  text,
+  language,
+  stripParenthetical = false,
+}) {
+  const cleanText = normalizeSpeechText(text, stripParenthetical);
+  if (!cleanText) {
+    throw new Error('Text for speech output is empty.');
+  }
+
   const key = cacheKey(cleanText, language);
   const now = Date.now();
   const cachedEntry = audioCache.get(key);
