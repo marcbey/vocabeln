@@ -4,16 +4,19 @@ import { parseIrregularData, parseVocabData } from './schema.js';
 describe('data schema validation', () => {
   it('parses valid vocab data', () => {
     const parsed = parseVocabData({
-      'Page 1': [{ en: 'cat', de: 'Katze' }],
+      'Class 5 - Page 1': [{ english: 'cat', german: 'Katze' }],
     });
 
-    expect(parsed['Page 1'][0]).toEqual({ en: 'cat', de: 'Katze' });
+    expect(parsed['Class 5 - Page 1'][0]).toEqual({
+      english: 'cat',
+      german: 'Katze',
+    });
   });
 
   it('throws for invalid vocab shape', () => {
     expect(() =>
       parseVocabData({
-        'Page 1': [{ en: '', de: 'Katze' }],
+        'Class 5 - Page 1': [{ english: '', german: 'Katze' }],
       })
     ).toThrow(/Vocab dataset is invalid/);
   });

@@ -3,8 +3,8 @@ import { z } from 'zod';
 const nonEmptyString = z.string().trim().min(1);
 
 export const vocabEntrySchema = z.object({
-  en: nonEmptyString,
-  de: nonEmptyString,
+  english: nonEmptyString,
+  german: nonEmptyString,
 });
 
 export const vocabDataSchema = z.record(
