@@ -15,6 +15,11 @@ vi.mock('./data/index.js', () => ({
       label: 'Klasse 6',
       headline: 'Vokabeln für die Klasse 6',
     },
+    {
+      id: 'class7',
+      label: 'Klasse 7',
+      headline: 'Vokabeln für die Klasse 7',
+    },
   ],
   CLASS_DATASETS: {
     class5: {
@@ -40,6 +45,19 @@ vi.mock('./data/index.js', () => ({
           infinitive: 'go',
           simplePast: 'went',
           pastParticiple: 'gone',
+        },
+      ],
+    },
+    class7: {
+      vocabData: {
+        'Class 7 - Page 1': [{ en: 'house', de: 'Haus' }],
+      },
+      irregularData: [
+        {
+          german: 'laufen',
+          infinitive: 'run',
+          simplePast: 'ran',
+          pastParticiple: 'run',
         },
       ],
     },
@@ -124,6 +142,15 @@ describe('App', () => {
     await user.type(class6Input, 'Hund');
     await user.click(screen.getAllByRole('button', { name: 'Check!' })[0]);
     expect(localStorage.getItem('progress:class6')).toBeTruthy();
+
+    await user.selectOptions(classSelect, 'class7');
+    expect(await screen.findByText('Vokabeln für die Klasse 7')).toBeInTheDocument();
+    expect(await screen.findByText('house')).toBeInTheDocument();
+
+    const class7Input = screen.getByPlaceholderText('Deine Antwort...');
+    await user.type(class7Input, 'Haus');
+    await user.click(screen.getAllByRole('button', { name: 'Check!' })[0]);
+    expect(localStorage.getItem('progress:class7')).toBeTruthy();
 
     await user.selectOptions(classSelect, 'class5');
     expect(await screen.findByText('Vokabeln für die Klasse 5')).toBeInTheDocument();
