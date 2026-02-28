@@ -1,46 +1,211 @@
-# Vokabeltrainer (React)
+# Vokabeltrainer (React + Express + OpenAI)
 
-A React vocab trainer with the same UX as the vanilla prototype.
+Interaktiver Vokabeltrainer fuer Klassen 5-7 mit Text-Quiz, Spracheingabe (STT), Vorlesen (TTS), Beispielsatz-TTS und persistentem TTS-Cache.
+
+## Funktionsuebersicht
+
+### Quiz
+- Klassenwechsel: `Klasse 5`, `Klasse 6`, `Klasse 7`
+- Abfragerichtungen:
+  - `en-de`
+  - `de-en`
+  - `mixed`
+  - `irregular` (unregelmaessige Verben)
+- Seitenweise Lernen mit Fortschrittsanzeige pro Seite
+- Automatischer Wechsel der Richtung, wenn in einer Richtung bereits alle Woerter erledigt sind
+- Loesung anzeigen / naechstes Wort
+- `Tafel-Modus` fuer manuelle Richtig/Falsch-Bewertung
+- `Retry` pro Seite
+- Fortschritts-Reset (`Neu anfangen`) mit Bestaetigungsdialog
+- Visuelles Feedback:
+  - Gruen/Rot-Status am Input
+  - Fireworks-Effekt bei Seitenabschluss
+
+### Audio / Sprache
+- `Vorlesen` Button: spricht das aktuelle Wort
+- `Beispielsatz` Button: generiert kurzen Beispielsatz und spricht ihn
+- Spracheingabe per Mikrofon (`hold-to-record`):
+  - gedrueckt halten -> aufnehmen
+  - loslassen -> transkribieren + Antwort pruefen
+- Fehlermeldungen fuer Playback-/Mikrofon-/STT-Fehler
+
+### Persistenz
+- Pro Klasse persistierte Einstellungen und Fortschritte in `localStorage`
+- Aktive Klasse wird gespeichert
+- Backward-Compatibility fuer alte (ungescopte) `class5` Keys
+
+## Architektur
+
+```mermaid
+flowchart LR
+  A["React UI (Vite)"] --> B["Express API (/api/*)"]
+  B --> C["OpenAI API"]
+  B --> D["TTS Disk Cache (/var/data/tts-cache)"]
+  A --> E["localStorage (settings/progress)"]
+  B --> F["Rate Limit (40 req/min)"]
+```
+
+### Frontend
+- Einstieg: `src/App.jsx`
+- Quiz-Orchestrierung: `src/hooks/useQuizController.js`
+  - State: `useQuizState`
+  - Actions: `useQuizActions`
+  - Persistenz: `useQuizPersistence`
+  - Status-Flash: `useQuizStatusFlash`
+- Audio:
+  - TTS Playback: `src/hooks/audio/useSpeechPlayback.js`
+  - STT Aufnahme + Upload: `src/hooks/audio/useSpeechInput.js`
+- Komponenten:
+  - Header/Navigation: `src/components/Header.jsx` + `src/components/header/*`
+  - Fragekarte: `src/components/QuestionCard.jsx`
+  - Antwort-/Mikrofonbereich: `src/components/question/AnswerInputSection.jsx`
+  - Vorlesen/Beispielsatz: `src/components/question/QuestionPrompt.jsx`
+
+### Backend
+- Server/Boot: `server/index.js`
+  - JSON body limit: `1mb`
+  - Audio rate limit: `40` Requests / `60s` auf `/api/tts` und `/api/stt/check`
+- Routen:
+  - Health: `server/routes/health.js`
+  - TTS: `server/routes/tts.js`
+  - STT: `server/routes/sttCheck.js`
+- OpenAI Integration:
+  - Client: `server/openai/client.js`
+  - TTS: `server/openai/synthesizeVocabulary.js`
+  - Beispielsatz-Generierung: `server/openai/generateExampleSentence.js`
+  - STT: `server/openai/transcribeAndNormalizeAnswer.js`
+
+### TTS Cache Architektur
+- L1: In-Memory Cache (`Map`) im Node-Prozess
+- L2: Persistenter Disk-Cache via `server/cache/ttsDiskCache.js`
+  - Audio-Dateien: `TTS_CACHE_DIR/audio/*.mp3`
+  - Metadaten: `TTS_CACHE_DIR/meta/index.json`
+- In-Flight-Dedupe:
+  - Gleiche parallele Requests teilen sich denselben Upstream-Call
+- TTL:
+  - Vocabulary Audio: 30 Tage
+  - Example Audio: 7 Tage
+  - Example Sentence (Text): 7 Tage
+- Schreibschutz:
+  - Atomare Writes (`.tmp` -> `rename`)
+  - Serialisierte Meta-Updates via Write-Queue
+
+Details: siehe `CACHE.md`.
+
+## API
+
+### `GET /api/health`
+- Antwort: `{"status":"ok"}`
+
+### `POST /api/tts`
+- Body (JSON):
+  - `text` (string, 1..120)
+  - `language` (`de` | `en`)
+- Antwort:
+  - `200` mit `audio/mpeg`
+- Header:
+  - `X-Cache`
+  - `X-TTS-Audio-Cache`
+
+### `POST /api/tts/example`
+- Body (JSON):
+  - `text` (string, 1..120)
+  - `language` (`de` | `en`)
+- Ablauf:
+  - Beispielsatz generieren
+  - Beispielsatz als MP3 synthetisieren
+- Antwort:
+  - `200` mit `audio/mpeg`
+- Header:
+  - `X-Cache`
+  - `X-TTS-Audio-Cache`
+  - `X-TTS-Sentence-Cache`
+
+### `POST /api/stt/check`
+- Body: `multipart/form-data`
+  - `audio` (Datei, max 5MB)
+  - `language` (`de` | `en`)
+- Antwort:
+  - `200`: `{ transcript, answer }`
+  - `400`: ungueltige Payload / ungueltiges Audio
+  - `500`: Upstream-/Serverfehler
+
+## Datenmodell
+
+- Vokabeldaten liegen statisch in `src/data/*.json`
+- Normalisierte Datasets entstehen in `src/data/index.js`:
+  - `vocabData` (seitenbasiert)
+  - `irregularData` (unregelmaessige Verben)
+
+## Environment Variablen
+
+Backend-relevant:
+- `OPENAI_API_KEY` (pflicht)
+- `OPENAI_TTS_MODEL` (optional, default `gpt-4o-mini-tts`)
+- `OPENAI_STT_MODEL` (optional, default `gpt-4o-mini-transcribe`)
+- `OPENAI_TEXT_MODEL` (optional, default `gpt-4o-mini`)
+- `TTS_CACHE_DIR` (optional, default `/tmp/tts-cache`; in Render via Terraform auf `/var/data/tts-cache`)
+
+Wichtig:
+- OpenAI Secrets niemals ins Frontend (`VITE_*`) legen.
 
 ## Lokal entwickeln
-- `npm ci`
-- `npm run dev:full` (Frontend + Backend parallel)
-- Optional getrennt:
-  - `npm run dev` (Vite auf Port 5173)
-  - `npm run dev:server` (API auf Port 10000)
-- `npm run lint` (ESLint)
-- `npm run test` (Vitest Test-Suite)
-- `npm run check` (Lint + Tests + Build)
 
-## Build
-- `npm run build` → schreibt nach `dist`
-- `npm run start` startet den Produktionsserver (API + statische App)
+### Setup
+1. `npm ci`
+2. `.env` im Projektroot anlegen (mindestens `OPENAI_API_KEY`)
 
-## OpenAI Konfiguration
+Beispiel:
 
-Folgende Environment Variablen werden im Backend verwendet:
-- `OPENAI_API_KEY` (Pflicht)
-- `OPENAI_TTS_MODEL` (optional, default: `gpt-4o-mini-tts`)
-- `OPENAI_STT_MODEL` (optional, default: `gpt-4o-mini-transcribe`)
-- `OPENAI_TEXT_MODEL` (optional, default: `gpt-4o-mini`, fuer Beispielsatz-Generierung)
+```bash
+OPENAI_API_KEY=sk-...
+OPENAI_TTS_MODEL=gpt-4o-mini-tts
+OPENAI_STT_MODEL=gpt-4o-mini-transcribe
+OPENAI_TEXT_MODEL=gpt-4o-mini
+TTS_CACHE_DIR=/tmp/tts-cache
+```
 
-Der API-Key darf nicht in `VITE_*` Variablen liegen.
+### Start
+- Komplett: `npm run dev:full`
+- Nur Frontend: `npm run dev` (Port 5173)
+- Nur Backend: `npm run dev:server` (Port 10000)
 
-Lokal:
-- `.env` im Projektroot anlegen
-- Beispiel:
-  - `OPENAI_API_KEY=sk-...`
-  - `OPENAI_TTS_MODEL=gpt-4o-mini-tts`
-  - `OPENAI_STT_MODEL=gpt-4o-mini-transcribe`
-  - `OPENAI_TEXT_MODEL=gpt-4o-mini`
-- `npm run dev:full` laedt `.env` automatisch, falls vorhanden.
+### Qualitaet
+- Lint: `npm run lint`
+- Tests: `npm run test`
+- Full check: `npm run check`
+
+### Build / Prod-Start
+- Build: `npm run build` (Output `dist`)
+- Start: `npm run start` (serves API + statische App)
+
+## Deployment
+
+### Render (Blueprint)
+- Config: `render.yaml`
+- Build Command: `npm ci && npm run build`
+- Start Command: `NODE_ENV=production npm run start`
+- Mindestens setzen:
+  - `OPENAI_API_KEY`
+- Optional setzen:
+  - `OPENAI_TTS_MODEL`
+  - `OPENAI_STT_MODEL`
+  - `OPENAI_TEXT_MODEL`
+
+### Render via Terraform
+- Infra: `infra/render`
+- Provisioniert:
+  - Web Service
+  - Persistent Disk (default 1GB, `/var/data`)
+  - Env Vars inkl. `TTS_CACHE_DIR` und `OPENAI_TEXT_MODEL`
+- Anleitung: `infra/render/README.md`
 
 ## TTS Cache Debug (curl)
 
 Die TTS-Endpunkte liefern Cache-Header:
-- `X-Cache` (`HIT` oder `MISS`)
-- `X-TTS-Audio-Cache` (`memory`, `disk`, `openai`)
-- `X-TTS-Sentence-Cache` (nur bei `/api/tts/example`)
+- `X-Cache` (`HIT` | `MISS`)
+- `X-TTS-Audio-Cache` (`memory` | `disk` | `openai`)
+- `X-TTS-Sentence-Cache` (nur `/api/tts/example`)
 
 Lokaler Test (Server auf Port `10000`):
 
@@ -52,7 +217,7 @@ curl -s -D - \
   -d '{"text":"Haus","language":"de"}' \
   -o /tmp/tts-vocabulary.mp3 | grep -i -E 'x-cache|x-tts-'
 
-# 2) Gleiches nochmal (sollte typischerweise HIT sein)
+# 2) Gleiches nochmal (typisch: HIT)
 curl -s -D - \
   -H "Content-Type: application/json" \
   -X POST http://localhost:10000/api/tts \
@@ -66,21 +231,3 @@ curl -s -D - \
   -d '{"text":"Haus","language":"de"}' \
   -o /tmp/tts-example.mp3 | grep -i -E 'x-cache|x-tts-'
 ```
-
-## Deployment auf Render
-
-Das Deployment ist auf Render als Web Service ausgelegt (Frontend + Backend in einem Service).
-
-- Blueprint: `render.yaml`
-- Build Command: `npm ci && npm run build`
-- Start Command: `NODE_ENV=production npm run start`
-- Benoetigte Env Vars auf Render:
-  - `OPENAI_API_KEY`
-
-### Render Setup Checkliste
-
-1. In Render: `New +` -> `Blueprint` waehlen und Repo verbinden.
-2. `render.yaml` bestaetigen und Service erstellen.
-3. Unter Service `Environment` den Secret `OPENAI_API_KEY` setzen.
-4. Optional `OPENAI_TTS_MODEL`, `OPENAI_STT_MODEL` und `OPENAI_TEXT_MODEL` setzen.
-5. Deploy starten und auf `.../api/health` pruefen (`{"status":"ok"}`).
