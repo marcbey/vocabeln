@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import HeaderDesktopControls from './header/HeaderDesktopControls.jsx';
+import HeaderIntro from './header/HeaderIntro.jsx';
 import HeaderMobilePanel from './header/HeaderMobilePanel.jsx';
 import MobileMenuButton from './header/MobileMenuButton.jsx';
 
@@ -24,50 +25,21 @@ export default function Header({
   const closeMobileMenu = () => {
     setMobileMenuOpen(false);
   };
-
-  const handlePageChange = (nextPage) => {
-    onPageChange(nextPage);
+  const runAndClose = (action) => (...args) => {
+    action(...args);
     closeMobileMenu();
   };
 
-  const handleDirectionChange = (nextDirection) => {
-    onDirectionChange(nextDirection);
-    closeMobileMenu();
-  };
-
-  const handleToggleBoardMode = () => {
-    onToggleBoardMode();
-    closeMobileMenu();
-  };
-
-  const handleReset = () => {
-    onReset();
-    closeMobileMenu();
-  };
-
-  const handleClassChange = (nextClassId) => {
-    onClassChange(nextClassId);
-    closeMobileMenu();
-  };
+  const handlePageChange = runAndClose(onPageChange);
+  const handleDirectionChange = runAndClose(onDirectionChange);
+  const handleToggleBoardMode = runAndClose(onToggleBoardMode);
+  const handleReset = runAndClose(onReset);
+  const handleClassChange = runAndClose(onClassChange);
 
   return (
     <header className="w-full max-w-[1100px] rounded-xl2 border-2 border-[#3f567e] bg-white px-4 py-4 md:px-5 md:py-[18px] flex flex-col gap-3 shadow-deep">
       <div className="flex w-full items-start gap-3 md:items-center">
-        <div className="min-w-0 shrink">
-          <h1 className="m-0 text-lg md:text-2xl tracking-tight flex items-center gap-2 font-extrabold min-w-0">
-            <span
-              className="w-4 h-4 rounded-full inline-block shrink-0"
-              style={{
-                background: 'linear-gradient(135deg, #2179ff, #ff9f1c)',
-                boxShadow: '0 0 0 4px rgba(33, 121, 255, 0.18)',
-              }}
-            />
-            <span className="truncate">{headline}</span>
-          </h1>
-          <p className="mt-1 text-[13px] md:text-[14px] text-muted font-semibold">
-            Jede Runde macht dich besser und fit für die nächste Englischarbeit.
-          </p>
-        </div>
+        <HeaderIntro headline={headline} />
 
         <MobileMenuButton
           open={mobileMenuOpen}

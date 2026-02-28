@@ -3,6 +3,7 @@ import classNames from 'classnames';
 import ClassSelect from './ClassSelect.jsx';
 import DirectionSelect from './DirectionSelect.jsx';
 import HeaderActions from './HeaderActions.jsx';
+import MobilePanelSection from './MobilePanelSection.jsx';
 import PageSelect from './PageSelect.jsx';
 
 export default function HeaderMobilePanel({
@@ -53,14 +54,12 @@ export default function HeaderMobilePanel({
           </button>
         </div>
 
-        <div
-          className={classNames('grid gap-2 md:hidden', {
+        <MobilePanelSection
+          label="Seite"
+          className={classNames('md:hidden', {
             'opacity-60': isIrregular,
           })}
         >
-          <p className="m-0 text-[12px] uppercase tracking-[0.08em] text-muted font-extrabold">
-            Seite
-          </p>
           <PageSelect
             pages={pages}
             page={page}
@@ -69,42 +68,39 @@ export default function HeaderMobilePanel({
             onChange={onPageChange}
             className="w-full"
           />
-        </div>
+        </MobilePanelSection>
 
-        <div className="grid gap-2 md:hidden">
-          <p className="m-0 text-[12px] uppercase tracking-[0.08em] text-muted font-extrabold">
-            Richtung
-          </p>
+        <MobilePanelSection label="Richtung" className="md:hidden">
           <DirectionSelect
             direction={direction}
             onChange={onDirectionChange}
             className="w-full"
           />
-        </div>
+        </MobilePanelSection>
 
-        <div className="grid gap-2 border-t border-[#3f567e]/35 pt-3 md:hidden">
-          <p className="m-0 text-[12px] uppercase tracking-[0.08em] text-muted font-extrabold">
-            Optionen
-          </p>
+        <MobilePanelSection
+          label="Optionen"
+          className="border-t border-[#3f567e]/35 pt-3 md:hidden"
+        >
           <HeaderActions
             boardMode={boardMode}
             onToggleBoardMode={onToggleBoardMode}
             onReset={onReset}
             fullWidth
           />
-        </div>
+        </MobilePanelSection>
 
-        <div className="grid gap-2 border-t border-[#3f567e]/35 pt-3">
-          <p className="m-0 text-[12px] uppercase tracking-[0.08em] text-muted font-extrabold">
-            Klasse wechseln
-          </p>
+        <MobilePanelSection
+          label="Klasse wechseln"
+          className="border-t border-[#3f567e]/35 pt-3"
+        >
           <ClassSelect
             value={activeClassId}
             options={classOptions}
             onChange={onClassChange}
             className="w-full"
           />
-        </div>
+        </MobilePanelSection>
       </div>
     </div>
   );

@@ -1,6 +1,9 @@
-import classNames from 'classnames';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect } from 'react';
+import { useSolutionRevealFlash } from '../../hooks/question/useSolutionRevealFlash.js';
 import { useSpeechPlayback } from '../../hooks/audio/useSpeechPlayback.js';
+import QuestionPromptAudioButtons from './QuestionPromptAudioButtons.jsx';
+import QuestionTranslationRow from './QuestionTranslationRow.jsx';
+import QuestionWordDisplay from './QuestionWordDisplay.jsx';
 
 export default function QuestionPrompt({
   questionText,
@@ -24,8 +27,10 @@ export default function QuestionPrompt({
   const isVocabularyActive = activePlaybackType === 'vocabulary';
   const isExampleActive = activePlaybackType === 'example';
   const questionLanguageLabel = questionLanguage === 'de' ? 'Deutsch' : 'Englisch';
-  const [solutionRevealFlash, setSolutionRevealFlash] = useState(false);
-  const revealTimerRef = useRef(null);
+  const solutionRevealFlash = useSolutionRevealFlash({
+    showingSolution,
+    translation,
+  });
 
   const vocabularyButtonLabel = isVocabularyActive
     ? isLoading
@@ -47,91 +52,38 @@ export default function QuestionPrompt({
     onSpeechPlaybackErrorChange?.(error);
   }, [error, onSpeechPlaybackErrorChange]);
 
-  useEffect(() => {
-    if (!showingSolution) {
-      return;
-    }
-
-    if (revealTimerRef.current) {
-      clearTimeout(revealTimerRef.current);
-      revealTimerRef.current = null;
-    }
-
-    setSolutionRevealFlash(true);
-    revealTimerRef.current = window.setTimeout(() => {
-      setSolutionRevealFlash(false);
-      revealTimerRef.current = null;
-    }, 850);
-  }, [showingSolution, translation]);
-
-  useEffect(() => {
-    return () => {
-      if (revealTimerRef.current) {
-        clearTimeout(revealTimerRef.current);
-      }
-    };
-  }, []);
-
   return (
     <div className="mt-1 mb-3 px-3 py-3 md:px-4 md:py-4 bg-[#e0e9f8] border-2 border-[#3f567e] rounded-xl2 shadow-[inset_0_1px_0_rgba(255,255,255,0.85)] flex flex-col gap-3">
       <div className="w-full flex flex-col gap-3 md:flex-row md:items-start">
-        <div className="flex-1 min-w-0">
-          <p className="m-0 mb-1 text-[12px] uppercase tracking-[0.08em] text-muted font-extrabold">
-            Wort ({questionLanguageLabel})
-          </p>
-          <span className="inline-flex max-w-full items-center text-left text-[2rem] md:text-[2.55rem] font-black leading-[1.04] px-3 py-2 rounded-xl border border-accent/40 bg-gradient-to-r from-accent/16 to-accent2/18 shadow-[0_0_0_1px_rgba(33,121,255,0.22)] break-words">
-            {questionText}
-          </span>
-        </div>
+        <QuestionWordDisplay
+          questionText={questionText}
+          questionLanguageLabel={questionLanguageLabel}
+        />
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 gap-2 md:w-[170px] shrink-0">
-          <button
-            type="button"
-            className="secondary px-3 text-sm whitespace-nowrap min-h-[46px] w-full"
-            onClick={() =>
-              playVocabulary({
-                text: questionText,
-                language: questionLanguage,
-              })
-            }
-            disabled={disabled}
-          >
-            {vocabularyButtonLabel}
-          </button>
-
-          <button
-            type="button"
-            className="secondary px-3 text-sm whitespace-nowrap min-h-[46px] w-full"
-            onClick={() =>
-              playExampleSentence({
-                text: questionText,
-                language: questionLanguage,
-              })
-            }
-            disabled={disabled}
-          >
-            {exampleButtonLabel}
-          </button>
-        </div>
+        <QuestionPromptAudioButtons
+          disabled={disabled}
+          vocabularyButtonLabel={vocabularyButtonLabel}
+          exampleButtonLabel={exampleButtonLabel}
+          onPlayVocabulary={() =>
+            playVocabulary({
+              text: questionText,
+              language: questionLanguage,
+            })
+          }
+          onPlayExampleSentence={() =>
+            playExampleSentence({
+              text: questionText,
+              language: questionLanguage,
+            })
+          }
+        />
       </div>
 
-      <div className="w-full flex flex-col gap-2 items-start md:flex-row md:items-center">
-        <span className="text-[12px] uppercase tracking-[0.08em] text-muted font-extrabold">
-          Üebersetzung
-        </span>
-        <span
-          className={classNames(
-            'text-base md:text-lg text-text px-3 py-1.5 rounded-lg border-2 border-dashed border-[#3f567e] bg-white inline-flex items-center gap-2 transition-all duration-200 min-h-[38px] w-full md:w-auto justify-center md:justify-start text-center md:text-left',
-            {
-              'font-bold': showTranslation,
-              'text-muted': !showTranslation,
-              'solution-reveal-flash border-[#0d47b7]': solutionRevealFlash,
-            }
-          )}
-        >
-          {showTranslation ? translation : 'Wird nach dem Check eingeblendet'}
-        </span>
-      </div>
+      <QuestionTranslationRow
+        showTranslation={showTranslation}
+        translation={translation}
+        solutionRevealFlash={solutionRevealFlash}
+      />
     </div>
   );
 }
