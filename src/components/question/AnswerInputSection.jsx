@@ -77,9 +77,9 @@ export default function AnswerInputSection({
           className={classNames(
             'w-full pr-12 py-3.5 md:py-4 text-[1.15rem] md:text-[1.3rem] font-bold rounded-[18px] border-2 border-[#3f567e] bg-white focus:ring-2 focus:ring-accent focus:border-accent transition-all duration-200 shadow-[0_8px_20px_rgba(33,121,255,0.12)]',
             {
-              'border-good/70 bg-[rgba(23,164,109,0.10)] shadow-[0_0_0_3px_rgba(23,164,109,0.24)]':
+              'border-[#0b7a4f] bg-[rgba(11,122,79,0.18)] shadow-[0_0_0_4px_rgba(11,122,79,0.34),0_10px_24px_rgba(11,122,79,0.22)] scale-[1.01]':
                 status === 'correct',
-              'border-[#c62828] bg-[rgba(198,40,40,0.10)] shadow-[0_0_0_3px_rgba(198,40,40,0.22)]':
+              'border-[#b91c1c] bg-[rgba(185,28,28,0.16)] shadow-[0_0_0_4px_rgba(185,28,28,0.34),0_10px_24px_rgba(185,28,28,0.20)] scale-[1.01]':
                 status === 'wrong',
             }
           )}
@@ -94,10 +94,10 @@ export default function AnswerInputSection({
 
         <span
           className={classNames(
-            'absolute right-3 top-1/2 -translate-y-1/2 opacity-0 pointer-events-none font-black text-xl transition-opacity duration-200',
+            'absolute right-2.5 top-1/2 -translate-y-1/2 opacity-0 pointer-events-none font-black text-lg transition-all duration-200 rounded-full w-8 h-8 inline-flex items-center justify-center',
             {
-              'opacity-100 text-good': status === 'correct',
-              'opacity-100 text-[#c62828]': status === 'wrong',
+              'opacity-100 text-white bg-[#0b7a4f] scale-110': status === 'correct',
+              'opacity-100 text-white bg-[#b91c1c] scale-110': status === 'wrong',
             }
           )}
         >

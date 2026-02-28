@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-const FLASH_TIMEOUT_MS = 450;
-const STATUS_TIMEOUT_MS = 2000;
+const FLASH_TIMEOUT_MS = 1100;
+const STATUS_TIMEOUT_MS = 2800;
 
 export function useQuizStatusFlash({ boardMode, showingSolution, onRefocus }) {
   const [status, setStatus] = useState(null);

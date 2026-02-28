@@ -13,8 +13,6 @@ export default function QuestionMobileFooter({
 }) {
   return (
     <div className="md:hidden mt-4 grid gap-3 border-t-2 border-[#3f567e] pt-3">
-      <ProgressBadge counts={counts} className="w-full" />
-
       {!pageComplete && !boardMode && (
         <QuestionActions
           showingSolution={showingSolution}
@@ -25,6 +23,8 @@ export default function QuestionMobileFooter({
           className="grid grid-cols-2 gap-2 w-full"
         />
       )}
+
+      <ProgressBadge counts={counts} className="w-full" />
     </div>
   );
 }

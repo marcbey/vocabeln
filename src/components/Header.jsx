@@ -65,7 +65,7 @@ export default function Header({
             <span className="truncate">{headline}</span>
           </h1>
           <p className="mt-1 text-[13px] md:text-[14px] text-muted font-semibold">
-            Jede Runde macht dich besser, hol dir den Highscore und rock die naechste Englischarbeit.
+            Jede Runde macht dich besser und fit für die nächste Englischarbeit.
           </p>
         </div>
 

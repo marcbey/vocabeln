@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSpeechPlayback } from '../../hooks/audio/useSpeechPlayback.js';
 
 export default function QuestionPrompt({
@@ -7,6 +7,7 @@ export default function QuestionPrompt({
   questionLanguage,
   canSpeak,
   translation,
+  showingSolution,
   showTranslation,
   onSpeechPlaybackErrorChange,
 }) {
@@ -23,6 +24,8 @@ export default function QuestionPrompt({
   const isVocabularyActive = activePlaybackType === 'vocabulary';
   const isExampleActive = activePlaybackType === 'example';
   const questionLanguageLabel = questionLanguage === 'de' ? 'Deutsch' : 'Englisch';
+  const [solutionRevealFlash, setSolutionRevealFlash] = useState(false);
+  const revealTimerRef = useRef(null);
 
   const vocabularyButtonLabel = isVocabularyActive
     ? isLoading
@@ -43,6 +46,31 @@ export default function QuestionPrompt({
   useEffect(() => {
     onSpeechPlaybackErrorChange?.(error);
   }, [error, onSpeechPlaybackErrorChange]);
+
+  useEffect(() => {
+    if (!showingSolution) {
+      return;
+    }
+
+    if (revealTimerRef.current) {
+      clearTimeout(revealTimerRef.current);
+      revealTimerRef.current = null;
+    }
+
+    setSolutionRevealFlash(true);
+    revealTimerRef.current = window.setTimeout(() => {
+      setSolutionRevealFlash(false);
+      revealTimerRef.current = null;
+    }, 850);
+  }, [showingSolution, translation]);
+
+  useEffect(() => {
+    return () => {
+      if (revealTimerRef.current) {
+        clearTimeout(revealTimerRef.current);
+      }
+    };
+  }, []);
 
   return (
     <div className="mt-1 mb-3 px-3 py-3 md:px-4 md:py-4 bg-[#e0e9f8] border-2 border-[#3f567e] rounded-xl2 shadow-[inset_0_1px_0_rgba(255,255,255,0.85)] flex flex-col gap-3">
@@ -97,6 +125,7 @@ export default function QuestionPrompt({
             {
               'font-bold': showTranslation,
               'text-muted': !showTranslation,
+              'solution-reveal-flash border-[#0d47b7]': solutionRevealFlash,
             }
           )}
         >
