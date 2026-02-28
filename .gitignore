@@ -15,3 +15,4 @@ pnpm-debug.log*
 *.tfstate.*
 *.tfvars
 crash.log
+output
