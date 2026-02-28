@@ -69,7 +69,6 @@ export default function App() {
   const [speechPlaybackError, setSpeechPlaybackError] = useState('');
   const [speechInputError, setSpeechInputError] = useState('');
   const mainRef = useRef(null);
-  const hasScrolledMainIntoViewRef = useRef(false);
 
   const quiz = useQuizController({
     classId: activeClassId,
@@ -85,12 +84,11 @@ export default function App() {
     setSpeechInputError(nextError || '');
   }, []);
 
-  const scrollMainIntoViewOnFirstMobileInteraction = useCallback(() => {
-    if (hasScrolledMainIntoViewRef.current || !isMobileViewport()) {
+  const scrollMainIntoViewOnMobileInteraction = useCallback(() => {
+    if (!isMobileViewport()) {
       return;
     }
 
-    hasScrolledMainIntoViewRef.current = true;
     window.requestAnimationFrame(() => {
       mainRef.current?.scrollIntoView?.({
         behavior: 'smooth',
@@ -105,9 +103,9 @@ export default function App() {
         return;
       }
 
-      scrollMainIntoViewOnFirstMobileInteraction();
+      scrollMainIntoViewOnMobileInteraction();
     },
-    [scrollMainIntoViewOnFirstMobileInteraction]
+    [scrollMainIntoViewOnMobileInteraction]
   );
 
   const handleMainKeyDownCapture = useCallback(
@@ -120,9 +118,9 @@ export default function App() {
         return;
       }
 
-      scrollMainIntoViewOnFirstMobileInteraction();
+      scrollMainIntoViewOnMobileInteraction();
     },
-    [scrollMainIntoViewOnFirstMobileInteraction]
+    [scrollMainIntoViewOnMobileInteraction]
   );
 
   return (

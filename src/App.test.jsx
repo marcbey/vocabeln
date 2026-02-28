@@ -167,7 +167,7 @@ describe('App', () => {
     expect(progressBadges.length).toBeGreaterThan(0);
   });
 
-  it('auto-scrolls main to top once on first mobile interaction in main, but not for header actions', async () => {
+  it('auto-scrolls main to top on each mobile interaction in main, but not for header actions', async () => {
     const user = userEvent.setup();
     const originalMatchMedia = window.matchMedia;
     const originalRaf = window.requestAnimationFrame;
@@ -200,7 +200,7 @@ describe('App', () => {
       expect(scrollIntoViewSpy).toHaveBeenCalledTimes(1);
 
       await user.click(screen.getAllByRole('button', { name: 'Lösung zeigen' })[0]);
-      expect(scrollIntoViewSpy).toHaveBeenCalledTimes(1);
+      expect(scrollIntoViewSpy).toHaveBeenCalledTimes(2);
     } finally {
       window.matchMedia = originalMatchMedia;
       window.requestAnimationFrame = originalRaf;
