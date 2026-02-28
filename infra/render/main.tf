@@ -25,11 +25,12 @@ resource "render_web_service" "vocabeln" {
 
   runtime_source = {
     native_runtime = {
-      auto_deploy   = true
-      branch        = var.repo_branch
-      build_command = "npm ci && npm run build"
-      repo_url      = var.repo_url
-      runtime       = "node"
+      auto_deploy         = true
+      auto_deploy_trigger = var.auto_deploy_trigger
+      branch              = var.repo_branch
+      build_command       = "npm ci && npm run build"
+      repo_url            = var.repo_url
+      runtime             = "node"
     }
   }
 

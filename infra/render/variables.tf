@@ -45,6 +45,20 @@ variable "region" {
   default     = "oregon"
 }
 
+variable "auto_deploy_trigger" {
+  description = "Auto deploy behavior for Git-based services (commit, checks_passed, off)"
+  type        = string
+  default     = "commit"
+
+  validation {
+    condition = contains(
+      ["commit", "checks_passed", "off"],
+      var.auto_deploy_trigger
+    )
+    error_message = "auto_deploy_trigger must be one of: commit, checks_passed, off."
+  }
+}
+
 variable "openai_tts_model" {
   description = "OpenAI TTS model name"
   type        = string
