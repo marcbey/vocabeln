@@ -1,7 +1,7 @@
+import { useEffect } from 'react';
 import classNames from 'classnames';
 import ClassSelect from './ClassSelect.jsx';
 import DirectionSelect from './DirectionSelect.jsx';
-import HeaderActions from './HeaderActions.jsx';
 import PageSelect from './PageSelect.jsx';
 
 export default function HeaderMobilePanel({
@@ -12,51 +12,83 @@ export default function HeaderMobilePanel({
   completedPages,
   isIrregular,
   direction,
-  boardMode,
   onClassChange,
   onPageChange,
   onDirectionChange,
-  onToggleBoardMode,
-  onReset,
+  onClose,
 }) {
+  useEffect(() => {
+    const handleEscape = (event) => {
+      if (event.key === 'Escape') {
+        onClose?.();
+      }
+    };
+
+    window.addEventListener('keydown', handleEscape);
+    return () => {
+      window.removeEventListener('keydown', handleEscape);
+    };
+  }, [onClose]);
+
   return (
-    <div className="md:hidden flex gap-3 items-center overflow-x-auto bg-panel/90 border border-white/10 rounded-xl p-3 shadow-deep">
-      <ClassSelect
-        value={activeClassId}
-        options={classOptions}
-        onChange={onClassChange}
-        className="pr-7 min-w-[130px] w-[130px] shrink-0"
+    <div className="fixed inset-0 z-30 flex items-start justify-end p-4 md:p-6">
+      <div
+        className="absolute inset-0 bg-[#101d36]/40 backdrop-blur-[1px] cursor-pointer"
+        onClick={onClose}
+        aria-hidden="true"
       />
 
-      <div
-        className={classNames('flex items-center shrink-0', {
-          'opacity-50 pointer-events-none': isIrregular,
-        })}
-      >
-        <PageSelect
-          pages={pages}
-          page={page}
-          completedPages={completedPages}
-          disabled={isIrregular}
-          onChange={onPageChange}
-          className="pr-7 min-w-[145px] w-[145px]"
-        />
-      </div>
+      <div className="relative w-full max-w-[340px] grid gap-3 rounded-xl2 border-2 border-[#3f567e] bg-white p-4 shadow-deep">
+        <div className="flex items-center justify-end">
+          <button
+            type="button"
+            className="secondary min-h-[40px] px-3 py-1.5 text-[13px]"
+            onClick={onClose}
+          >
+            Schliessen
+          </button>
+        </div>
 
-      <div className="flex items-center shrink-0">
-        <DirectionSelect
-          direction={direction}
-          onChange={onDirectionChange}
-          className="pr-7 min-w-[210px] w-[210px]"
-        />
-      </div>
+        <div
+          className={classNames('grid gap-2 md:hidden', {
+            'opacity-60': isIrregular,
+          })}
+        >
+          <p className="m-0 text-[12px] uppercase tracking-[0.08em] text-muted font-extrabold">
+            Seite
+          </p>
+          <PageSelect
+            pages={pages}
+            page={page}
+            completedPages={completedPages}
+            disabled={isIrregular}
+            onChange={onPageChange}
+            className="w-full"
+          />
+        </div>
 
-      <div className="shrink-0">
-        <HeaderActions
-          boardMode={boardMode}
-          onToggleBoardMode={onToggleBoardMode}
-          onReset={onReset}
-        />
+        <div className="grid gap-2 md:hidden">
+          <p className="m-0 text-[12px] uppercase tracking-[0.08em] text-muted font-extrabold">
+            Richtung
+          </p>
+          <DirectionSelect
+            direction={direction}
+            onChange={onDirectionChange}
+            className="w-full"
+          />
+        </div>
+
+        <div className="grid gap-2 border-t border-[#3f567e]/35 pt-3">
+          <p className="m-0 text-[12px] uppercase tracking-[0.08em] text-muted font-extrabold">
+            Klasse wechseln
+          </p>
+          <ClassSelect
+            value={activeClassId}
+            options={classOptions}
+            onChange={onClassChange}
+            className="w-full"
+          />
+        </div>
       </div>
     </div>
   );

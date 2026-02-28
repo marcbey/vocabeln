@@ -126,15 +126,19 @@ describe('App', () => {
 
     expect(screen.getByText('Vokabeln für die Klasse 5')).toBeInTheDocument();
 
-    const classSelect = screen.getByLabelText('Klasse');
     const answerInput = screen.getByPlaceholderText('Deine Antwort...');
+    const openClassMenu = async () => {
+      await user.click(screen.getByRole('button', { name: /menü öffnen/i }));
+      return screen.findByLabelText('Klasse');
+    };
 
     await user.type(answerInput, 'Katze');
     await user.click(screen.getAllByRole('button', { name: 'Check!' })[0]);
 
     expect(localStorage.getItem('progress:class5')).toBeTruthy();
 
-    await user.selectOptions(classSelect, 'class6');
+    const classSelectForClass6 = await openClassMenu();
+    await user.selectOptions(classSelectForClass6, 'class6');
     expect(await screen.findByText('Vokabeln für die Klasse 6')).toBeInTheDocument();
     expect(await screen.findByText('dog')).toBeInTheDocument();
 
@@ -143,7 +147,8 @@ describe('App', () => {
     await user.click(screen.getAllByRole('button', { name: 'Check!' })[0]);
     expect(localStorage.getItem('progress:class6')).toBeTruthy();
 
-    await user.selectOptions(classSelect, 'class7');
+    const classSelectForClass7 = await openClassMenu();
+    await user.selectOptions(classSelectForClass7, 'class7');
     expect(await screen.findByText('Vokabeln für die Klasse 7')).toBeInTheDocument();
     expect(await screen.findByText('house')).toBeInTheDocument();
 
@@ -152,7 +157,8 @@ describe('App', () => {
     await user.click(screen.getAllByRole('button', { name: 'Check!' })[0]);
     expect(localStorage.getItem('progress:class7')).toBeTruthy();
 
-    await user.selectOptions(classSelect, 'class5');
+    const classSelectForClass5 = await openClassMenu();
+    await user.selectOptions(classSelectForClass5, 'class5');
     expect(await screen.findByText('Vokabeln für die Klasse 5')).toBeInTheDocument();
 
     const progressBadges = await screen.findAllByText(

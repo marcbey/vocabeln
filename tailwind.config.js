@@ -7,24 +7,24 @@ export default {
   theme: {
     extend: {
       colors: {
-        bg: '#0f1c2e',
-        panel: '#13253a',
-        accent: '#3cdfff',
-        accent2: '#ff7ac3',
-        good: '#6df2a4',
-        warn: '#ffb347',
-        text: '#e9f2ff',
-        muted: '#9eb4d1',
+        bg: '#f4f8ff',
+        panel: '#ffffff',
+        accent: '#0d47b7',
+        accent2: '#8f3f00',
+        good: '#0a6a45',
+        warn: '#6f3400',
+        text: '#101d36',
+        muted: '#243a5f',
       },
       boxShadow: {
-        glow: '0 8px 20px rgba(60, 223, 255, 0.35)',
-        deep: '0 15px 40px rgba(0, 0, 0, 0.35)',
+        glow: '0 12px 28px rgba(33, 121, 255, 0.24)',
+        deep: '0 24px 48px rgba(26, 39, 66, 0.16)',
       },
       borderRadius: {
-        xl2: '18px',
+        xl2: '22px',
       },
       fontFamily: {
-        display: ['"Baloo 2"', '"Comic Neue"', '"Trebuchet MS"', 'system-ui', 'sans-serif'],
+        display: ['"Fredoka"', '"Nunito"', '"Trebuchet MS"', 'sans-serif'],
       },
       transitionDuration: {
         fast: '220ms',

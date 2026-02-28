@@ -37,7 +37,7 @@ export default function QuestionCard({
   return (
     <section
       className={classNames(
-        'bg-panel/90 border border-white/10 rounded-xl2 p-5 shadow-deep relative overflow-hidden flex flex-col',
+        'bg-white border-2 border-[#3f567e] rounded-xl2 p-4 md:p-5 shadow-deep relative overflow-hidden flex flex-col',
         flashClass
       )}
     >
@@ -74,7 +74,7 @@ export default function QuestionCard({
 
       {pageComplete && <RetryButton onRetry={onRetry} />}
 
-      <div className="hidden md:flex mt-3 items-center justify-end">
+      <div className="hidden md:flex mt-4 items-center justify-end">
         <ProgressBadge counts={counts} />
       </div>
 

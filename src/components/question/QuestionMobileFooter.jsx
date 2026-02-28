@@ -12,11 +12,8 @@ export default function QuestionMobileFooter({
   onShowSolution,
 }) {
   return (
-    <div className="md:hidden mt-3 flex flex-wrap sm:flex-nowrap items-center gap-3 justify-between">
-      <ProgressBadge
-        counts={counts}
-        className="order-2 sm:order-1 w-full sm:w-auto"
-      />
+    <div className="md:hidden mt-4 grid gap-3 border-t-2 border-[#3f567e] pt-3">
+      <ProgressBadge counts={counts} className="w-full" />
 
       {!pageComplete && !boardMode && (
         <QuestionActions
@@ -25,7 +22,7 @@ export default function QuestionMobileFooter({
           disableShowSolution={disableShowSolution}
           onSubmit={onSubmit}
           onShowSolution={onShowSolution}
-          className="flex gap-3 ml-auto order-1 sm:order-2 w-full sm:w-auto justify-end"
+          className="grid grid-cols-2 gap-2 w-full"
         />
       )}
     </div>

@@ -63,8 +63,8 @@ export default function AnswerInputSection({
   };
 
   return (
-    <div className="flex flex-wrap md:flex-nowrap gap-3 items-stretch mt-2 md:items-center">
-      <div className="relative flex-1 min-w-[240px]">
+    <div className="mt-1 grid gap-3 md:flex md:items-center">
+      <div className="relative flex-1 min-w-0">
         <input
           ref={inputRef}
           type="text"
@@ -75,11 +75,11 @@ export default function AnswerInputSection({
               : 'Deine Antwort...'
           }
           className={classNames(
-            'w-full pr-14 py-4.5 text-xl font-semibold rounded-2xl shadow-glow border-2 border-white/20 bg-[#0f1f33]/90 focus:ring-2 focus:ring-accent focus:border-accent transition-all duration-200',
+            'w-full pr-12 py-3.5 md:py-4 text-[1.15rem] md:text-[1.3rem] font-bold rounded-[18px] border-2 border-[#3f567e] bg-white focus:ring-2 focus:ring-accent focus:border-accent transition-all duration-200 shadow-[0_8px_20px_rgba(33,121,255,0.12)]',
             {
-              'border-good/80 bg-[rgba(109,242,164,0.10)] shadow-[0_0_0_2px_rgba(109,242,164,0.40)]':
+              'border-good/70 bg-[rgba(23,164,109,0.10)] shadow-[0_0_0_3px_rgba(23,164,109,0.24)]':
                 status === 'correct',
-              'border-[#ff8585]/80 bg-[rgba(255,133,133,0.10)] shadow-[0_0_0_2px_rgba(255,133,133,0.40)]':
+              'border-[#c62828] bg-[rgba(198,40,40,0.10)] shadow-[0_0_0_3px_rgba(198,40,40,0.22)]':
                 status === 'wrong',
             }
           )}
@@ -94,10 +94,10 @@ export default function AnswerInputSection({
 
         <span
           className={classNames(
-            'absolute right-3 top-1/2 -translate-y-1/2 opacity-0 pointer-events-none font-extrabold transition-opacity duration-200',
+            'absolute right-3 top-1/2 -translate-y-1/2 opacity-0 pointer-events-none font-black text-xl transition-opacity duration-200',
             {
               'opacity-100 text-good': status === 'correct',
-              'opacity-100 text-[#ff8585]': status === 'wrong',
+              'opacity-100 text-[#c62828]': status === 'wrong',
             }
           )}
         >
@@ -107,8 +107,8 @@ export default function AnswerInputSection({
 
       <button
         type="button"
-        className={classNames('secondary px-4 py-3 whitespace-nowrap', {
-          'ring-1 ring-accent2/40 text-accent2': isRecording,
+        className={classNames('secondary w-full md:w-[148px] px-4 py-3 whitespace-nowrap min-h-[52px]', {
+          'ring-2 ring-accent2 text-[#7b3700] border-accent2 bg-[#fff5e9]': isRecording,
         })}
         onPointerDown={handleMicPointerDown}
         onPointerUp={handleMicPointerUp}

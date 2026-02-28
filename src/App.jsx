@@ -46,7 +46,7 @@ export default function App() {
   }, []);
 
   return (
-    <div className="flex flex-col items-center gap-5">
+    <div className="flex w-full flex-col items-center gap-4 md:gap-5">
       <Header
         headline={activeClass.headline}
         activeClassId={activeClassId}
@@ -91,14 +91,16 @@ export default function App() {
         />
       </main>
 
-      <section className="w-full max-w-[1100px] min-h-[14px] -mt-2">
+      <section className="w-full max-w-[1100px] min-h-[14px] -mt-1 px-1">
         {speechPlaybackError && (
-          <p className="text-[11px] text-muted/80 leading-tight">
+          <p className="text-[12px] font-semibold text-[#9a5a00] leading-tight">
             {speechPlaybackError}
           </p>
         )}
         {speechInputError && (
-          <p className="text-[11px] text-muted/80 leading-tight">{speechInputError}</p>
+          <p className="text-[12px] font-semibold text-[#9a5a00] leading-tight">
+            {speechInputError}
+          </p>
         )}
       </section>
 

@@ -1,3 +1,5 @@
+import classNames from 'classnames';
+
 export default function QuestionActions({
   showingSolution,
   disableSubmit,
@@ -10,7 +12,10 @@ export default function QuestionActions({
     <div className={className}>
       <button
         type="button"
-        className="px-4 whitespace-nowrap"
+        className={classNames(
+          'px-4 md:px-5 whitespace-nowrap min-h-[50px] w-full md:w-[120px]',
+          { secondary: showingSolution }
+        )}
         onClick={onSubmit}
         disabled={disableSubmit}
       >
@@ -18,7 +23,10 @@ export default function QuestionActions({
       </button>
       <button
         type="button"
-        className="secondary px-4 whitespace-nowrap"
+        className={classNames(
+          'px-4 md:px-5 whitespace-nowrap min-h-[50px] w-full md:w-[170px]',
+          { secondary: !showingSolution }
+        )}
         onClick={onShowSolution}
         disabled={disableShowSolution}
       >
