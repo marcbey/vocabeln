@@ -37,7 +37,7 @@ export default {
         },
       },
       animation: {
-        pop: 'pop 900ms ease-out forwards',
+        pop: 'pop 1500ms ease-out forwards',
       },
     },
   },

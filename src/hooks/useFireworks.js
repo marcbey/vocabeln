@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 const COLORS = ['#ff8fb1', '#6df2a4', '#3cdfff', '#ffd66d', '#b18fff'];
-const BURST_LIMIT = 6;
-const SPARKS_PER_BURST = 25;
-const BURST_INTERVAL_MS = 350;
-const SPARK_LIFETIME_MS = 900;
+const BURST_LIMIT = 10;
+const SPARKS_PER_BURST = 36;
+const BURST_INTERVAL_MS = 260;
+const SPARK_LIFETIME_MS = 1500;
 
 function randomIndex(max) {
   return Math.floor(Math.random() * max);
@@ -23,7 +23,7 @@ function createBurstSparks() {
 
   return Array.from({ length: SPARKS_PER_BURST }, (_, index) => {
     const angle = (Math.PI * 2 * index) / SPARKS_PER_BURST;
-    const distance = 80 + Math.random() * 70;
+    const distance = 95 + Math.random() * 95;
 
     return {
       id: sparkId(index),
