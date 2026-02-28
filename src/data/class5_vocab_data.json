@@ -852,7 +852,7 @@
     },
     {
       "english": "Look …",
-      "german": "Schau mal …; Schau … nach ."
+      "german": "Schau mal …; Schau … nach."
     },
     {
       "english": "thanks",
@@ -1940,7 +1940,7 @@
     },
     {
       "english": "oh",
-      "german": "null (bei Uhrzeiten und Telefonnumern)"
+      "german": "null (bei Uhrzeiten und Telefonnummern)"
     },
     {
       "english": "past",
@@ -1990,7 +1990,7 @@
     },
     {
       "english": "with trainers on",
-      "german": "und hat T urnschuhe an"
+      "german": "und hat Turnschuhe an"
     },
     {
       "english": "lead",
@@ -2432,7 +2432,7 @@
     },
     {
       "english": "to have a sleepover",
-      "german": "machen ine Übernachtungsparty"
+      "german": "eine Übernachtungsparty machen"
     },
     {
       "english": "to go to a theme park",
@@ -2727,7 +2727,7 @@
       "german": "Einkaufszettel"
     },
     {
-      "english": "Can yousay that again, please?",
+      "english": "Can you say that again, please?",
       "german": "Könntest du das bitte wiederholen?"
     },
     {
@@ -3603,7 +3603,7 @@
       "german": "warm"
     },
     {
-      "english": "See yousoon!",
+      "english": "See you soon!",
       "german": "Bis bald!"
     }
   ],
