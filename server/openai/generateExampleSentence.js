@@ -4,6 +4,69 @@ import { sanitizeVocabularyText } from './synthesizeVocabulary.js';
 const CACHE_TTL_MS = 1000 * 60 * 60 * 6;
 const CACHE_MAX_ITEMS = 200;
 const sentenceCache = new Map();
+const APOSTROPHE_VARIANTS_RE = /[’´`ʼʹ′]/g;
+
+const STOP_WORDS = {
+  de: new Set([
+    'am',
+    'an',
+    'auf',
+    'aus',
+    'bei',
+    'bis',
+    'das',
+    'dass',
+    'dein',
+    'dem',
+    'den',
+    'der',
+    'des',
+    'die',
+    'ein',
+    'eine',
+    'einem',
+    'einen',
+    'einer',
+    'er',
+    'es',
+    'für',
+    'im',
+    'in',
+    'ist',
+    'mein',
+    'mit',
+    'nach',
+    'sich',
+    'über',
+    'um',
+    'und',
+    'vom',
+    'von',
+    'vor',
+    'zu',
+    'zum',
+    'zur',
+  ]),
+  en: new Set([
+    'a',
+    'an',
+    'and',
+    'are',
+    'as',
+    'at',
+    'for',
+    'from',
+    'in',
+    'is',
+    'of',
+    'on',
+    'or',
+    'that',
+    'the',
+    'to',
+    'with',
+  ]),
+};
 
 const PROMPT_BY_LANGUAGE = {
   de: [
@@ -45,8 +108,116 @@ function normalizeSentence(text) {
     .trim();
 }
 
-function includesVocabulary(sentence, vocabulary) {
-  return sentence.toLowerCase().includes(vocabulary.toLowerCase());
+function normalizeForMatching(value) {
+  return value
+    .replace(APOSTROPHE_VARIANTS_RE, "'")
+    .toLowerCase()
+    .replace(/'/g, '')
+    .replace(/[^\p{L}\p{N}\s-]/gu, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function toMatchToken(token) {
+  return token
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .replace(/-/g, '');
+}
+
+function tokenize(value) {
+  const normalized = normalizeForMatching(value);
+  if (!normalized) {
+    return [];
+  }
+
+  return normalized
+    .split(' ')
+    .map(toMatchToken)
+    .filter(Boolean);
+}
+
+export function extractVocabularyVariants(vocabulary) {
+  return vocabulary
+    .split(/[;|/]/)
+    .map((variant) => variant.replace(/^hier:\s*/i, '').trim())
+    .filter(Boolean);
+}
+
+function tokenMatches(sentenceToken, vocabularyToken) {
+  if (!sentenceToken || !vocabularyToken) {
+    return false;
+  }
+
+  if (sentenceToken === vocabularyToken) {
+    return true;
+  }
+
+  const shorter =
+    sentenceToken.length <= vocabularyToken.length
+      ? sentenceToken
+      : vocabularyToken;
+  const longer =
+    sentenceToken.length > vocabularyToken.length
+      ? sentenceToken
+      : vocabularyToken;
+
+  return shorter.length >= 4 && longer.startsWith(shorter);
+}
+
+function getRelevantTokens(tokens, language) {
+  const stopWords = STOP_WORDS[language] || STOP_WORDS.en;
+  const relevant = tokens.filter(
+    (token) => token.length >= 2 && !stopWords.has(token)
+  );
+
+  if (relevant.length > 0) {
+    return relevant;
+  }
+
+  return tokens.filter((token) => token.length >= 2);
+}
+
+function sentenceUsesVariant(sentence, vocabularyVariant, language) {
+  const normalizedSentence = normalizeForMatching(sentence);
+  const normalizedVariant = normalizeForMatching(vocabularyVariant);
+  if (!normalizedSentence || !normalizedVariant) {
+    return false;
+  }
+
+  if (normalizedSentence.includes(normalizedVariant)) {
+    return true;
+  }
+
+  const sentenceTokens = tokenize(sentence);
+  if (!sentenceTokens.length) {
+    return false;
+  }
+
+  const variantTokens = getRelevantTokens(tokenize(vocabularyVariant), language);
+  if (!variantTokens.length) {
+    return false;
+  }
+
+  return variantTokens.every((variantToken) =>
+    sentenceTokens.some((sentenceToken) =>
+      tokenMatches(sentenceToken, variantToken)
+    )
+  );
+}
+
+export function sentenceUsesVocabulary(sentence, vocabularyVariants, language) {
+  return vocabularyVariants.some((variant) =>
+    sentenceUsesVariant(sentence, variant, language)
+  );
+}
+
+function pickPromptVocabulary(vocabulary, variants) {
+  if (variants.length) {
+    return variants[0];
+  }
+
+  return vocabulary;
 }
 
 function fallbackSentence(vocabulary, language) {
@@ -63,7 +234,9 @@ export async function generateExampleSentence({ text, language }) {
     throw new Error('Vocabulary text for example sentence is empty.');
   }
 
-  const key = cacheKey(vocabulary, language);
+  const vocabularyVariants = extractVocabularyVariants(vocabulary);
+  const promptVocabulary = pickPromptVocabulary(vocabulary, vocabularyVariants);
+  const key = cacheKey(promptVocabulary, language);
   const now = Date.now();
   const cachedEntry = sentenceCache.get(key);
 
@@ -85,7 +258,10 @@ export async function generateExampleSentence({ text, language }) {
       },
       {
         role: 'user',
-        content: `Vocabulary: ${vocabulary}`,
+        content:
+          language === 'de'
+            ? `Vokabel: ${promptVocabulary}`
+            : `Vocabulary: ${promptVocabulary}`,
       },
     ],
     temperature: 0.5,
@@ -98,9 +274,13 @@ export async function generateExampleSentence({ text, language }) {
   const sentence =
     normalizedSentence &&
     normalizedSentence.length <= 180 &&
-    includesVocabulary(normalizedSentence, vocabulary)
+    sentenceUsesVocabulary(
+      normalizedSentence,
+      vocabularyVariants.length ? vocabularyVariants : [promptVocabulary],
+      language
+    )
       ? normalizedSentence
-      : fallbackSentence(vocabulary, language);
+      : fallbackSentence(promptVocabulary, language);
 
   sentenceCache.set(key, {
     sentence,
