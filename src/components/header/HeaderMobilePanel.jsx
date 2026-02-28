@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import classNames from 'classnames';
 import ClassSelect from './ClassSelect.jsx';
 import DirectionSelect from './DirectionSelect.jsx';
+import HeaderActions from './HeaderActions.jsx';
 import PageSelect from './PageSelect.jsx';
 
 export default function HeaderMobilePanel({
@@ -12,9 +13,12 @@ export default function HeaderMobilePanel({
   completedPages,
   isIrregular,
   direction,
+  boardMode,
   onClassChange,
   onPageChange,
   onDirectionChange,
+  onToggleBoardMode,
+  onReset,
   onClose,
 }) {
   useEffect(() => {
@@ -75,6 +79,18 @@ export default function HeaderMobilePanel({
             direction={direction}
             onChange={onDirectionChange}
             className="w-full"
+          />
+        </div>
+
+        <div className="grid gap-2 border-t border-[#3f567e]/35 pt-3 md:hidden">
+          <p className="m-0 text-[12px] uppercase tracking-[0.08em] text-muted font-extrabold">
+            Optionen
+          </p>
+          <HeaderActions
+            boardMode={boardMode}
+            onToggleBoardMode={onToggleBoardMode}
+            onReset={onReset}
+            fullWidth
           />
         </div>
 

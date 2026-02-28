@@ -97,9 +97,12 @@ export default function Header({
           completedPages={completedPages}
           isIrregular={isIrregular}
           direction={direction}
+          boardMode={boardMode}
           onClassChange={handleClassChange}
           onPageChange={handlePageChange}
           onDirectionChange={handleDirectionChange}
+          onToggleBoardMode={handleToggleBoardMode}
+          onReset={handleReset}
           onClose={closeMobileMenu}
         />
       )}
