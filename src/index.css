@@ -97,6 +97,14 @@ button.toggle.active {
   background: linear-gradient(135deg, #f3a229 0%, #d86e00 100%);
 }
 
+.no-touch-text-select {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
 .badge {
   @apply text-sm rounded-xl border-2 border-[#3f567e] bg-white text-text;
 }

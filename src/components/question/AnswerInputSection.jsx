@@ -107,9 +107,12 @@ export default function AnswerInputSection({
 
       <button
         type="button"
-        className={classNames('secondary w-full md:w-[148px] px-4 py-3 whitespace-nowrap min-h-[52px]', {
-          'ring-2 ring-accent2 text-[#7b3700] border-accent2 bg-[#fff5e9]': isRecording,
-        })}
+        className={classNames(
+          'secondary w-full md:w-[148px] px-4 py-3 whitespace-nowrap min-h-[52px] no-touch-text-select',
+          {
+            'ring-2 ring-accent2 text-[#7b3700] border-accent2 bg-[#fff5e9]': isRecording,
+          }
+        )}
         onPointerDown={handleMicPointerDown}
         onPointerUp={handleMicPointerUp}
         onPointerCancel={stopRecording}
@@ -118,6 +121,7 @@ export default function AnswerInputSection({
             stopRecording();
           }
         }}
+        onContextMenu={(event) => event.preventDefault()}
         onKeyDown={handleMicKeyDown}
         onKeyUp={handleMicKeyUp}
         disabled={speechDisabled}
