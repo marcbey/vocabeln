@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { DIRECTIONS, IRREGULAR_PAGE_KEY } from '../../constants.js';
 import { answeredKey, isCorrect, isCorrectIrregular } from '../../utils/answers.js';
 import {
@@ -6,6 +6,8 @@ import {
   pickWordForDirection,
 } from '../../utils/quiz.js';
 import { getQuestionDirection } from './selectors.js';
+
+const SPOKEN_CORRECT_PREVIEW_MS = 280;
 
 export function useQuizActions({
   pages,
@@ -45,6 +47,23 @@ export function useQuizActions({
   const { persistSettings, loadPageProgress, persistProgress, clearStoredProgress } =
     persistence;
   const { setStatusFlash, clearStatusFlash, clearStatusOnly } = statusFlash;
+  const spokenSubmitTimerRef = useRef(null);
+
+  const clearPendingSpokenSubmit = useCallback(() => {
+    if (!spokenSubmitTimerRef.current) {
+      return;
+    }
+
+    window.clearTimeout(spokenSubmitTimerRef.current);
+    spokenSubmitTimerRef.current = null;
+  }, []);
+
+  useEffect(
+    () => () => {
+      clearPendingSpokenSubmit();
+    },
+    [clearPendingSpokenSubmit]
+  );
 
   const applyPageProgress = useCallback(
     (progress) => {
@@ -55,10 +74,16 @@ export function useQuizActions({
   );
 
   const resetQuestionUi = useCallback(() => {
+    clearPendingSpokenSubmit();
     setShowingSolution(false);
     clearStatusFlash();
     setAnswerValue('');
-  }, [clearStatusFlash, setAnswerValue, setShowingSolution]);
+  }, [
+    clearPendingSpokenSubmit,
+    clearStatusFlash,
+    setAnswerValue,
+    setShowingSolution,
+  ]);
 
   const handleCompletion = useCallback(
     (nextAnswered = answeredCorrect) => {
@@ -187,6 +212,8 @@ export function useQuizActions({
   }, [answeredCorrect, changeDirection, direction, page, vocabData]);
 
   const setNextWord = useCallback(() => {
+    clearPendingSpokenSubmit();
+
     const nextWord = pickWordForDirection({
       direction,
       page,
@@ -215,6 +242,7 @@ export function useQuizActions({
   }, [
     answeredCorrect,
     autoSwitchDirectionIfNeeded,
+    clearPendingSpokenSubmit,
     clearStatusOnly,
     direction,
     irregularData,
@@ -229,6 +257,8 @@ export function useQuizActions({
 
   const submitRawAnswer = useCallback(
     (rawInput, { preserveInput = true } = {}) => {
+      clearPendingSpokenSubmit();
+
       if (boardMode || showingSolution || !currentWord) {
         return;
       }
@@ -297,6 +327,7 @@ export function useQuizActions({
       answeredCorrect,
       asked,
       boardMode,
+      clearPendingSpokenSubmit,
       currentQuestionDir,
       currentWord,
       direction,
@@ -314,6 +345,8 @@ export function useQuizActions({
   );
 
   const submitAnswer = useCallback(() => {
+    clearPendingSpokenSubmit();
+
     if (boardMode || showingSolution || !currentWord) {
       return;
     }
@@ -326,6 +359,7 @@ export function useQuizActions({
   }, [
     answerValue,
     boardMode,
+    clearPendingSpokenSubmit,
     currentWord,
     submitRawAnswer,
     showingSolution,
@@ -337,13 +371,54 @@ export function useQuizActions({
         return;
       }
 
-      submitRawAnswer(spokenAnswer, { preserveInput: true });
+      if (boardMode || showingSolution || !currentWord) {
+        return;
+      }
+
+      const rawAnswer = spokenAnswer.trim();
+      if (!rawAnswer) {
+        return;
+      }
+
+      const questionDirection = getQuestionDirection(direction, currentQuestionDir);
+      const expectedAnswer =
+        questionDirection === DIRECTIONS[0] ? currentWord.de : currentWord.en;
+      const spokenAnswerIsCorrect =
+        questionDirection === 'irregular'
+          ? isCorrectIrregular(rawAnswer, currentWord)
+          : isCorrect(rawAnswer, expectedAnswer);
+
+      if (!spokenAnswerIsCorrect) {
+        submitRawAnswer(spokenAnswer, { preserveInput: true });
+        return;
+      }
+
+      clearPendingSpokenSubmit();
+      setAnswerValue(spokenAnswer);
+      clearStatusOnly();
+
+      spokenSubmitTimerRef.current = window.setTimeout(() => {
+        spokenSubmitTimerRef.current = null;
+        submitRawAnswer(spokenAnswer, { preserveInput: false });
+      }, SPOKEN_CORRECT_PREVIEW_MS);
     },
-    [submitRawAnswer]
+    [
+      boardMode,
+      clearPendingSpokenSubmit,
+      clearStatusOnly,
+      currentQuestionDir,
+      currentWord,
+      direction,
+      setAnswerValue,
+      showingSolution,
+      submitRawAnswer,
+    ]
   );
 
   const applyBoardResult = useCallback(
     (isAnswerCorrect) => {
+      clearPendingSpokenSubmit();
+
       if (!currentWord) {
         return;
       }
@@ -397,6 +472,7 @@ export function useQuizActions({
       answeredCorrect,
       asked,
       boardMode,
+      clearPendingSpokenSubmit,
       currentQuestionDir,
       currentWord,
       direction,
@@ -413,6 +489,8 @@ export function useQuizActions({
   );
 
   const showOrAdvanceSolution = useCallback(() => {
+    clearPendingSpokenSubmit();
+
     if (boardMode || !currentWord) {
       return;
     }
@@ -442,6 +520,7 @@ export function useQuizActions({
     answeredCorrect,
     asked,
     boardMode,
+    clearPendingSpokenSubmit,
     clearStatusFlash,
     currentWord,
     direction,
@@ -457,13 +536,16 @@ export function useQuizActions({
 
   const handleAnswerChange = useCallback(
     (value) => {
+      clearPendingSpokenSubmit();
       setAnswerValue(value);
       clearStatusOnly();
     },
-    [clearStatusOnly, setAnswerValue]
+    [clearPendingSpokenSubmit, clearStatusOnly, setAnswerValue]
   );
 
   const toggleBoardMode = useCallback(() => {
+    clearPendingSpokenSubmit();
+
     const nextBoardMode = !boardMode;
     setBoardMode(nextBoardMode);
     persistSettings(page, direction, nextBoardMode);
@@ -473,6 +555,7 @@ export function useQuizActions({
     }
   }, [
     boardMode,
+    clearPendingSpokenSubmit,
     direction,
     focusAnswer,
     page,
@@ -482,6 +565,8 @@ export function useQuizActions({
   ]);
 
   const resetAll = useCallback(() => {
+    clearPendingSpokenSubmit();
+
     if (!window.confirm('Fortschritt wirklich löschen?')) {
       return;
     }
@@ -509,6 +594,7 @@ export function useQuizActions({
     persistSettings(initialPage, DIRECTIONS[0], false);
   }, [
     clearStatusFlash,
+    clearPendingSpokenSubmit,
     clearStoredProgress,
     pages,
     persistSettings,
@@ -526,6 +612,8 @@ export function useQuizActions({
   ]);
 
   const retryPage = useCallback(() => {
+    clearPendingSpokenSubmit();
+
     setCompletedPages((prev) => {
       const next = new Set(prev);
       next.delete(page);
@@ -548,6 +636,7 @@ export function useQuizActions({
     setNextWord();
   }, [
     clearStatusFlash,
+    clearPendingSpokenSubmit,
     page,
     persistProgress,
     setAnswerValue,
