@@ -7,7 +7,7 @@ import {
 } from '../../utils/quiz.js';
 import { getQuestionDirection } from './selectors.js';
 
-const SPOKEN_CORRECT_PREVIEW_MS = 280;
+const SPOKEN_CORRECT_PREVIEW_MS = 2000;
 
 export function useQuizActions({
   pages,
