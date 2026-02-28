@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Header from './components/Header.jsx';
 import FireworksOverlay from './components/FireworksOverlay.jsx';
 import QuestionCard from './components/QuestionCard.jsx';
@@ -9,6 +9,44 @@ import {
 } from './data/index.js';
 import { useQuizController } from './hooks/useQuizController.js';
 import { loadActiveClass, saveActiveClass } from './utils/storage.js';
+
+const MOBILE_BREAKPOINT_QUERY = '(max-width: 767px)';
+const MAIN_INTERACTION_SELECTOR =
+  'button, [role="button"], input, select, textarea, [data-main-action]';
+
+function isMobileViewport() {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  if (typeof window.matchMedia === 'function') {
+    return window.matchMedia(MOBILE_BREAKPOINT_QUERY).matches;
+  }
+
+  return window.innerWidth <= 767;
+}
+
+function shouldTriggerMainAutoScroll(target) {
+  if (!(target instanceof Element)) {
+    return false;
+  }
+
+  const actionElement = target.closest(MAIN_INTERACTION_SELECTOR);
+  if (!actionElement) {
+    return false;
+  }
+
+  if (
+    actionElement instanceof HTMLButtonElement ||
+    actionElement instanceof HTMLInputElement ||
+    actionElement instanceof HTMLSelectElement ||
+    actionElement instanceof HTMLTextAreaElement
+  ) {
+    return !actionElement.disabled;
+  }
+
+  return actionElement.getAttribute('aria-disabled') !== 'true';
+}
 
 export default function App() {
   const [activeClassId, setActiveClassId] = useState(() =>
@@ -30,6 +68,8 @@ export default function App() {
   const activeDataset = CLASS_DATASETS[activeClassId] ?? CLASS_DATASETS[DEFAULT_CLASS_ID];
   const [speechPlaybackError, setSpeechPlaybackError] = useState('');
   const [speechInputError, setSpeechInputError] = useState('');
+  const mainRef = useRef(null);
+  const hasScrolledMainIntoViewRef = useRef(false);
 
   const quiz = useQuizController({
     classId: activeClassId,
@@ -44,6 +84,46 @@ export default function App() {
   const handleSpeechInputErrorChange = useCallback((nextError) => {
     setSpeechInputError(nextError || '');
   }, []);
+
+  const scrollMainIntoViewOnFirstMobileInteraction = useCallback(() => {
+    if (hasScrolledMainIntoViewRef.current || !isMobileViewport()) {
+      return;
+    }
+
+    hasScrolledMainIntoViewRef.current = true;
+    window.requestAnimationFrame(() => {
+      mainRef.current?.scrollIntoView?.({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    });
+  }, []);
+
+  const handleMainPointerDownCapture = useCallback(
+    (event) => {
+      if (!shouldTriggerMainAutoScroll(event.target)) {
+        return;
+      }
+
+      scrollMainIntoViewOnFirstMobileInteraction();
+    },
+    [scrollMainIntoViewOnFirstMobileInteraction]
+  );
+
+  const handleMainKeyDownCapture = useCallback(
+    (event) => {
+      if (event.key !== 'Enter' && event.key !== ' ') {
+        return;
+      }
+
+      if (!shouldTriggerMainAutoScroll(event.target)) {
+        return;
+      }
+
+      scrollMainIntoViewOnFirstMobileInteraction();
+    },
+    [scrollMainIntoViewOnFirstMobileInteraction]
+  );
 
   return (
     <div className="flex w-full flex-col items-center gap-4 md:gap-5">
@@ -64,7 +144,12 @@ export default function App() {
         onReset={quiz.resetAll}
       />
 
-      <main className="w-full max-w-[1100px] grid grid-cols-1 gap-4">
+      <main
+        ref={mainRef}
+        className="w-full max-w-[1100px] grid grid-cols-1 gap-4"
+        onPointerDownCapture={handleMainPointerDownCapture}
+        onKeyDownCapture={handleMainKeyDownCapture}
+      >
         <QuestionCard
           questionText={quiz.questionText}
           questionLanguage={quiz.questionLanguage}

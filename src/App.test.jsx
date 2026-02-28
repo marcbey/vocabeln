@@ -166,4 +166,49 @@ describe('App', () => {
     );
     expect(progressBadges.length).toBeGreaterThan(0);
   });
+
+  it('auto-scrolls main to top once on first mobile interaction in main, but not for header actions', async () => {
+    const user = userEvent.setup();
+    const originalMatchMedia = window.matchMedia;
+    const originalRaf = window.requestAnimationFrame;
+    const originalScrollIntoView = Element.prototype.scrollIntoView;
+    const scrollIntoViewSpy = vi.fn();
+
+    window.matchMedia = vi.fn().mockImplementation((query) => ({
+      matches: query === '(max-width: 767px)',
+      media: query,
+      onchange: null,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    }));
+    window.requestAnimationFrame = vi.fn((callback) => {
+      callback();
+      return 1;
+    });
+    Element.prototype.scrollIntoView = scrollIntoViewSpy;
+
+    try {
+      render(<App />);
+
+      await user.click(screen.getByRole('button', { name: /menü öffnen/i }));
+      expect(scrollIntoViewSpy).not.toHaveBeenCalled();
+
+      await user.click(screen.getAllByRole('button', { name: 'Check!' })[0]);
+      expect(scrollIntoViewSpy).toHaveBeenCalledTimes(1);
+
+      await user.click(screen.getAllByRole('button', { name: 'Lösung zeigen' })[0]);
+      expect(scrollIntoViewSpy).toHaveBeenCalledTimes(1);
+    } finally {
+      window.matchMedia = originalMatchMedia;
+      window.requestAnimationFrame = originalRaf;
+      if (originalScrollIntoView) {
+        Element.prototype.scrollIntoView = originalScrollIntoView;
+      } else {
+        delete Element.prototype.scrollIntoView;
+      }
+    }
+  });
 });
