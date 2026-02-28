@@ -42,6 +42,30 @@ After apply:
 terraform output service_url
 ```
 
+## TTS cache disk (1GB)
+
+The Terraform config can attach a Render persistent disk and pass the cache
+directory into the service env (`TTS_CACHE_DIR`).
+
+Defaults:
+
+- `persistent_disk_enabled = true`
+- `persistent_disk_size_gb = 1`
+- `persistent_disk_mount_path = "/var/data"`
+- `tts_cache_dir = "/var/data/tts-cache"`
+- `openai_text_model = "gpt-4o-mini"`
+
+Adjust these values in `terraform.tfvars` if needed.
+If `persistent_disk_enabled = false`, Terraform sets `TTS_CACHE_DIR` to
+`/tmp/tts-cache` automatically.
+
+After deploy, you can verify on the service shell:
+
+```bash
+echo "$TTS_CACHE_DIR"
+ls -la /var/data
+```
+
 ## Auto-deploy notes
 
 Terraform config in this folder explicitly sets:

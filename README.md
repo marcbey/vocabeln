@@ -35,6 +35,38 @@ Lokal:
   - `OPENAI_TEXT_MODEL=gpt-4o-mini`
 - `npm run dev:full` laedt `.env` automatisch, falls vorhanden.
 
+## TTS Cache Debug (curl)
+
+Die TTS-Endpunkte liefern Cache-Header:
+- `X-Cache` (`HIT` oder `MISS`)
+- `X-TTS-Audio-Cache` (`memory`, `disk`, `openai`)
+- `X-TTS-Sentence-Cache` (nur bei `/api/tts/example`)
+
+Lokaler Test (Server auf Port `10000`):
+
+```bash
+# 1) Vorlesen
+curl -s -D - \
+  -H "Content-Type: application/json" \
+  -X POST http://localhost:10000/api/tts \
+  -d '{"text":"Haus","language":"de"}' \
+  -o /tmp/tts-vocabulary.mp3 | grep -i -E 'x-cache|x-tts-'
+
+# 2) Gleiches nochmal (sollte typischerweise HIT sein)
+curl -s -D - \
+  -H "Content-Type: application/json" \
+  -X POST http://localhost:10000/api/tts \
+  -d '{"text":"Haus","language":"de"}' \
+  -o /tmp/tts-vocabulary-2.mp3 | grep -i -E 'x-cache|x-tts-'
+
+# 3) Beispielsatz
+curl -s -D - \
+  -H "Content-Type: application/json" \
+  -X POST http://localhost:10000/api/tts/example \
+  -d '{"text":"Haus","language":"de"}' \
+  -o /tmp/tts-example.mp3 | grep -i -E 'x-cache|x-tts-'
+```
+
 ## Deployment auf Render
 
 Das Deployment ist auf Render als Web Service ausgelegt (Frontend + Backend in einem Service).

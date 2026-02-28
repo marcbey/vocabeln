@@ -16,6 +16,12 @@ provider "render" {
   skip_deploy_after_service_update = false
 }
 
+locals {
+  tts_cache_dir = trimspace(
+    var.persistent_disk_enabled ? var.tts_cache_dir : "/tmp/tts-cache"
+  )
+}
+
 resource "render_web_service" "vocabeln" {
   name              = var.service_name
   plan              = var.plan
@@ -34,10 +40,18 @@ resource "render_web_service" "vocabeln" {
     }
   }
 
+  disk = var.persistent_disk_enabled ? {
+    name       = var.persistent_disk_name
+    mount_path = var.persistent_disk_mount_path
+    size_gb    = var.persistent_disk_size_gb
+  } : null
+
   env_vars = {
-    OPENAI_API_KEY   = { value = var.openai_api_key }
-    OPENAI_TTS_MODEL = { value = var.openai_tts_model }
-    OPENAI_STT_MODEL = { value = var.openai_stt_model }
+    OPENAI_API_KEY    = { value = var.openai_api_key }
+    OPENAI_TTS_MODEL  = { value = var.openai_tts_model }
+    OPENAI_STT_MODEL  = { value = var.openai_stt_model }
+    OPENAI_TEXT_MODEL = { value = var.openai_text_model }
+    TTS_CACHE_DIR     = { value = local.tts_cache_dir }
   }
 }
 

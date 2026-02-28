@@ -1,9 +1,13 @@
 import { getOpenAIClient } from './client.js';
 import { sanitizeVocabularyText } from './synthesizeVocabulary.js';
+import { hashCacheParts, ttsDiskCache } from '../cache/ttsDiskCache.js';
 
-const CACHE_TTL_MS = 1000 * 60 * 60 * 6;
-const CACHE_MAX_ITEMS = 200;
+const MEMORY_CACHE_TTL_MS = 1000 * 60 * 60 * 6;
+const MEMORY_CACHE_MAX_ITEMS = 200;
+const DISK_CACHE_TTL_MS = 1000 * 60 * 60 * 24 * 7;
+const SENTENCE_PROMPT_VERSION = 'v1';
 const sentenceCache = new Map();
+const inFlightSentenceRequests = new Map();
 const APOSTROPHE_VARIANTS_RE = /[’´`ʼʹ′]/g;
 
 const STOP_WORDS = {
@@ -81,8 +85,14 @@ const PROMPT_BY_LANGUAGE = {
   ].join(' '),
 };
 
-function cacheKey(vocabulary, language) {
-  return `${language}:${vocabulary.toLowerCase()}`;
+function cacheKey({ vocabulary, language, model }) {
+  return hashCacheParts([
+    'tts-sentence',
+    language,
+    vocabulary.toLowerCase(),
+    model,
+    SENTENCE_PROMPT_VERSION,
+  ]);
 }
 
 function pruneCache() {
@@ -94,7 +104,7 @@ function pruneCache() {
     }
   }
 
-  while (sentenceCache.size > CACHE_MAX_ITEMS) {
+  while (sentenceCache.size > MEMORY_CACHE_MAX_ITEMS) {
     const oldestKey = sentenceCache.keys().next().value;
     sentenceCache.delete(oldestKey);
   }
@@ -228,19 +238,31 @@ function fallbackSentence(vocabulary, language) {
   return `Today I use the word ${vocabulary}.`;
 }
 
-export async function generateExampleSentence({ text, language }) {
+export async function generateExampleSentence({
+  text,
+  language,
+  telemetry = null,
+}) {
   const vocabulary = sanitizeVocabularyText(text.trim());
   if (!vocabulary) {
     throw new Error('Vocabulary text for example sentence is empty.');
   }
 
+  const model = process.env.OPENAI_TEXT_MODEL || 'gpt-4o-mini';
   const vocabularyVariants = extractVocabularyVariants(vocabulary);
   const promptVocabulary = pickPromptVocabulary(vocabulary, vocabularyVariants);
-  const key = cacheKey(promptVocabulary, language);
+  const key = cacheKey({
+    vocabulary: promptVocabulary,
+    language,
+    model,
+  });
   const now = Date.now();
   const cachedEntry = sentenceCache.get(key);
 
   if (cachedEntry && cachedEntry.expiresAt > now) {
+    if (telemetry && typeof telemetry === 'object') {
+      telemetry.sentenceCache = 'memory';
+    }
     return cachedEntry.sentence;
   }
 
@@ -248,45 +270,80 @@ export async function generateExampleSentence({ text, language }) {
     sentenceCache.delete(key);
   }
 
-  const openai = getOpenAIClient();
-  const response = await openai.responses.create({
-    model: process.env.OPENAI_TEXT_MODEL || 'gpt-4o-mini',
-    input: [
-      {
-        role: 'system',
-        content: PROMPT_BY_LANGUAGE[language] || PROMPT_BY_LANGUAGE.en,
-      },
-      {
-        role: 'user',
-        content:
-          language === 'de'
-            ? `Vokabel: ${promptVocabulary}`
-            : `Vocabulary: ${promptVocabulary}`,
-      },
-    ],
-    temperature: 0.5,
-    max_output_tokens: 80,
+  const inFlight = inFlightSentenceRequests.get(key);
+  if (inFlight) {
+    return inFlight;
+  }
+
+  const loadSentencePromise = (async () => {
+    const diskCachedSentence = await ttsDiskCache.getSentence(key);
+    if (diskCachedSentence) {
+      sentenceCache.set(key, {
+        sentence: diskCachedSentence,
+        expiresAt: Date.now() + MEMORY_CACHE_TTL_MS,
+      });
+      pruneCache();
+      if (telemetry && typeof telemetry === 'object') {
+        telemetry.sentenceCache = 'disk';
+      }
+      return diskCachedSentence;
+    }
+
+    const openai = getOpenAIClient();
+    const response = await openai.responses.create({
+      model,
+      input: [
+        {
+          role: 'system',
+          content: PROMPT_BY_LANGUAGE[language] || PROMPT_BY_LANGUAGE.en,
+        },
+        {
+          role: 'user',
+          content:
+            language === 'de'
+              ? `Vokabel: ${promptVocabulary}`
+              : `Vocabulary: ${promptVocabulary}`,
+        },
+      ],
+      temperature: 0.5,
+      max_output_tokens: 80,
+    });
+
+    const rawSentence =
+      typeof response.output_text === 'string' ? response.output_text : '';
+    const normalizedSentence = normalizeSentence(rawSentence);
+    const sentence =
+      normalizedSentence &&
+      normalizedSentence.length <= 180 &&
+      sentenceUsesVocabulary(
+        normalizedSentence,
+        vocabularyVariants.length ? vocabularyVariants : [promptVocabulary],
+        language
+      )
+        ? normalizedSentence
+        : fallbackSentence(promptVocabulary, language);
+
+    sentenceCache.set(key, {
+      sentence,
+      expiresAt: Date.now() + MEMORY_CACHE_TTL_MS,
+    });
+    pruneCache();
+
+    await ttsDiskCache.setSentence({
+      cacheKey: key,
+      sentence,
+      ttlMs: DISK_CACHE_TTL_MS,
+      language,
+    });
+    if (telemetry && typeof telemetry === 'object') {
+      telemetry.sentenceCache = 'openai';
+    }
+
+    return sentence;
+  })().finally(() => {
+    inFlightSentenceRequests.delete(key);
   });
 
-  const rawSentence =
-    typeof response.output_text === 'string' ? response.output_text : '';
-  const normalizedSentence = normalizeSentence(rawSentence);
-  const sentence =
-    normalizedSentence &&
-    normalizedSentence.length <= 180 &&
-    sentenceUsesVocabulary(
-      normalizedSentence,
-      vocabularyVariants.length ? vocabularyVariants : [promptVocabulary],
-      language
-    )
-      ? normalizedSentence
-      : fallbackSentence(promptVocabulary, language);
-
-  sentenceCache.set(key, {
-    sentence,
-    expiresAt: now + CACHE_TTL_MS,
-  });
-  pruneCache();
-
-  return sentence;
+  inFlightSentenceRequests.set(key, loadSentencePromise);
+  return loadSentencePromise;
 }
