@@ -248,6 +248,3 @@ Definition of done:
 5. Implement audio UI hooks/components with exact endpoint contracts.
 6. Add/adjust tests for quiz behavior, sentence matching, cache edge cases.
 7. Verify Render deployment config and env var wiring.
-
-## 15. Deprecation Note
-After this spec, `FEATURE.md` and `PROTOTYPE_SPEC.md` are no longer required for architecture/stack decisions and can be removed.
