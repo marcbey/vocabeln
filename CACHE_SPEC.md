@@ -237,13 +237,25 @@ Endpoints must expose cache source via headers:
 - `MISS` if any used source is `openai`
 - else `HIT`
 
-## 15. Security and Data Handling
+## 15. Monitoring Metrics
+Expose or derive at least these counters for operations observability:
+- `tts_cache_l1_hit`
+- `tts_cache_l2_hit`
+- `tts_cache_miss`
+- `tts_sentence_l2_hit`
+- `tts_sentence_miss`
+- `tts_cache_write_ok`
+- `tts_cache_write_fail`
+- `tts_openai_tts_requests`
+- `tts_openai_text_requests`
+
+## 16. Security and Data Handling
 - Cache only synthesized MP3 + generated sentence text metadata.
 - Do not store STT raw audio.
 - Do not store API keys in cache files.
 - Keep cache path outside web-served static directory.
 
-## 16. Environment and Infra Requirements
+## 17. Environment and Infra Requirements
 - `TTS_CACHE_DIR` configurable via env.
 - Render persistent disk recommended:
   - mount path `/var/data`
@@ -251,7 +263,7 @@ Endpoints must expose cache source via headers:
   - cache dir `/var/data/tts-cache`
 - If persistent disk disabled, fallback to `/tmp/tts-cache`.
 
-## 17. Test Matrix (Minimum)
+## 18. Test Matrix (Minimum)
 Implement automated tests for:
 1. Audio write/read roundtrip and reload across cache instance restart.
 2. Sentence TTL expiration.
@@ -260,7 +272,7 @@ Implement automated tests for:
 5. In-flight dedupe (same key should call upstream once).
 6. Missing-file stale metadata cleanup.
 
-## 18. Implementation Checklist
+## 19. Implementation Checklist
 1. Implement disk cache module with atomic index writes.
 2. Implement hash key helpers and versioned key material.
 3. Integrate L1+L2 read path for audio and sentence.
@@ -269,6 +281,6 @@ Implement automated tests for:
 6. Add cache response headers in TTS routes.
 7. Add tests from matrix above.
 
-## 19. Deprecation Note
+## 20. Deprecation Note
 After this spec is adopted, cache implementation no longer requires `FEATURE.md` or `PROTOTYPE_SPEC.md` context.
 Those files can be removed.
