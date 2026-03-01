@@ -33,7 +33,6 @@ export default function QuestionPrompt({
   questionLanguage,
   answerLanguage,
   canSpeak,
-  status,
   translation,
   showingSolution,
   showTranslation,
@@ -49,8 +48,6 @@ export default function QuestionPrompt({
   } = useSpeechPlayback();
   const [isReadAloudEnabled, setIsReadAloudEnabled] = useState(loadReadAloudEnabled);
   const previousShowingSolutionRef = useRef(showingSolution);
-  const previousStatusRef = useRef(status);
-  const skipNextQuestionReadRef = useRef(false);
 
   const exampleDisabled = !canSpeak || isLoading;
   const isExampleActive = activePlaybackType === 'example';
@@ -108,11 +105,6 @@ export default function QuestionPrompt({
       return;
     }
 
-    if (skipNextQuestionReadRef.current) {
-      skipNextQuestionReadRef.current = false;
-      return;
-    }
-
     playQuestion();
   }, [isReadAloudEnabled, playQuestion]);
 
@@ -125,19 +117,6 @@ export default function QuestionPrompt({
 
     previousShowingSolutionRef.current = showingSolution;
   }, [isReadAloudEnabled, playTranslation, showingSolution]);
-
-  useEffect(() => {
-    const previousStatus = previousStatusRef.current;
-
-    if (isReadAloudEnabled && previousStatus !== 'correct' && status === 'correct') {
-      // After a correct check, the next word is picked immediately. Skip that one
-      // auto-read once so the revealed solution can be heard first.
-      skipNextQuestionReadRef.current = true;
-      playTranslation();
-    }
-
-    previousStatusRef.current = status;
-  }, [isReadAloudEnabled, playTranslation, status]);
 
   useEffect(() => {
     const handleShortcutKeyDown = (event) => {

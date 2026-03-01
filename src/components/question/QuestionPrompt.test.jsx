@@ -43,7 +43,6 @@ function renderQuestionPrompt(overrides = {}) {
     questionLanguage: 'en',
     answerLanguage: 'de',
     canSpeak: true,
-    status: null,
     translation: 'Katze',
     showingSolution: false,
     showTranslation: false,
@@ -143,7 +142,6 @@ describe('QuestionPrompt desktop shortcuts', () => {
         questionLanguage="en"
         answerLanguage="de"
         canSpeak
-        status={null}
         translation="Katze"
         showingSolution
         showTranslation={false}
@@ -157,65 +155,13 @@ describe('QuestionPrompt desktop shortcuts', () => {
     });
   });
 
-  it('reads translation when status switches to correct while toggle is enabled', () => {
-    localStorage.setItem(READ_ALOUD_STORAGE_KEY, '1');
-
-    const { rerender } = renderQuestionPrompt({
-      status: null,
-      translation: 'Katze',
-      answerLanguage: 'de',
-    });
-    speechPlaybackMock.playVocabulary.mockClear();
-
-    rerender(
-      <QuestionPrompt
-        questionText="cat"
-        questionLanguage="en"
-        answerLanguage="de"
-        canSpeak
-        status="correct"
-        translation="Katze"
-        showingSolution={false}
-        showTranslation={false}
-        onSpeechPlaybackErrorChange={vi.fn()}
-      />
-    );
-
-    expect(speechPlaybackMock.playVocabulary).toHaveBeenCalledWith({
-      text: 'Katze',
-      language: 'de',
-    });
-  });
-
-  it('does not immediately replace correct-solution playback with the next question', () => {
+  it('auto-reads each new active question while toggle is enabled', () => {
     localStorage.setItem(READ_ALOUD_STORAGE_KEY, '1');
 
     const { rerender } = renderQuestionPrompt({
       questionText: 'cat',
-      status: null,
-      translation: 'Katze',
-      answerLanguage: 'de',
+      questionLanguage: 'en',
     });
-    speechPlaybackMock.playVocabulary.mockClear();
-
-    rerender(
-      <QuestionPrompt
-        questionText="cat"
-        questionLanguage="en"
-        answerLanguage="de"
-        canSpeak
-        status="correct"
-        translation="Katze"
-        showingSolution={false}
-        showTranslation={false}
-        onSpeechPlaybackErrorChange={vi.fn()}
-      />
-    );
-    expect(speechPlaybackMock.playVocabulary).toHaveBeenCalledWith({
-      text: 'Katze',
-      language: 'de',
-    });
-
     speechPlaybackMock.playVocabulary.mockClear();
 
     rerender(
@@ -224,7 +170,6 @@ describe('QuestionPrompt desktop shortcuts', () => {
         questionLanguage="en"
         answerLanguage="de"
         canSpeak
-        status={null}
         translation="Hund"
         showingSolution={false}
         showTranslation={false}
@@ -232,7 +177,10 @@ describe('QuestionPrompt desktop shortcuts', () => {
       />
     );
 
-    expect(speechPlaybackMock.playVocabulary).toHaveBeenCalledTimes(0);
+    expect(speechPlaybackMock.playVocabulary).toHaveBeenCalledWith({
+      text: 'dog',
+      language: 'en',
+    });
   });
 
   it('can trigger playback shortcuts when an input is focused with platform modifier', () => {

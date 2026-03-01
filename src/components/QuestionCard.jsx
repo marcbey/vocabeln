@@ -46,7 +46,6 @@ export default function QuestionCard({
         questionLanguage={questionLanguage}
         answerLanguage={answerLanguage}
         canSpeak={Boolean(currentWord)}
-        status={status}
         translation={translation}
         showingSolution={showingSolution}
         showTranslation={showTranslation}

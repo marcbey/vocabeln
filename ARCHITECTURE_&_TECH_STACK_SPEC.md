@@ -118,8 +118,6 @@ Backward compatibility rule for class5:
 - Read-aloud toggle behavior:
   - if enabled, auto-read current question text whenever a new question becomes active
   - if enabled, read translation when solution is revealed
-  - if enabled, read translation when answer status changes to `correct` (typed or spoken)
-  - after a `correct` status, suppress the immediate next-question auto-read once so translation playback is not overwritten
 
 ## 8. Backend Architecture
 ## 8.1 Middleware and Limits

@@ -75,7 +75,6 @@ Read-aloud toggle behavior:
 - If toggle is `An`, app auto-plays:
   - current question text when a new question is active
   - translation when `Loesung zeigen` reveals the solution
-  - translation when answer status changes to `correct`
 
 ## 5.2 Answer Area (non-board mode)
 Row content:
@@ -161,7 +160,6 @@ Disabled when:
 5. If correct:
    - mark answered key as correct
    - set status `correct`
-   - if read-aloud toggle is `An`: read translation once
    - clear input
    - persist progress
    - if page complete: trigger fireworks once and keep completion state
@@ -180,7 +178,6 @@ Disabled when:
 6. If `answer` returned:
    - if spoken answer is wrong: submit immediately like typed answer (input preserved)
    - if spoken answer is correct: show text in input for 2000ms preview, then auto-submit and clear
-   - when spoken answer is correct and read-aloud toggle is `An`, translation is read after validation succeeds (`status=correct`)
 
 ## 7.3 Show Solution Flow
 1. Click `Loesung zeigen`:
@@ -328,7 +325,7 @@ Guard rails:
 - Speech errors are visible but non-blocking.
 - Progress badge reflects real-time counts correctly in all modes.
 - `Vorlesen` toggle state persists via `speech:autoReadEnabled` and restores after reload.
-- With `Vorlesen: An`, question text and required translation events are auto-read according to sections 5.1 and 7.
+- With `Vorlesen: An`, question text and solution-reveal translation are auto-read according to sections 5.1 and 7.
 
 ## 14. Deprecation Note
 After this spec is adopted, UI/UX implementation must not depend on `FEATURE.md` or `PROTOTYPE_SPEC.md`.
