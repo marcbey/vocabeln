@@ -144,6 +144,12 @@
     "german": "hören"
   },
   {
+    "infinitive": "hurt",
+    "simplePast": "hurt",
+    "pastParticiple": "hurt",
+    "german": "weh tun; verletzen"
+  },
+  {
     "infinitive": "keep",
     "simplePast": "kept",
     "pastParticiple": "kept",

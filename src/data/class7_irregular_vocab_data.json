@@ -24,12 +24,6 @@
     "german": "verbrennen; brennen"
   },
   {
-    "infinitive": "cost",
-    "simplePast": "cost",
-    "pastParticiple": "cost",
-    "german": "kosten"
-  },
-  {
     "infinitive": "dream",
     "simplePast": "dreamt",
     "pastParticiple": "dreamt",
@@ -84,16 +78,10 @@
     "german": "klingeln; läuten"
   },
   {
-    "infinitive": "run",
-    "simplePast": "ran",
-    "pastParticiple": "run",
-    "german": "hier: betreiben; leiten; führen"
-  },
-  {
-    "infinitive": "sell",
-    "simplePast": "sold",
-    "pastParticiple": "sold",
-    "german": "verkaufen"
+    "infinitive": "shake",
+    "simplePast": "shook",
+    "pastParticiple": "shaken",
+    "german": "schütteln; zittern"
   },
   {
     "infinitive": "sink",
@@ -102,9 +90,9 @@
     "german": "untergehen; sinken"
   },
   {
-    "infinitive": "teach",
-    "simplePast": "taught",
-    "pastParticiple": "taught",
-    "german": "beibringen; unterrichten; lehren"
+    "infinitive": "stick",
+    "simplePast": "stuck",
+    "pastParticiple": "stuck",
+    "german": "kleben; stecken bleiben"
   }
 ]

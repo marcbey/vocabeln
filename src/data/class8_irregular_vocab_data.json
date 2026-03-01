@@ -12,28 +12,10 @@
     "german": "graben"
   },
   {
-    "infinitive": "drive",
-    "simplePast": "drove",
-    "pastParticiple": "driven",
-    "german": "ein Fahrzeug führen (z. B. Auto/Bus)"
-  },
-  {
     "infinitive": "grow",
     "simplePast": "grew",
     "pastParticiple": "grown",
     "german": "wachsen"
-  },
-  {
-    "infinitive": "hide",
-    "simplePast": "hid",
-    "pastParticiple": "hidden",
-    "german": "verstecken"
-  },
-  {
-    "infinitive": "lay",
-    "simplePast": "laid",
-    "pastParticiple": "laid",
-    "german": "legen"
   },
   {
     "infinitive": "lead",
@@ -48,12 +30,6 @@
     "german": "liegen"
   },
   {
-    "infinitive": "mean",
-    "simplePast": "meant",
-    "pastParticiple": "meant",
-    "german": "bedeuten; meinen"
-  },
-  {
     "infinitive": "overtake",
     "simplePast": "overtook",
     "pastParticiple": "overtaken",
@@ -66,22 +42,10 @@
     "german": "beweisen; nachweisen"
   },
   {
-    "infinitive": "ring",
-    "simplePast": "rang",
-    "pastParticiple": "rung",
-    "german": "klingeln; läuten"
-  },
-  {
     "infinitive": "rise",
     "simplePast": "rose",
     "pastParticiple": "risen",
     "german": "aufgehen; ansteigen"
-  },
-  {
-    "infinitive": "shake",
-    "simplePast": "shook",
-    "pastParticiple": "shaken",
-    "german": "schütteln; zittern"
   },
   {
     "infinitive": "shine",
@@ -94,6 +58,12 @@
     "simplePast": "shot",
     "pastParticiple": "shot",
     "german": "schießen"
+  },
+  {
+    "infinitive": "show",
+    "simplePast": "showed",
+    "pastParticiple": "shown",
+    "german": "zeigen"
   },
   {
     "infinitive": "slide",
@@ -112,12 +82,6 @@
     "simplePast": "stole",
     "pastParticiple": "stolen",
     "german": "stehlen"
-  },
-  {
-    "infinitive": "stick",
-    "simplePast": "stuck",
-    "pastParticiple": "stuck",
-    "german": "kleben; stecken bleiben"
   },
   {
     "infinitive": "sting",
@@ -148,12 +112,6 @@
     "simplePast": "woke",
     "pastParticiple": "woken",
     "german": "wecken; aufwachen"
-  },
-  {
-    "infinitive": "wear",
-    "simplePast": "wore",
-    "pastParticiple": "worn",
-    "german": "tragen (Kleidung); anhaben"
   },
   {
     "infinitive": "weave",
