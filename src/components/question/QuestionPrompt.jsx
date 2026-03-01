@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useSolutionRevealFlash } from '../../hooks/question/useSolutionRevealFlash.js';
+import { shouldHandleDesktopShortcutKeyDown } from '../../hooks/keyboard/desktopShortcuts.js';
 import { useSpeechPlayback } from '../../hooks/audio/useSpeechPlayback.js';
 import QuestionPromptAudioButtons from './QuestionPromptAudioButtons.jsx';
 import QuestionTranslationRow from './QuestionTranslationRow.jsx';
@@ -51,6 +52,43 @@ export default function QuestionPrompt({
   useEffect(() => {
     onSpeechPlaybackErrorChange?.(error);
   }, [error, onSpeechPlaybackErrorChange]);
+
+  useEffect(() => {
+    const handleShortcutKeyDown = (event) => {
+      if (event.repeat || !shouldHandleDesktopShortcutKeyDown(event) || disabled) {
+        return;
+      }
+
+      const key = event.key.toLowerCase();
+
+      if (key === 'v') {
+        event.preventDefault();
+        playVocabulary({
+          text: questionText,
+          language: questionLanguage,
+        });
+      }
+
+      if (key === 'b') {
+        event.preventDefault();
+        playExampleSentence({
+          text: questionText,
+          language: questionLanguage,
+        });
+      }
+    };
+
+    window.addEventListener('keydown', handleShortcutKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleShortcutKeyDown);
+    };
+  }, [
+    disabled,
+    playVocabulary,
+    playExampleSentence,
+    questionLanguage,
+    questionText,
+  ]);
 
   return (
     <div className="mt-1 mb-3 px-3 py-3 md:px-4 md:py-4 bg-[#e0e9f8] border-2 border-[#3f567e] rounded-xl2 shadow-[inset_0_1px_0_rgba(255,255,255,0.85)] flex flex-col gap-3">

@@ -274,6 +274,21 @@ Rules:
 - Keyboard operation required for check, solution, menu, and speech input.
 - Focus visible styles required on buttons/inputs/selects.
 
+## 11.1 Desktop Keyboard Shortcuts (`>= 768px`)
+- `v` -> trigger `Vorlesen`
+- `b` -> trigger `Beispielsatz`
+- `m` -> push-to-talk microphone:
+  - `keydown m` starts recording
+  - `keyup m` stops recording
+- `c` -> trigger `Check!`
+- `l` -> trigger `Loesung zeigen` (only when solution is hidden)
+- `w` -> trigger `Weiter` (only when solution is visible)
+
+Guard rails:
+- Shortcuts are desktop-only and must not run on mobile.
+- Ignore shortcut handling when `Ctrl`, `Cmd`, or `Alt` is pressed.
+- Ignore shortcut handling when focus is inside editable text controls (`input`, `textarea`, `select`, contenteditable).
+
 ## 12. Copy Catalog (Exact Labels)
 - Header buttons: `Tafel-Modus`, `Neu anfangen`, `Schliessen`
 - Action buttons: `Check!`, `Loesung zeigen`, `Weiter`
