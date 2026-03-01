@@ -1,3 +1,5 @@
+import KeyboardShortcutHint from './KeyboardShortcutHint.jsx';
+
 export default function QuestionPromptAudioButtons({
   disabled,
   vocabularyButtonLabel,
@@ -13,7 +15,10 @@ export default function QuestionPromptAudioButtons({
         onClick={onPlayVocabulary}
         disabled={disabled}
       >
-        {vocabularyButtonLabel}
+        <span className="inline-flex items-center justify-center gap-2">
+          <span>{vocabularyButtonLabel}</span>
+          <KeyboardShortcutHint shortcutKey="V" />
+        </span>
       </button>
 
       <button
@@ -22,7 +27,10 @@ export default function QuestionPromptAudioButtons({
         onClick={onPlayExampleSentence}
         disabled={disabled}
       >
-        {exampleButtonLabel}
+        <span className="inline-flex items-center justify-center gap-2">
+          <span>{exampleButtonLabel}</span>
+          <KeyboardShortcutHint shortcutKey="B" />
+        </span>
       </button>
     </div>
   );

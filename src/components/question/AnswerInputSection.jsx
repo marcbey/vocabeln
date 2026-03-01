@@ -1,5 +1,10 @@
 import { useEffect, useRef } from 'react';
-import { shouldHandleDesktopShortcutKeyDown } from '../../hooks/keyboard/desktopShortcuts.js';
+import {
+  isShortcutModifierPressed,
+  isShortcutModifierRelease,
+  isLetterShortcutPressed,
+  shouldHandleDesktopShortcutKeyDown,
+} from '../../hooks/keyboard/desktopShortcuts.js';
 import { useSpeechInput } from '../../hooks/audio/useSpeechInput.js';
 import AnswerTextInput from './AnswerTextInput.jsx';
 import QuestionActions from './QuestionActions.jsx';
@@ -77,14 +82,21 @@ export default function AnswerInputSection({
     };
 
     const handleShortcutKeyDown = (event) => {
-      if (!shouldHandleDesktopShortcutKeyDown(event)) {
+      if (
+        !shouldHandleDesktopShortcutKeyDown(event, {
+          allowInEditable: true,
+        })
+      ) {
+        return;
+      }
+
+      if (!isShortcutModifierPressed(event)) {
         return;
       }
 
       const shortcutConfig = shortcutConfigRef.current;
-      const key = event.key.toLowerCase();
 
-      if (key === 'm') {
+      if (isLetterShortcutPressed(event, 'm')) {
         if (
           event.repeat ||
           shortcutConfig.speechDisabled ||
@@ -103,14 +115,14 @@ export default function AnswerInputSection({
         return;
       }
 
-      if (key === 'c' && !shortcutConfig.disableSubmit) {
+      if (isLetterShortcutPressed(event, 'c') && !shortcutConfig.disableSubmit) {
         event.preventDefault();
         shortcutConfig.onSubmit();
         return;
       }
 
       if (
-        key === 'l' &&
+        isLetterShortcutPressed(event, 'l') &&
         !shortcutConfig.showingSolution &&
         !shortcutConfig.disableShowSolution
       ) {
@@ -120,7 +132,7 @@ export default function AnswerInputSection({
       }
 
       if (
-        key === 'w' &&
+        isLetterShortcutPressed(event, 'w') &&
         shortcutConfig.showingSolution &&
         !shortcutConfig.disableShowSolution
       ) {
@@ -130,7 +142,12 @@ export default function AnswerInputSection({
     };
 
     const handleShortcutKeyUp = (event) => {
-      if (event.key.toLowerCase() !== 'm') {
+      if (isShortcutModifierRelease(event)) {
+        releaseMicrophoneShortcut();
+        return;
+      }
+
+      if (!isLetterShortcutPressed(event, 'm')) {
         return;
       }
 

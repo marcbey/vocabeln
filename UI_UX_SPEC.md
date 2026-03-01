@@ -275,19 +275,28 @@ Rules:
 - Focus visible styles required on buttons/inputs/selects.
 
 ## 11.1 Desktop Keyboard Shortcuts (`>= 768px`)
-- `v` -> trigger `Vorlesen`
-- `b` -> trigger `Beispielsatz`
-- `m` -> push-to-talk microphone:
-  - `keydown m` starts recording
+- Platform mapping:
+  - macOS: use `Ctrl+<letter>` (`⌃` key)
+  - Windows/Linux: use `Alt+<letter>`
+- `v` combo -> trigger `Vorlesen`
+- `b` combo -> trigger `Beispielsatz`
+- `m` combo -> push-to-talk microphone:
+  - `keydown` with platform combo starts recording
   - `keyup m` stops recording
-- `c` -> trigger `Check!`
-- `l` -> trigger `Loesung zeigen` (only when solution is hidden)
-- `w` -> trigger `Weiter` (only when solution is visible)
+- `c` combo -> trigger `Check!`
+- `l` combo -> trigger `Loesung zeigen` (only when solution is hidden)
+- `w` combo -> trigger `Weiter` (only when solution is visible)
+
+Visual hint requirement:
+- Buttons with keyboard shortcuts must show a visible desktop key hint chip next to the label:
+  - macOS examples: `⌃V`, `⌃B`, `⌃M`, `⌃C`, `⌃L`, `⌃W`
+  - Windows/Linux examples: `Alt+V`, `Alt+B`, `Alt+M`, `Alt+C`, `Alt+L`, `Alt+W`
+- Key hint chips are visual-only (`aria-hidden`) so accessible button names remain the exact copy labels.
 
 Guard rails:
 - Shortcuts are desktop-only and must not run on mobile.
-- Ignore shortcut handling when `Ctrl`, `Cmd`, or `Alt` is pressed.
-- Ignore shortcut handling when focus is inside editable text controls (`input`, `textarea`, `select`, contenteditable).
+- Ignore shortcut handling when `Cmd` is pressed.
+- Platform shortcut combos are allowed while focus is inside editable text controls (`input`, `textarea`, `select`, contenteditable`) so they work even while typing.
 
 ## 12. Copy Catalog (Exact Labels)
 - Header buttons: `Tafel-Modus`, `Neu anfangen`, `Schliessen`

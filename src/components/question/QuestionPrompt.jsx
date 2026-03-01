@@ -1,6 +1,10 @@
 import { useEffect } from 'react';
 import { useSolutionRevealFlash } from '../../hooks/question/useSolutionRevealFlash.js';
-import { shouldHandleDesktopShortcutKeyDown } from '../../hooks/keyboard/desktopShortcuts.js';
+import {
+  isShortcutModifierPressed,
+  isLetterShortcutPressed,
+  shouldHandleDesktopShortcutKeyDown,
+} from '../../hooks/keyboard/desktopShortcuts.js';
 import { useSpeechPlayback } from '../../hooks/audio/useSpeechPlayback.js';
 import QuestionPromptAudioButtons from './QuestionPromptAudioButtons.jsx';
 import QuestionTranslationRow from './QuestionTranslationRow.jsx';
@@ -55,13 +59,21 @@ export default function QuestionPrompt({
 
   useEffect(() => {
     const handleShortcutKeyDown = (event) => {
-      if (event.repeat || !shouldHandleDesktopShortcutKeyDown(event) || disabled) {
+      if (
+        event.repeat ||
+        !shouldHandleDesktopShortcutKeyDown(event, {
+          allowInEditable: true,
+        }) ||
+        disabled
+      ) {
         return;
       }
 
-      const key = event.key.toLowerCase();
+      if (!isShortcutModifierPressed(event)) {
+        return;
+      }
 
-      if (key === 'v') {
+      if (isLetterShortcutPressed(event, 'v')) {
         event.preventDefault();
         playVocabulary({
           text: questionText,
@@ -69,7 +81,7 @@ export default function QuestionPrompt({
         });
       }
 
-      if (key === 'b') {
+      if (isLetterShortcutPressed(event, 'b')) {
         event.preventDefault();
         playExampleSentence({
           text: questionText,

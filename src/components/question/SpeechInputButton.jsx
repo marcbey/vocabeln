@@ -1,4 +1,5 @@
 import classNames from 'classnames';
+import KeyboardShortcutHint from './KeyboardShortcutHint.jsx';
 
 export default function SpeechInputButton({
   isRecording,
@@ -69,7 +70,10 @@ export default function SpeechInputButton({
       disabled={disabled}
       aria-label="Spracheingabe starten"
     >
-      {label}
+      <span className="inline-flex items-center justify-center gap-2">
+        <span>{label}</span>
+        <KeyboardShortcutHint shortcutKey="M" />
+      </span>
     </button>
   );
 }

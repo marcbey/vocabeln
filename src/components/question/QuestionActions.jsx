@@ -1,4 +1,5 @@
 import classNames from 'classnames';
+import KeyboardShortcutHint from './KeyboardShortcutHint.jsx';
 
 export default function QuestionActions({
   showingSolution,
@@ -19,7 +20,10 @@ export default function QuestionActions({
         onClick={onSubmit}
         disabled={disableSubmit}
       >
-        Check!
+        <span className="inline-flex items-center justify-center gap-2">
+          <span>Check!</span>
+          <KeyboardShortcutHint shortcutKey="C" />
+        </span>
       </button>
       <button
         type="button"
@@ -30,7 +34,10 @@ export default function QuestionActions({
         onClick={onShowSolution}
         disabled={disableShowSolution}
       >
-        {showingSolution ? 'Weiter' : 'Lösung zeigen'}
+        <span className="inline-flex items-center justify-center gap-2">
+          <span>{showingSolution ? 'Weiter' : 'Lösung zeigen'}</span>
+          <KeyboardShortcutHint shortcutKey={showingSolution ? 'W' : 'L'} />
+        </span>
       </button>
     </div>
   );
