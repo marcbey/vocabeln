@@ -4,6 +4,8 @@ import class6IrregularRaw from './class6_irregular_vocab_data.json';
 import class6VocabRaw from './class6_vocab_data.json';
 import class7IrregularRaw from './class7_irregular_vocab_data.json';
 import class7VocabRaw from './class7_vocab_data.json';
+import class8IrregularRaw from './class8_irregular_vocab_data.json';
+import class8VocabRaw from './class8_vocab_data.json';
 import { parseIrregularData, parseVocabData } from './schema.js';
 
 function mapVocabToAppShape(vocabData) {
@@ -43,12 +45,18 @@ export const CLASS_OPTIONS = [
     label: 'Klasse 7',
     headline: 'Vokabeln für die Klasse 7',
   },
+  {
+    id: 'class8',
+    label: 'Klasse 8',
+    headline: 'Vokabeln für die Klasse 8',
+  },
 ];
 
 export const CLASS_DATASETS = {
   class5: createDataset(class5VocabRaw, class5IrregularRaw),
   class6: createDataset(class6VocabRaw, class6IrregularRaw),
   class7: createDataset(class7VocabRaw, class7IrregularRaw),
+  class8: createDataset(class8VocabRaw, class8IrregularRaw),
 };
 
 // Backwards-compatible exports used by a few tests and utility imports.
