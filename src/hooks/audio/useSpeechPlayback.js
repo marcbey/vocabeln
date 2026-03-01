@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 function toUserMessage(responseStatus) {
   if (responseStatus >= 500) {
-    return 'Sprachausgabe ist gerade nicht verfuegbar.';
+    return 'Sprachausgabe ist gerade nicht verfügbar.';
   }
 
   return 'Sprachausgabe konnte nicht geladen werden.';

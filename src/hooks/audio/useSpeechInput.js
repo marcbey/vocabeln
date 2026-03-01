@@ -67,13 +67,13 @@ export function useSpeechInput({ language, onAnswerReady }) {
       if (!response.ok) {
         const payload = await response
           .json()
-          .catch(() => ({ error: 'Spracherkennung ist gerade nicht verfuegbar.' }));
+          .catch(() => ({ error: 'Spracherkennung ist gerade nicht verfügbar.' }));
 
         if (response.status === 400) {
           throw new Error('Audio konnte nicht ausgewertet werden.');
         }
 
-        throw new Error(payload.error || 'Spracherkennung ist gerade nicht verfuegbar.');
+        throw new Error(payload.error || 'Spracherkennung ist gerade nicht verfügbar.');
       }
 
       const payload = await response.json();
@@ -107,7 +107,7 @@ export function useSpeechInput({ language, onAnswerReady }) {
     }
 
     if (!window.MediaRecorder || !navigator.mediaDevices?.getUserMedia) {
-      setHint('Spracheingabe auf diesem Geraet nicht verfuegbar.');
+      setHint('Spracheingabe auf diesem Gerät nicht verfügbar.');
       return;
     }
 
