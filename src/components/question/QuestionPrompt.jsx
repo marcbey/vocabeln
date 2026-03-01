@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSolutionRevealFlash } from '../../hooks/question/useSolutionRevealFlash.js';
 import {
   isShortcutModifierPressed,
@@ -10,10 +10,30 @@ import QuestionPromptAudioButtons from './QuestionPromptAudioButtons.jsx';
 import QuestionTranslationRow from './QuestionTranslationRow.jsx';
 import QuestionWordDisplay from './QuestionWordDisplay.jsx';
 
+const READ_ALOUD_STORAGE_KEY = 'speech:autoReadEnabled';
+
+function loadReadAloudEnabled() {
+  try {
+    return localStorage.getItem(READ_ALOUD_STORAGE_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+function saveReadAloudEnabled(enabled) {
+  try {
+    localStorage.setItem(READ_ALOUD_STORAGE_KEY, enabled ? '1' : '0');
+  } catch {
+    // Ignore storage write errors (private mode / blocked storage).
+  }
+}
+
 export default function QuestionPrompt({
   questionText,
   questionLanguage,
+  answerLanguage,
   canSpeak,
+  status,
   translation,
   showingSolution,
   showTranslation,
@@ -27,23 +47,19 @@ export default function QuestionPrompt({
     playVocabulary,
     playExampleSentence,
   } = useSpeechPlayback();
+  const [isReadAloudEnabled, setIsReadAloudEnabled] = useState(loadReadAloudEnabled);
+  const previousShowingSolutionRef = useRef(showingSolution);
+  const previousStatusRef = useRef(status);
+  const skipNextQuestionReadRef = useRef(false);
 
-  const disabled = !canSpeak || isLoading;
-  const isVocabularyActive = activePlaybackType === 'vocabulary';
+  const exampleDisabled = !canSpeak || isLoading;
   const isExampleActive = activePlaybackType === 'example';
   const questionLanguageLabel = questionLanguage === 'de' ? 'Deutsch' : 'Englisch';
   const solutionRevealFlash = useSolutionRevealFlash({
     showingSolution,
     translation,
   });
-
-  const vocabularyButtonLabel = isVocabularyActive
-    ? isLoading
-      ? 'Lade Audio...'
-      : isPlaying
-        ? 'Spielt...'
-        : 'Vorlesen'
-    : 'Vorlesen';
+  const readAloudButtonLabel = `Vorlesen: ${isReadAloudEnabled ? 'An' : 'Aus'}`;
 
   const exampleButtonLabel = isExampleActive
     ? isLoading
@@ -53,9 +69,75 @@ export default function QuestionPrompt({
         : 'Beispielsatz'
     : 'Beispielsatz';
 
+  const playQuestion = useCallback(() => {
+    if (!canSpeak || !questionText) {
+      return;
+    }
+
+    playVocabulary({
+      text: questionText,
+      language: questionLanguage,
+    });
+  }, [canSpeak, playVocabulary, questionLanguage, questionText]);
+
+  const playTranslation = useCallback(() => {
+    if (!translation || !answerLanguage) {
+      return;
+    }
+
+    playVocabulary({
+      text: translation,
+      language: answerLanguage,
+    });
+  }, [answerLanguage, playVocabulary, translation]);
+
+  const toggleReadAloud = useCallback(() => {
+    setIsReadAloudEnabled((current) => !current);
+  }, []);
+
+  useEffect(() => {
+    saveReadAloudEnabled(isReadAloudEnabled);
+  }, [isReadAloudEnabled]);
+
   useEffect(() => {
     onSpeechPlaybackErrorChange?.(error);
   }, [error, onSpeechPlaybackErrorChange]);
+
+  useEffect(() => {
+    if (!isReadAloudEnabled) {
+      return;
+    }
+
+    if (skipNextQuestionReadRef.current) {
+      skipNextQuestionReadRef.current = false;
+      return;
+    }
+
+    playQuestion();
+  }, [isReadAloudEnabled, playQuestion]);
+
+  useEffect(() => {
+    const wasShowingSolution = previousShowingSolutionRef.current;
+
+    if (isReadAloudEnabled && !wasShowingSolution && showingSolution) {
+      playTranslation();
+    }
+
+    previousShowingSolutionRef.current = showingSolution;
+  }, [isReadAloudEnabled, playTranslation, showingSolution]);
+
+  useEffect(() => {
+    const previousStatus = previousStatusRef.current;
+
+    if (isReadAloudEnabled && previousStatus !== 'correct' && status === 'correct') {
+      // After a correct check, the next word is picked immediately. Skip that one
+      // auto-read once so the revealed solution can be heard first.
+      skipNextQuestionReadRef.current = true;
+      playTranslation();
+    }
+
+    previousStatusRef.current = status;
+  }, [isReadAloudEnabled, playTranslation, status]);
 
   useEffect(() => {
     const handleShortcutKeyDown = (event) => {
@@ -63,8 +145,7 @@ export default function QuestionPrompt({
         event.repeat ||
         !shouldHandleDesktopShortcutKeyDown(event, {
           allowInEditable: true,
-        }) ||
-        disabled
+        })
       ) {
         return;
       }
@@ -75,13 +156,15 @@ export default function QuestionPrompt({
 
       if (isLetterShortcutPressed(event, 'v')) {
         event.preventDefault();
-        playVocabulary({
-          text: questionText,
-          language: questionLanguage,
-        });
+        toggleReadAloud();
+        return;
       }
 
-      if (isLetterShortcutPressed(event, 'b')) {
+      if (exampleDisabled) {
+        return;
+      }
+
+      if (isLetterShortcutPressed(event, 'b') && canSpeak) {
         event.preventDefault();
         playExampleSentence({
           text: questionText,
@@ -95,11 +178,12 @@ export default function QuestionPrompt({
       window.removeEventListener('keydown', handleShortcutKeyDown);
     };
   }, [
-    disabled,
-    playVocabulary,
+    canSpeak,
+    exampleDisabled,
     playExampleSentence,
     questionLanguage,
     questionText,
+    toggleReadAloud,
   ]);
 
   return (
@@ -111,15 +195,11 @@ export default function QuestionPrompt({
         />
 
         <QuestionPromptAudioButtons
-          disabled={disabled}
-          vocabularyButtonLabel={vocabularyButtonLabel}
+          exampleDisabled={exampleDisabled}
+          isReadAloudEnabled={isReadAloudEnabled}
+          readAloudButtonLabel={readAloudButtonLabel}
           exampleButtonLabel={exampleButtonLabel}
-          onPlayVocabulary={() =>
-            playVocabulary({
-              text: questionText,
-              language: questionLanguage,
-            })
-          }
+          onToggleReadAloud={toggleReadAloud}
           onPlayExampleSentence={() =>
             playExampleSentence({
               text: questionText,

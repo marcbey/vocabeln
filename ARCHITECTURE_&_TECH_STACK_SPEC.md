@@ -12,7 +12,7 @@ Build a vocabulary trainer web app for class levels 5-8 with:
 - irregular verb training (`irregular`)
 - text answer validation
 - optional board mode (manual correct/wrong marking)
-- text-to-speech (word + generated example sentence)
+- text-to-speech (auto read-aloud toggle + generated example sentence)
 - speech-to-text input (push-to-talk)
 - per-class persisted progress/settings
 
@@ -102,6 +102,9 @@ State persistence is per class via localStorage keys:
 - `progress:<classId>`
 - `activeClass`
 
+Global UI preference persistence:
+- `speech:autoReadEnabled` (read-aloud toggle, values `1`/`0`)
+
 Backward compatibility rule for class5:
 - if scoped class5 key missing, read legacy unscoped keys.
 
@@ -112,6 +115,11 @@ Backward compatibility rule for class5:
 - Irregular mode complete when all irregular entries for selected class are correct.
 - If one regular direction is exhausted and the other still has open items, auto-switch direction.
 - Correct spoken answer in non-board mode is previewed in input and auto-submitted after 2000ms.
+- Read-aloud toggle behavior:
+  - if enabled, auto-read current question text whenever a new question becomes active
+  - if enabled, read translation when solution is revealed
+  - if enabled, read translation when answer status changes to `correct` (typed or spoken)
+  - after a `correct` status, suppress the immediate next-question auto-read once so translation playback is not overwritten
 
 ## 8. Backend Architecture
 ## 8.1 Middleware and Limits

@@ -3,6 +3,8 @@ import { fireEvent, render } from '@testing-library/react';
 import { isMacPlatform } from '../../hooks/keyboard/desktopShortcuts.js';
 import QuestionPrompt from './QuestionPrompt.jsx';
 
+const READ_ALOUD_STORAGE_KEY = 'speech:autoReadEnabled';
+
 const speechPlaybackMock = vi.hoisted(() => ({
   isLoading: false,
   isPlaying: false,
@@ -39,7 +41,9 @@ function renderQuestionPrompt(overrides = {}) {
   const defaultProps = {
     questionText: 'cat',
     questionLanguage: 'en',
+    answerLanguage: 'de',
     canSpeak: true,
+    status: null,
     translation: 'Katze',
     showingSolution: false,
     showTranslation: false,
@@ -57,6 +61,7 @@ describe('QuestionPrompt desktop shortcuts', () => {
   beforeEach(() => {
     speechPlaybackMock.playVocabulary.mockReset();
     speechPlaybackMock.playExampleSentence.mockReset();
+    localStorage.clear();
     window.matchMedia = createMatchMediaMock();
   });
 
@@ -67,7 +72,10 @@ describe('QuestionPrompt desktop shortcuts', () => {
   it('handles v and b keyboard shortcuts on desktop', () => {
     renderQuestionPrompt();
 
+    expect(localStorage.getItem(READ_ALOUD_STORAGE_KEY)).toBe('0');
+
     fireEvent.keyDown(window, { key: 'v', ...shortcutModifierProps() });
+    expect(localStorage.getItem(READ_ALOUD_STORAGE_KEY)).toBe('1');
     expect(speechPlaybackMock.playVocabulary).toHaveBeenCalledWith({
       text: 'cat',
       language: 'en',
@@ -80,10 +88,11 @@ describe('QuestionPrompt desktop shortcuts', () => {
     });
   });
 
-  it('ignores playback shortcuts when speaking is disabled', () => {
+  it('allows toggling read-aloud while speaking is disabled but blocks playback', () => {
     renderQuestionPrompt({ canSpeak: false });
 
     fireEvent.keyDown(window, { key: 'v', ...shortcutModifierProps() });
+    expect(localStorage.getItem(READ_ALOUD_STORAGE_KEY)).toBe('1');
     fireEvent.keyDown(window, { key: 'b', ...shortcutModifierProps() });
 
     expect(speechPlaybackMock.playVocabulary).toHaveBeenCalledTimes(0);
@@ -107,6 +116,125 @@ describe('QuestionPrompt desktop shortcuts', () => {
     expect(speechPlaybackMock.playExampleSentence).toHaveBeenCalledTimes(0);
   });
 
+  it('auto-reads the current question on initial render when toggle is enabled', () => {
+    localStorage.setItem(READ_ALOUD_STORAGE_KEY, '1');
+
+    renderQuestionPrompt();
+
+    expect(speechPlaybackMock.playVocabulary).toHaveBeenCalledWith({
+      text: 'cat',
+      language: 'en',
+    });
+  });
+
+  it('reads translation when the solution is shown while toggle is enabled', () => {
+    localStorage.setItem(READ_ALOUD_STORAGE_KEY, '1');
+
+    const { rerender } = renderQuestionPrompt({
+      showingSolution: false,
+      translation: 'Katze',
+      answerLanguage: 'de',
+    });
+    speechPlaybackMock.playVocabulary.mockClear();
+
+    rerender(
+      <QuestionPrompt
+        questionText="cat"
+        questionLanguage="en"
+        answerLanguage="de"
+        canSpeak
+        status={null}
+        translation="Katze"
+        showingSolution
+        showTranslation={false}
+        onSpeechPlaybackErrorChange={vi.fn()}
+      />
+    );
+
+    expect(speechPlaybackMock.playVocabulary).toHaveBeenCalledWith({
+      text: 'Katze',
+      language: 'de',
+    });
+  });
+
+  it('reads translation when status switches to correct while toggle is enabled', () => {
+    localStorage.setItem(READ_ALOUD_STORAGE_KEY, '1');
+
+    const { rerender } = renderQuestionPrompt({
+      status: null,
+      translation: 'Katze',
+      answerLanguage: 'de',
+    });
+    speechPlaybackMock.playVocabulary.mockClear();
+
+    rerender(
+      <QuestionPrompt
+        questionText="cat"
+        questionLanguage="en"
+        answerLanguage="de"
+        canSpeak
+        status="correct"
+        translation="Katze"
+        showingSolution={false}
+        showTranslation={false}
+        onSpeechPlaybackErrorChange={vi.fn()}
+      />
+    );
+
+    expect(speechPlaybackMock.playVocabulary).toHaveBeenCalledWith({
+      text: 'Katze',
+      language: 'de',
+    });
+  });
+
+  it('does not immediately replace correct-solution playback with the next question', () => {
+    localStorage.setItem(READ_ALOUD_STORAGE_KEY, '1');
+
+    const { rerender } = renderQuestionPrompt({
+      questionText: 'cat',
+      status: null,
+      translation: 'Katze',
+      answerLanguage: 'de',
+    });
+    speechPlaybackMock.playVocabulary.mockClear();
+
+    rerender(
+      <QuestionPrompt
+        questionText="cat"
+        questionLanguage="en"
+        answerLanguage="de"
+        canSpeak
+        status="correct"
+        translation="Katze"
+        showingSolution={false}
+        showTranslation={false}
+        onSpeechPlaybackErrorChange={vi.fn()}
+      />
+    );
+    expect(speechPlaybackMock.playVocabulary).toHaveBeenCalledWith({
+      text: 'Katze',
+      language: 'de',
+    });
+
+    speechPlaybackMock.playVocabulary.mockClear();
+
+    rerender(
+      <QuestionPrompt
+        questionText="dog"
+        questionLanguage="en"
+        answerLanguage="de"
+        canSpeak
+        status={null}
+        translation="Hund"
+        showingSolution={false}
+        showTranslation={false}
+        onSpeechPlaybackErrorChange={vi.fn()}
+      />
+    );
+
+    expect(speechPlaybackMock.playVocabulary).toHaveBeenCalledTimes(0);
+  });
+
   it('can trigger playback shortcuts when an input is focused with platform modifier', () => {
     renderQuestionPrompt();
     const focusedInput = document.createElement('input');
@@ -114,6 +242,7 @@ describe('QuestionPrompt desktop shortcuts', () => {
     focusedInput.focus();
 
     fireEvent.keyDown(focusedInput, { key: 'v', ...shortcutModifierProps() });
+    expect(localStorage.getItem(READ_ALOUD_STORAGE_KEY)).toBe('1');
     fireEvent.keyDown(focusedInput, { key: 'b', ...shortcutModifierProps() });
 
     expect(speechPlaybackMock.playVocabulary).toHaveBeenCalledTimes(1);
@@ -131,6 +260,7 @@ describe('QuestionPrompt desktop shortcuts', () => {
       ...shortcutModifierProps(),
     });
 
+    expect(localStorage.getItem(READ_ALOUD_STORAGE_KEY)).toBe('1');
     expect(speechPlaybackMock.playVocabulary).toHaveBeenCalledTimes(1);
   });
 });

@@ -1,22 +1,24 @@
 import KeyboardShortcutHint from './KeyboardShortcutHint.jsx';
 
 export default function QuestionPromptAudioButtons({
-  disabled,
-  vocabularyButtonLabel,
+  exampleDisabled,
+  isReadAloudEnabled,
+  readAloudButtonLabel,
   exampleButtonLabel,
-  onPlayVocabulary,
+  onToggleReadAloud,
   onPlayExampleSentence,
 }) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 gap-2 md:w-[170px] shrink-0">
       <button
         type="button"
-        className="secondary px-3 text-sm whitespace-nowrap min-h-[46px] w-full"
-        onClick={onPlayVocabulary}
-        disabled={disabled}
+        className={`toggle px-3 text-sm whitespace-nowrap min-h-[46px] w-full ${
+          isReadAloudEnabled ? 'active' : ''
+        }`}
+        onClick={onToggleReadAloud}
       >
         <span className="inline-flex items-center justify-center gap-2">
-          <span>{vocabularyButtonLabel}</span>
+          <span>{readAloudButtonLabel}</span>
           <KeyboardShortcutHint shortcutKey="V" />
         </span>
       </button>
@@ -25,7 +27,7 @@ export default function QuestionPromptAudioButtons({
         type="button"
         className="secondary px-3 text-sm whitespace-nowrap min-h-[46px] w-full"
         onClick={onPlayExampleSentence}
-        disabled={disabled}
+        disabled={exampleDisabled}
       >
         <span className="inline-flex items-center justify-center gap-2">
           <span>{exampleButtonLabel}</span>

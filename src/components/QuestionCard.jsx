@@ -44,7 +44,9 @@ export default function QuestionCard({
       <QuestionPrompt
         questionText={questionText}
         questionLanguage={questionLanguage}
+        answerLanguage={answerLanguage}
         canSpeak={Boolean(currentWord)}
+        status={status}
         translation={translation}
         showingSolution={showingSolution}
         showTranslation={showTranslation}

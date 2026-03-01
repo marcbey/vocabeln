@@ -59,7 +59,7 @@ Contains:
 - Word label: `Wort (Deutsch|Englisch)`
 - Large question word text
 - Two audio buttons:
-  - `Vorlesen`
+  - `Vorlesen: Aus` / `Vorlesen: An` (toggle)
   - `Beispielsatz`
 - Translation row:
   - label `Uebersetzung`
@@ -68,6 +68,14 @@ Contains:
 Translation visibility:
 - visible if `showingSolution` OR `boardMode`
 - hidden otherwise
+
+Read-aloud toggle behavior:
+- Toggle state is persisted in `localStorage` key `speech:autoReadEnabled` (`1`/`0`).
+- If key is missing or unreadable, default is `Aus`.
+- If toggle is `An`, app auto-plays:
+  - current question text when a new question is active
+  - translation when `Loesung zeigen` reveals the solution
+  - translation when answer status changes to `correct`
 
 ## 5.2 Answer Area (non-board mode)
 Row content:
@@ -131,16 +139,15 @@ Disabled when:
 - currently submitting speech
 
 ## 6.4 Audio Playback Buttons
-Disabled when:
-- no current word
-- playback request loading
+`Vorlesen` control:
+- is a persistent on/off toggle (`Vorlesen: Aus` / `Vorlesen: An`)
+- remains clickable even when no current word is active
 
-Dynamic labels:
-- word playback:
-  - `Vorlesen`
-  - `Lade Audio...`
-  - `Spielt...`
-- sentence playback:
+`Beispielsatz` button:
+- disabled when:
+  - no current word
+  - playback request loading
+- dynamic labels:
   - `Beispielsatz`
   - `Lade Satz...`
   - `Spielt Satz...`
@@ -154,6 +161,7 @@ Dynamic labels:
 5. If correct:
    - mark answered key as correct
    - set status `correct`
+   - if read-aloud toggle is `An`: read translation once
    - clear input
    - persist progress
    - if page complete: trigger fireworks once and keep completion state
@@ -172,11 +180,13 @@ Dynamic labels:
 6. If `answer` returned:
    - if spoken answer is wrong: submit immediately like typed answer (input preserved)
    - if spoken answer is correct: show text in input for 2000ms preview, then auto-submit and clear
+   - when spoken answer is correct and read-aloud toggle is `An`, translation is read after validation succeeds (`status=correct`)
 
 ## 7.3 Show Solution Flow
 1. Click `Loesung zeigen`:
    - increment `asked`
    - set `showingSolution = true`
+   - if read-aloud toggle is `An`: read translation
    - persist progress
 2. Click `Weiter`:
    - hide solution
@@ -278,7 +288,7 @@ Rules:
 - Platform mapping:
   - macOS: use `Ctrl+<letter>` (`⌃` key)
   - Windows/Linux: use `Alt+<letter>`
-- `v` combo -> trigger `Vorlesen`
+- `v` combo -> toggle `Vorlesen` on/off
 - `b` combo -> trigger `Beispielsatz`
 - `m` combo -> push-to-talk microphone:
   - `keydown` with platform combo starts recording
@@ -304,7 +314,9 @@ Guard rails:
 - Board buttons: `✓ Richtig`, `✗ Falsch`
 - Retry: `Diese Seite nochmal ueben`
 - Speech button: `Mikrofon`, `Aufnahme...`, `Pruefe...`
-- Audio buttons: `Vorlesen`, `Beispielsatz`, `Lade Audio...`, `Spielt...`, `Lade Satz...`, `Spielt Satz...`
+- Audio buttons:
+  - `Vorlesen: Aus`, `Vorlesen: An`
+  - `Beispielsatz`, `Lade Satz...`, `Spielt Satz...`
 - Completion text: `Mega! Alles richtig auf dieser Seite.`
 
 ## 13. Acceptance Criteria
@@ -315,6 +327,8 @@ Guard rails:
 - Mobile menu, mobile footer actions, and auto-scroll behavior work.
 - Speech errors are visible but non-blocking.
 - Progress badge reflects real-time counts correctly in all modes.
+- `Vorlesen` toggle state persists via `speech:autoReadEnabled` and restores after reload.
+- With `Vorlesen: An`, question text and required translation events are auto-read according to sections 5.1 and 7.
 
 ## 14. Deprecation Note
 After this spec is adopted, UI/UX implementation must not depend on `FEATURE.md` or `PROTOTYPE_SPEC.md`.
