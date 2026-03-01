@@ -10,6 +10,7 @@ This spec supersedes architecture-related content in `FEATURE.md` and `PROTOTYPE
 Build a vocabulary trainer web app for class levels 5-8 with:
 - regular vocabulary training (`en-de`, `de-en`, `mixed`)
 - irregular verb training (`irregular`)
+- regular vocabulary scoping by either `page` or `unit` (mutually exclusive filter modes)
 - text answer validation
 - optional board mode (manual correct/wrong marking)
 - text-to-speech (auto read-aloud toggle + generated example sentence)
@@ -91,11 +92,16 @@ Single service deployment:
 ## 7. Frontend Architecture
 ## 7.1 Application State Model
 Central quiz state is owned by `useQuizController`:
-- page context: `page`, `pages`, `direction`, `lastRegularPage`
+- scope context: `page`, `pages`, `unit`, `units`, `filterMode`, `direction`, `lastRegularPage`
 - mode context: `boardMode`, `showingSolution`
-- progress context: `asked`, `answeredCorrect`, `completedPages`, `pageComplete`
+- progress context: `asked`, `answeredCorrect`, `completedPages`, `completedUnits`, `pageComplete`
 - question context: `currentWord`, `currentQuestionDir`, `questionText`, `translation`, `questionLanguage`, `answerLanguage`
 - answer context: `answerValue`, `status`, `flash`
+
+Internal scope representation:
+- Regular page scopes use the literal page key (e.g. `Class 6 - Page 28`).
+- Unit scopes use virtual keys with prefix `unit::` (e.g. `unit::Unit 2`).
+- Persisted settings can store either key shape; hydration restores filter mode from key type.
 
 State persistence is per class via localStorage keys:
 - `settings:<classId>`
@@ -112,8 +118,14 @@ Backward compatibility rule for class5:
 - Directions: `en-de`, `de-en`, `mixed`, `irregular`
 - Mixed mode randomly asks both regular directions.
 - Regular page complete only when both directions are completed (`2 * words on page`).
+- Regular unit complete only when both directions are completed for the unit scope (`2 * unique words in unit`).
 - Irregular mode complete when all irregular entries for selected class are correct.
 - If one regular direction is exhausted and the other still has open items, auto-switch direction.
+- Filter mode rules:
+  - `page` mode enables page select and disables unit select
+  - `unit` mode enables unit select and disables page select
+  - in `irregular` direction, filter/page/unit selects are disabled
+- Unit scope vocabulary is composed by merging mapped pages and deduplicating entries by `en::de`.
 - Correct spoken answer in non-board mode is previewed in input and auto-submitted after 2000ms.
 - Read-aloud toggle behavior:
   - if enabled, auto-read current question text whenever a new question becomes active
@@ -198,7 +210,13 @@ Error:
 ## 9.2 Irregular Verb Entry
 - `{ infinitive, simplePast, pastParticiple, german }` (all non-empty strings)
 
-## 9.3 Validation
+## 9.3 Unit-to-Page Mapping
+- Source JSON shape per class: `{ "<unitName>": string[] }`.
+- Values are page keys that must match keys in the class vocab dataset.
+- Unknown page keys are ignored during mapping (filtered out).
+- Runtime uses the mapping to build virtual `unit::` scopes.
+
+## 9.4 Validation
 - Parse datasets with zod on app start through `src/data/schema.js`.
 - Invalid dataset must throw hard error (fail fast).
 

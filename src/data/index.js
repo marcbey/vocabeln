@@ -1,10 +1,14 @@
 import class5IrregularRaw from './class5_irregular_vocab_data.json';
+import class5UnitPagesRaw from './class5_unit_pages.json';
 import class5VocabRaw from './class5_vocab_data.json';
 import class6IrregularRaw from './class6_irregular_vocab_data.json';
+import class6UnitPagesRaw from './class6_unit_pages.json';
 import class6VocabRaw from './class6_vocab_data.json';
 import class7IrregularRaw from './class7_irregular_vocab_data.json';
+import class7UnitPagesRaw from './class7_unit_pages.json';
 import class7VocabRaw from './class7_vocab_data.json';
 import class8IrregularRaw from './class8_irregular_vocab_data.json';
+import class8UnitPagesRaw from './class8_unit_pages.json';
 import class8VocabRaw from './class8_vocab_data.json';
 import { parseIrregularData, parseVocabData } from './schema.js';
 
@@ -20,10 +24,24 @@ function mapVocabToAppShape(vocabData) {
   );
 }
 
-function createDataset(vocabRaw, irregularRaw) {
+function mapUnitPagesToAppShape(vocabData, unitPagesData = {}) {
+  const knownPages = new Set(Object.keys(vocabData));
+
+  return Object.fromEntries(
+    Object.entries(unitPagesData).map(([unit, pages]) => [
+      unit,
+      pages.filter((page) => knownPages.has(page)),
+    ])
+  );
+}
+
+function createDataset(vocabRaw, irregularRaw, unitPagesRaw) {
+  const parsedVocab = parseVocabData(vocabRaw);
+
   return {
-    vocabData: mapVocabToAppShape(parseVocabData(vocabRaw)),
+    vocabData: mapVocabToAppShape(parsedVocab),
     irregularData: parseIrregularData(irregularRaw),
+    unitPages: mapUnitPagesToAppShape(parsedVocab, unitPagesRaw),
   };
 }
 
@@ -53,10 +71,10 @@ export const CLASS_OPTIONS = [
 ];
 
 export const CLASS_DATASETS = {
-  class5: createDataset(class5VocabRaw, class5IrregularRaw),
-  class6: createDataset(class6VocabRaw, class6IrregularRaw),
-  class7: createDataset(class7VocabRaw, class7IrregularRaw),
-  class8: createDataset(class8VocabRaw, class8IrregularRaw),
+  class5: createDataset(class5VocabRaw, class5IrregularRaw, class5UnitPagesRaw),
+  class6: createDataset(class6VocabRaw, class6IrregularRaw, class6UnitPagesRaw),
+  class7: createDataset(class7VocabRaw, class7IrregularRaw, class7UnitPagesRaw),
+  class8: createDataset(class8VocabRaw, class8IrregularRaw, class8UnitPagesRaw),
 };
 
 // Backwards-compatible exports used by a few tests and utility imports.

@@ -2,21 +2,29 @@ import { useEffect } from 'react';
 import classNames from 'classnames';
 import ClassSelect from './ClassSelect.jsx';
 import DirectionSelect from './DirectionSelect.jsx';
+import FilterModeSelect from './FilterModeSelect.jsx';
 import HeaderActions from './HeaderActions.jsx';
 import MobilePanelSection from './MobilePanelSection.jsx';
 import PageSelect from './PageSelect.jsx';
+import UnitSelect from './UnitSelect.jsx';
 
 export default function HeaderMobilePanel({
   activeClassId,
   classOptions,
+  filterMode,
   pages,
   page,
+  units,
+  unit,
   completedPages,
+  completedUnits,
   isIrregular,
   direction,
   boardMode,
   onClassChange,
+  onFilterModeChange,
   onPageChange,
+  onUnitChange,
   onDirectionChange,
   onToggleBoardMode,
   onReset,
@@ -55,17 +63,47 @@ export default function HeaderMobilePanel({
         </div>
 
         <MobilePanelSection
-          label="Seite"
+          label="Filter"
           className={classNames('md:hidden', {
             'opacity-60': isIrregular,
+          })}
+        >
+          <FilterModeSelect
+            value={filterMode}
+            onChange={onFilterModeChange}
+            disabled={isIrregular}
+            className="w-full"
+          />
+        </MobilePanelSection>
+
+        <MobilePanelSection
+          label="Seite"
+          className={classNames('md:hidden', {
+            'opacity-60': isIrregular || filterMode === 'unit',
           })}
         >
           <PageSelect
             pages={pages}
             page={page}
             completedPages={completedPages}
-            disabled={isIrregular}
+            disabled={isIrregular || filterMode === 'unit'}
             onChange={onPageChange}
+            className="w-full"
+          />
+        </MobilePanelSection>
+
+        <MobilePanelSection
+          label="Unit"
+          className={classNames('md:hidden', {
+            'opacity-60': isIrregular || filterMode === 'page',
+          })}
+        >
+          <UnitSelect
+            units={units}
+            unit={unit}
+            completedUnits={completedUnits}
+            disabled={isIrregular || filterMode === 'page'}
+            onChange={onUnitChange}
             className="w-full"
           />
         </MobilePanelSection>

@@ -26,6 +26,9 @@ vi.mock('./data/index.js', () => ({
       vocabData: {
         'Class 5 - Page 1': [{ en: 'cat', de: 'Katze' }],
       },
+      unitPages: {
+        'Unit 1': ['Class 5 - Page 1'],
+      },
       irregularData: [
         {
           german: 'sein',
@@ -39,6 +42,9 @@ vi.mock('./data/index.js', () => ({
       vocabData: {
         'Class 6 - Page 1': [{ en: 'dog', de: 'Hund' }],
       },
+      unitPages: {
+        'Unit 1': ['Class 6 - Page 1'],
+      },
       irregularData: [
         {
           german: 'gehen',
@@ -51,6 +57,9 @@ vi.mock('./data/index.js', () => ({
     class7: {
       vocabData: {
         'Class 7 - Page 1': [{ en: 'house', de: 'Haus' }],
+      },
+      unitPages: {
+        'Unit 1': ['Class 7 - Page 1'],
       },
       irregularData: [
         {
@@ -210,5 +219,30 @@ describe('App', () => {
         delete Element.prototype.scrollIntoView;
       }
     }
+  });
+
+  it('toggles between page and unit filters and disables the inactive select', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    const filterSelect = screen.getAllByLabelText('Filter')[0];
+    const pageSelect = screen.getAllByLabelText('Seite')[0];
+    const unitSelect = screen.getAllByLabelText('Unit')[0];
+
+    expect(filterSelect).toHaveValue('page');
+    expect(pageSelect).not.toBeDisabled();
+    expect(unitSelect).toBeDisabled();
+
+    await user.selectOptions(filterSelect, 'unit');
+
+    expect(filterSelect).toHaveValue('unit');
+    expect(pageSelect).toBeDisabled();
+    expect(unitSelect).not.toBeDisabled();
+
+    await user.selectOptions(filterSelect, 'page');
+
+    expect(filterSelect).toHaveValue('page');
+    expect(pageSelect).not.toBeDisabled();
+    expect(unitSelect).toBeDisabled();
   });
 });

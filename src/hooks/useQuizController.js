@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { isPageComplete as computePageComplete, getPages } from '../utils/quiz.js';
 import { useFireworks } from './useFireworks.js';
 import { useQuizActions } from './quiz/useQuizActions.js';
@@ -14,9 +14,72 @@ import {
 import { useQuizState } from './quiz/useQuizState.js';
 import { useQuizStatusFlash } from './quiz/useQuizStatusFlash.js';
 
-export function useQuizController({ classId, vocabData, irregularData }) {
+const UNIT_SCOPE_PREFIX = 'unit::';
+
+function toUnitScopeKey(unit) {
+  return `${UNIT_SCOPE_PREFIX}${unit}`;
+}
+
+function isUnitScopeKey(scopeKey) {
+  return scopeKey.startsWith(UNIT_SCOPE_PREFIX);
+}
+
+function fromUnitScopeKey(scopeKey) {
+  return scopeKey.replace(UNIT_SCOPE_PREFIX, '');
+}
+
+function dedupeVocabEntries(entries) {
+  const seen = new Set();
+  const deduped = [];
+
+  entries.forEach((entry) => {
+    const key = `${entry.en}::${entry.de}`;
+    if (seen.has(key)) {
+      return;
+    }
+    seen.add(key);
+    deduped.push(entry);
+  });
+
+  return deduped;
+}
+
+function buildUnitScopeVocabData({ vocabData, unitPages }) {
+  return Object.fromEntries(
+    Object.entries(unitPages).map(([unit, pages]) => {
+      const mergedEntries = pages.flatMap((page) => vocabData[page] || []);
+      return [toUnitScopeKey(unit), dedupeVocabEntries(mergedEntries)];
+    })
+  );
+}
+
+export function useQuizController({
+  classId,
+  vocabData,
+  irregularData,
+  unitPages = {},
+}) {
   const pages = useMemo(() => getPages(vocabData), [vocabData]);
+  const units = useMemo(() => Object.keys(unitPages), [unitPages]);
+  const unitScopeVocabData = useMemo(
+    () => buildUnitScopeVocabData({ vocabData, unitPages }),
+    [unitPages, vocabData]
+  );
+  const scopeVocabData = useMemo(
+    () => ({
+      ...vocabData,
+      ...unitScopeVocabData,
+    }),
+    [unitScopeVocabData, vocabData]
+  );
+  const scopePages = useMemo(
+    () => [...pages, ...Object.keys(unitScopeVocabData)],
+    [pages, unitScopeVocabData]
+  );
   const inputRef = useRef(null);
+  const [filterMode, setFilterMode] = useState('page');
+  const [selectedPage, setSelectedPage] = useState(pages[0] ?? '');
+  const [selectedUnit, setSelectedUnit] = useState(units[0] ?? '');
 
   const {
     page,
@@ -49,10 +112,10 @@ export function useQuizController({ classId, vocabData, irregularData }) {
         answeredCorrect,
         page,
         direction,
-        vocabData,
+        scopeVocabData,
         irregularData
       ),
-    [answeredCorrect, direction, irregularData, page, vocabData]
+    [answeredCorrect, direction, irregularData, page, scopeVocabData]
   );
 
   const focusAnswer = useCallback(
@@ -91,8 +154,8 @@ export function useQuizController({ classId, vocabData, irregularData }) {
   const { status, flash, clearStatusFlash } = statusFlash;
 
   const actions = useQuizActions({
-    pages,
-    vocabData,
+    pages: scopePages,
+    vocabData: scopeVocabData,
     irregularData,
     pageComplete,
     focusAnswer,
@@ -125,7 +188,7 @@ export function useQuizController({ classId, vocabData, irregularData }) {
     statusFlash,
   });
   const {
-    changePage,
+    changePage: changeScopePage,
     changeDirection,
     toggleBoardMode,
     submitAnswer,
@@ -139,8 +202,8 @@ export function useQuizController({ classId, vocabData, irregularData }) {
   } = actions;
 
   const totalCount = useMemo(
-    () => getTotalCount(page, direction, vocabData, irregularData),
-    [direction, irregularData, page, vocabData]
+    () => getTotalCount(page, direction, scopeVocabData, irregularData),
+    [direction, irregularData, page, scopeVocabData]
   );
 
   const correctCount = useMemo(
@@ -168,14 +231,112 @@ export function useQuizController({ classId, vocabData, irregularData }) {
     [currentQuestionDir, direction]
   );
 
+  const completedUnits = useMemo(() => {
+    const completed = new Set();
+    units.forEach((unit) => {
+      if (completedPages.has(toUnitScopeKey(unit))) {
+        completed.add(unit);
+      }
+    });
+    return completed;
+  }, [completedPages, units]);
+
+  const changePage = useCallback(
+    (nextPage) => {
+      setSelectedPage(nextPage);
+      setFilterMode('page');
+      changeScopePage(nextPage);
+    },
+    [changeScopePage]
+  );
+
+  const changeUnit = useCallback(
+    (nextUnit) => {
+      setSelectedUnit(nextUnit);
+      setFilterMode('unit');
+      const nextScopeKey = toUnitScopeKey(nextUnit);
+      if (!scopePages.includes(nextScopeKey)) {
+        return;
+      }
+
+      changeScopePage(nextScopeKey);
+    },
+    [changeScopePage, scopePages]
+  );
+
+  const changeFilterMode = useCallback(
+    (nextMode) => {
+      setFilterMode(nextMode);
+
+      if (nextMode === 'unit') {
+        const fallbackUnit = units[0] ?? '';
+        const nextUnit = selectedUnit || fallbackUnit;
+        if (!nextUnit) {
+          return;
+        }
+        if (!selectedUnit) {
+          setSelectedUnit(nextUnit);
+        }
+
+        const nextScopeKey = toUnitScopeKey(nextUnit);
+        if (scopePages.includes(nextScopeKey)) {
+          changeScopePage(nextScopeKey);
+        }
+        return;
+      }
+
+      const fallbackPage = pages[0] ?? '';
+      const nextPage = selectedPage || fallbackPage;
+      if (!nextPage) {
+        return;
+      }
+      if (!selectedPage) {
+        setSelectedPage(nextPage);
+      }
+      changeScopePage(nextPage);
+    },
+    [changeScopePage, pages, scopePages, selectedPage, selectedUnit, units]
+  );
+
   useEffect(() => {
-    if (!pages.length) {
+    if (pages.length && !pages.includes(selectedPage)) {
+      setSelectedPage(pages[0]);
+    }
+  }, [pages, selectedPage]);
+
+  useEffect(() => {
+    if (!units.length) {
+      setSelectedUnit('');
+      if (filterMode === 'unit') {
+        setFilterMode('page');
+      }
       return;
     }
 
-    const session = hydrateSession(pages);
+    if (!units.includes(selectedUnit)) {
+      setSelectedUnit(units[0]);
+    }
+  }, [filterMode, selectedUnit, units]);
+
+  useEffect(() => {
+    if (!scopePages.length) {
+      return;
+    }
+
+    const session = hydrateSession(scopePages);
     if (!session) {
       return;
+    }
+
+    if (isUnitScopeKey(session.savedPage)) {
+      const hydratedUnit = fromUnitScopeKey(session.savedPage);
+      if (units.includes(hydratedUnit)) {
+        setFilterMode('unit');
+        setSelectedUnit(hydratedUnit);
+      }
+    } else if (pages.includes(session.savedPage)) {
+      setFilterMode('page');
+      setSelectedPage(session.savedPage);
     }
 
     setDirection(session.direction);
@@ -192,6 +353,7 @@ export function useQuizController({ classId, vocabData, irregularData }) {
     clearStatusFlash,
     hydrateSession,
     pages,
+    scopePages,
     setAnswerValue,
     setAsked,
     setAnsweredCorrect,
@@ -201,6 +363,7 @@ export function useQuizController({ classId, vocabData, irregularData }) {
     setLastRegularPage,
     setPage,
     setShowingSolution,
+    units,
   ]);
 
   useEffect(() => {
@@ -216,10 +379,14 @@ export function useQuizController({ classId, vocabData, irregularData }) {
   return {
     bursts,
     pages,
-    page,
+    page: selectedPage,
+    units,
+    unit: selectedUnit,
+    filterMode,
     direction,
     boardMode,
     completedPages,
+    completedUnits,
     pageComplete,
     isIrregular: direction === 'irregular',
     currentWord,
@@ -238,6 +405,8 @@ export function useQuizController({ classId, vocabData, irregularData }) {
       totalCount,
     },
     changePage,
+    changeUnit,
+    changeFilterMode,
     changeDirection,
     toggleBoardMode,
     submitAnswer,

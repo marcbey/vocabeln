@@ -30,21 +30,30 @@ Max content width: 1100px.
 - Motivational subtitle: `Jede Runde macht dich besser und fit fuer die naechste Englischarbeit.`
 
 ## 4.2 Desktop Controls (`md` and up)
+- Filter select (`aria-label="Filter"`) with options:
+  - `Seite`
+  - `Unit`
 - Page select (`aria-label="Seite"`)
+- Unit select (`aria-label="Unit"`)
 - Direction select (`aria-label="Richtung"`)
 - Buttons:
   - `Tafel-Modus` toggle
   - `Neu anfangen`
 
 Behavior:
-- If direction is `irregular`, page select is disabled and visually dimmed.
+- If direction is `irregular`, filter/page/unit selects are disabled and visually dimmed.
+- If filter is `Seite`, page select is enabled and unit select is disabled + dimmed.
+- If filter is `Unit`, unit select is enabled and page select is disabled + dimmed.
 - Completed pages show suffix ` ✅` in page select option text.
+- Completed units show suffix ` ✅` in unit select option text.
 
 ## 4.3 Mobile Controls (`< md`)
 - Header shows hamburger button (`aria-label` changes open/close).
 - Clicking opens right-side overlay panel with backdrop.
 - Panel sections:
+  - Filter
   - Seite
+  - Unit
   - Richtung
   - Optionen
   - Klasse wechseln
@@ -52,6 +61,7 @@ Behavior:
 - Escape key closes panel.
 - Backdrop click closes panel.
 - Any action inside panel executes and then closes panel.
+- The same filter disable rules as desktop apply in the panel.
 
 ## 5. Question Card Specification
 ## 5.1 Top Prompt Area
@@ -205,14 +215,23 @@ Disabled when:
 - Leaving irregular mode:
   - restore `lastRegularPage` if valid, else first regular page
 
-## 7.6 Reset Flow
+## 7.6 Filter Flow (Page vs Unit)
+- Filter options are `Seite` and `Unit`.
+- `Seite` mode activates the selected page scope.
+- `Unit` mode activates the selected unit scope.
+- If `Unit` mode is selected and no unit was selected before, first available unit is used.
+- If `Seite` mode is selected and no page was selected before, first regular page is used.
+- Unit scope vocabulary is built from all pages mapped to that unit, with duplicate `en/de` pairs removed.
+- Active scope is persisted and restored, so reload restores page-mode or unit-mode automatically.
+
+## 7.7 Reset Flow
 Button `Neu anfangen`:
 - show browser confirm: `Fortschritt wirklich loeschen?`
 - if confirmed:
   - clear class-scoped localStorage progress/settings
   - reset state to initial page + `en-de`
 
-## 7.7 Retry Flow
+## 7.8 Retry Flow
 Button `Diese Seite nochmal ueben`:
 - remove current page from completed pages
 - clear answered state and asked count for current page
@@ -275,7 +294,7 @@ Rules:
 - Main interactions on mobile auto-scroll main card to top (for keyboard visibility and focus flow).
 
 ## 11. Accessibility Requirements
-- Every select has `aria-label` (`Seite`, `Richtung`, `Klasse`).
+- Every select has `aria-label` (`Filter`, `Seite`, `Unit`, `Richtung`, `Klasse`).
 - Mobile menu button has dynamic `aria-label` + `aria-expanded`.
 - Speech input has `aria-label="Spracheingabe starten"`.
 - Keyboard operation required for check, solution, menu, and speech input.
@@ -319,7 +338,8 @@ Guard rails:
 ## 13. Acceptance Criteria
 - Typed and spoken correctness use identical domain comparison behavior.
 - Irregular mode expects three forms and validates alternatives.
-- Page select disables in irregular mode.
+- In irregular mode, filter/page/unit selects are disabled.
+- Page and unit filters are mutually exclusive (one active, one disabled).
 - Completion reward appears only when page first becomes complete.
 - Mobile menu, mobile footer actions, and auto-scroll behavior work.
 - Speech errors are visible but non-blocking.

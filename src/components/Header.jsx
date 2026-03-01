@@ -8,14 +8,20 @@ export default function Header({
   headline,
   activeClassId,
   classOptions,
+  filterMode,
   pages,
   page,
+  units,
+  unit,
   direction,
   boardMode,
   completedPages,
+  completedUnits,
   isIrregular,
   onClassChange,
+  onFilterModeChange,
   onPageChange,
+  onUnitChange,
   onDirectionChange,
   onToggleBoardMode,
   onReset,
@@ -30,7 +36,9 @@ export default function Header({
     closeMobileMenu();
   };
 
+  const handleFilterModeChange = runAndClose(onFilterModeChange);
   const handlePageChange = runAndClose(onPageChange);
+  const handleUnitChange = runAndClose(onUnitChange);
   const handleDirectionChange = runAndClose(onDirectionChange);
   const handleToggleBoardMode = runAndClose(onToggleBoardMode);
   const handleReset = runAndClose(onReset);
@@ -48,13 +56,19 @@ export default function Header({
       </div>
 
       <HeaderDesktopControls
+        filterMode={filterMode}
         pages={pages}
         page={page}
+        units={units}
+        unit={unit}
         completedPages={completedPages}
+        completedUnits={completedUnits}
         isIrregular={isIrregular}
         direction={direction}
         boardMode={boardMode}
+        onFilterModeChange={handleFilterModeChange}
         onPageChange={handlePageChange}
+        onUnitChange={handleUnitChange}
         onDirectionChange={handleDirectionChange}
         onToggleBoardMode={handleToggleBoardMode}
         onReset={handleReset}
@@ -64,14 +78,20 @@ export default function Header({
         <HeaderMobilePanel
           activeClassId={activeClassId}
           classOptions={classOptions}
+          filterMode={filterMode}
           pages={pages}
           page={page}
+          units={units}
+          unit={unit}
           completedPages={completedPages}
+          completedUnits={completedUnits}
           isIrregular={isIrregular}
           direction={direction}
           boardMode={boardMode}
           onClassChange={handleClassChange}
+          onFilterModeChange={handleFilterModeChange}
           onPageChange={handlePageChange}
+          onUnitChange={handleUnitChange}
           onDirectionChange={handleDirectionChange}
           onToggleBoardMode={handleToggleBoardMode}
           onReset={handleReset}

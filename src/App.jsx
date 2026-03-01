@@ -37,6 +37,7 @@ export default function App() {
     classId: activeClassId,
     vocabData: activeDataset.vocabData,
     irregularData: activeDataset.irregularData,
+    unitPages: activeDataset.unitPages,
   });
 
   const handleSpeechPlaybackErrorChange = useCallback((nextError) => {
@@ -53,14 +54,20 @@ export default function App() {
         headline={activeClass.headline}
         activeClassId={activeClassId}
         classOptions={CLASS_OPTIONS}
+        filterMode={quiz.filterMode}
         pages={quiz.pages}
         page={quiz.page}
+        units={quiz.units}
+        unit={quiz.unit}
         direction={quiz.direction}
         boardMode={quiz.boardMode}
         completedPages={quiz.completedPages}
+        completedUnits={quiz.completedUnits}
         isIrregular={quiz.isIrregular}
         onClassChange={setActiveClassId}
+        onFilterModeChange={quiz.changeFilterMode}
         onPageChange={quiz.changePage}
+        onUnitChange={quiz.changeUnit}
         onDirectionChange={quiz.changeDirection}
         onToggleBoardMode={quiz.toggleBoardMode}
         onReset={quiz.resetAll}
