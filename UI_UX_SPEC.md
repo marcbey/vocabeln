@@ -44,6 +44,8 @@ Behavior:
 - If direction is `irregular`, filter/page/unit selects are disabled and visually dimmed.
 - If filter is `Seite`, page select is enabled and unit select is disabled + dimmed.
 - If filter is `Unit`, unit select is enabled and page select is disabled + dimmed.
+- `Seite` and `Unit` selects use the same control height as other header controls.
+- On desktop, all header selects use compact content-fit widths (not stretched full-width).
 - Completed pages show suffix ` ✅` in page select option text.
 - Completed units show suffix ` ✅` in unit select option text.
 
