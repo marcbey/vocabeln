@@ -1060,15 +1060,15 @@
     },
     {
       "english": "extracurricular",
-      "german": "außerhalb des Lehrplans; außerunterrichtlich"
+      "german": "außerhalb des Lehrplans; außerunterrichtlich (Zusatzunterricht)"
     },
     {
       "english": "cheerleader",
-      "german": "(Zusatzunterricht) Cheerleader (Mädchen, das in einer Gruppe eine"
+      "german": "Cheerleader (Mädchen, das in einer Gruppe eine Sportmannschaft anfeuert)"
     },
     {
       "english": "cheerleading",
-      "german": "Sportmannschaft anfeuert) Cheerleading (Aktivitäten der Cheerleader)"
+      "german": "Cheerleading (Aktivitäten der Cheerleader)"
     },
     {
       "english": "detention",
@@ -1900,11 +1900,11 @@
     },
     {
       "english": "to care about",
-      "german": "wichtig nehmen; sich kümmern um; sich"
+      "german": "wichtig nehmen; sich kümmern um; sich interessieren für"
     },
     {
       "english": "outside world",
-      "german": "interessieren für Außenwelt"
+      "german": "Außenwelt"
     },
     {
       "english": "forbidden",
@@ -2540,11 +2540,11 @@
     },
     {
       "english": "to unfriend",
-      "german": "entfreunden (jmdn. von seiner Freundesliste"
+      "german": "entfreunden (jmdn. von seiner Freundesliste streichen)"
     },
     {
       "english": "follower",
-      "german": "streichen) Follower; Followerin; Anhänger; Anhängerin"
+      "german": "Follower; Followerin; Anhänger; Anhängerin"
     },
     {
       "english": "to subscribe",
@@ -3344,11 +3344,11 @@
     },
     {
       "english": "I didn’t catch that.",
-      "german": "Das habe ich nicht verstanden.; Das habe ich"
+      "german": "Das habe ich nicht verstanden.; Das habe ich nicht gehört."
     },
     {
       "english": "I know what you mean.",
-      "german": "nicht gehört. Ich verstehe, was du meinst."
+      "german": "Ich verstehe, was du meinst."
     },
     {
       "english": "I see.",

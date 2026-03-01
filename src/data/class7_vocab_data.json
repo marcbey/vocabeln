@@ -275,6 +275,10 @@
     {
       "english": "a five minute walk",
       "german": "fünf Minuten zu Fuß"
+    },
+    {
+      "english": "souvenir shop",
+      "german": "Souvenirladen"
     }
   ],
   "Class 7 - Page 15": [
@@ -423,6 +427,10 @@
     {
       "english": "unfair",
       "german": "unfair"
+    },
+    {
+      "english": "huge",
+      "german": "riesig; riesengroß"
     }
   ],
   "Class 7 - Page 17": [
@@ -513,6 +521,10 @@
     {
       "english": "to go quiet",
       "german": "still werden"
+    },
+    {
+      "english": "a few",
+      "german": "ein paar; wenige; einige"
     }
   ],
   "Class 7 - Page 21": [
@@ -696,7 +708,7 @@
     },
     {
       "english": "zip line",
-      "german": "Unterhaltung Seilrutsche"
+      "german": "Seilrutsche"
     },
     {
       "english": "over",
@@ -705,6 +717,10 @@
     {
       "english": "skiing",
       "german": "Skifahren"
+    },
+    {
+      "english": "conversation",
+      "german": "Konversation; Gespräch; Unterhaltung"
     }
   ],
   "Class 7 - Page 33": [
@@ -855,14 +871,6 @@
       "german": "enthalten sein"
     },
     {
-      "english": "No way am I doing that",
-      "german": "Das mache ich auf keinen Fall"
-    },
-    {
-      "english": "again!",
-      "german": "noch mal!"
-    },
-    {
       "english": "rugby",
       "german": "Rugby"
     },
@@ -941,6 +949,14 @@
     {
       "english": "self",
       "german": "selbst; sich"
+    },
+    {
+      "english": "No way am I doing that again!",
+      "german": "Das mache ich auf keinen Fall noch mal!"
+    },
+    {
+      "english": "should",
+      "german": "sollte"
     }
   ],
   "Class 7 - Page 35": [
@@ -1109,6 +1125,10 @@
     {
       "english": "emergency call",
       "german": "Notruf"
+    },
+    {
+      "english": "injection",
+      "german": "Spritze"
     }
   ],
   "Class 7 - Page 39": [
@@ -1214,7 +1234,7 @@
     },
     {
       "english": "jousting",
-      "german": "zu sein Turnierzweikampf"
+      "german": "Turnierzweikampf"
     },
     {
       "english": "wheelchair",
@@ -1247,6 +1267,10 @@
     {
       "english": "lots",
       "german": "viel; jede Menge"
+    },
+    {
+      "english": "to make sb feel like sth",
+      "german": "jmdm. das Gefühl geben, etw. zu sein"
     }
   ],
   "Class 7 - Page 45": [
@@ -1565,10 +1589,6 @@
       "german": "USA (Vereinigte Staaten von Amerika)"
     },
     {
-      "english": "America",
-      "german": "Amerika"
-    },
-    {
       "english": "telephone",
       "german": "Telefon"
     },
@@ -1655,6 +1675,10 @@
     {
       "english": "whose",
       "german": "dessen; deren"
+    },
+    {
+      "english": "to invent",
+      "german": "erfinden"
     }
   ],
   "Class 7 - Page 55": [
@@ -1835,6 +1859,10 @@
     {
       "english": "monster",
       "german": "Ungeheuer; Monster"
+    },
+    {
+      "english": "to come up",
+      "german": "bevorstehen"
     }
   ],
   "Class 7 - Page 60": [
@@ -1923,6 +1951,10 @@
     {
       "english": "sad",
       "german": "traurig"
+    },
+    {
+      "english": "peace",
+      "german": "Frieden"
     }
   ],
   "Class 7 - Page 67": [
@@ -2163,6 +2195,10 @@
     {
       "english": "to be wrong",
       "german": "unrecht haben; sich irren"
+    },
+    {
+      "english": "straightforward",
+      "german": "aufrichtig; geradlinig"
     }
   ],
   "Class 7 - Page 77": [
@@ -2283,6 +2319,10 @@
     {
       "english": "wallet",
       "german": "Brieftasche; Geldbörse"
+    },
+    {
+      "english": "letter",
+      "german": "Brief; Buchstabe"
     }
   ],
   "Class 7 - Page 81": [
@@ -2441,6 +2481,10 @@
     {
       "english": "to be sorry",
       "german": "leid tun"
+    },
+    {
+      "english": "bench",
+      "german": "Bank; Sitzbank"
     }
   ],
   "Class 7 - Page 92": [
@@ -2719,6 +2763,10 @@
     {
       "english": "to join",
       "german": "sich anschließen"
+    },
+    {
+      "english": "body lotion",
+      "german": "Körperlotion"
     }
   ],
   "Class 7 - Page 97": [
@@ -2911,6 +2959,10 @@
     {
       "english": "cent",
       "german": "Cent (Währung)"
+    },
+    {
+      "english": "to change",
+      "german": "umsteigen"
     }
   ],
   "Class 7 - Page 102": [
@@ -2969,6 +3021,10 @@
     {
       "english": "rainbow",
       "german": "Regenbogen"
+    },
+    {
+      "english": "gold",
+      "german": "golden; Gold-"
     },
     {
       "english": "national",

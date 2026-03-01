@@ -91,14 +91,6 @@
     {
       "english": "See you.",
       "german": "Tschüss.; Bis bald."
-    },
-    {
-      "english": "to get up",
-      "german": "aufstehen"
-    },
-    {
-      "english": "them",
-      "german": "sie (Pl.); ihnen"
     }
   ],
   "Class 5 - Page 9": [
@@ -261,10 +253,6 @@
     {
       "english": "pink",
       "german": "pink; rosa"
-    },
-    {
-      "english": "holiday",
-      "german": "Ferien; Urlaub"
     }
   ],
   "Class 5 - Page 12": [
@@ -1115,6 +1103,10 @@
     {
       "english": "an",
       "german": "ein, eine"
+    },
+    {
+      "english": "pencil",
+      "german": "Bleistift; Buntstift"
     }
   ],
   "Class 5 - Page 35": [
@@ -1805,6 +1797,10 @@
     {
       "english": "for five months",
       "german": "fünf Monate lang"
+    },
+    {
+      "english": "winter",
+      "german": "Winter"
     }
   ],
   "Class 5 - Page 55": [
@@ -1931,6 +1927,10 @@
     {
       "english": "What time is it?",
       "german": "Wie spät ist es?; Wie viel Uhr ist es?"
+    },
+    {
+      "english": "to get up",
+      "german": "aufstehen"
     }
   ],
   "Class 5 - Page 59": [
@@ -1989,7 +1989,7 @@
       "german": "Geschichte"
     },
     {
-      "english": "with trainers on",
+      "english": "with his trainers on",
       "german": "und hat Turnschuhe an"
     },
     {
@@ -2517,6 +2517,10 @@
     {
       "english": "fun",
       "german": "Freude; Spaß"
+    },
+    {
+      "english": "eighteenth",
+      "german": "achtzehnte"
     }
   ],
   "Class 5 - Page 73": [
@@ -2641,7 +2645,7 @@
       "german": "Was kann ich für dich tun?"
     },
     {
-      "english": "toneed",
+      "english": "to need",
       "german": "brauchen"
     },
     {
@@ -2841,6 +2845,10 @@
     {
       "english": "to ask",
       "german": "fragen"
+    },
+    {
+      "english": "them",
+      "german": "sie (Pl.); ihnen"
     }
   ],
   "Class 5 - Page 83": [
@@ -3279,7 +3287,7 @@
       "german": "Schrei"
     },
     {
-      "english": "Manoverboard!",
+      "english": "Man overboard!",
       "german": "Mann über Bord!"
     },
     {
@@ -3433,6 +3441,10 @@
     {
       "english": "fed",
       "german": "simple past von to feed (füttern)"
+    },
+    {
+      "english": "holiday",
+      "german": "Ferien; Urlaub"
     }
   ],
   "Class 5 - Page 111": [
