@@ -129,7 +129,7 @@ export default function HeaderMobilePanel({
         </MobilePanelSection>
 
         <MobilePanelSection
-          label="Klasse wechseln"
+          label="Klasse"
           className="border-t border-[#3f567e]/35 pt-3"
         >
           <ClassSelect

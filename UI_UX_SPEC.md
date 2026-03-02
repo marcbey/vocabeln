@@ -58,7 +58,7 @@ Behavior:
   - Unit
   - Richtung
   - Optionen
-  - Klasse wechseln
+  - Klasse
 - Panel includes `Schliessen` button.
 - Escape key closes panel.
 - Backdrop click closes panel.
