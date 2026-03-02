@@ -74,6 +74,7 @@ Contains:
   - reserved with a two-line minimum height
   - centered horizontally and vertically
   - in desktop row layout, stretches to the same full height as the audio-button column
+  - when a new question word appears, show a short glow highlight around this word container
 - Two audio buttons:
   - `Vorlesen: Aus` / `Vorlesen: An` (toggle)
   - `Beispielsatz`
@@ -292,6 +293,7 @@ Use Tailwind theme extensions + CSS:
 ## 9.4 Motion
 - Feedback flash pulse: ~1100ms
 - Solution reveal flash: ~850ms
+- New-question word glow: ~620ms
 - Fireworks spark animation: ~1500ms
 - Respect `prefers-reduced-motion: reduce` by minimizing all animations/transitions
 

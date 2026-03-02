@@ -168,6 +168,10 @@ input::placeholder {
   animation: solutionFlash 850ms ease-out;
 }
 
+.question-word-new-glow {
+  animation: questionWordGlow 620ms ease-out;
+}
+
 @keyframes solutionFlash {
   0% {
     transform: scale(1);
@@ -182,6 +186,23 @@ input::placeholder {
   100% {
     transform: scale(1);
     filter: saturate(1);
+  }
+}
+
+@keyframes questionWordGlow {
+  0% {
+    filter: drop-shadow(0 0 0 rgba(11, 98, 230, 0));
+    transform: scale(1);
+  }
+
+  38% {
+    filter: drop-shadow(0 0 22px rgba(13, 71, 183, 0.74));
+    transform: scale(1.02);
+  }
+
+  100% {
+    filter: drop-shadow(0 0 0 rgba(11, 98, 230, 0));
+    transform: scale(1);
   }
 }
 
