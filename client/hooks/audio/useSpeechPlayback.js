@@ -10,6 +10,28 @@ function toUserMessage(responseStatus) {
   return 'Sprachausgabe konnte nicht geladen werden.';
 }
 
+const SUPPRESSED_PLAYBACK_ERROR_PATTERNS = [
+  'the request is not allowed by the user agent or the platform in the current context',
+  'possibly because the user denied permission',
+];
+
+export function normalizePlaybackErrorMessage(error) {
+  const message = typeof error?.message === 'string' ? error.message.trim() : '';
+  const messageLower = message.toLowerCase();
+  const errorName = typeof error?.name === 'string' ? error.name.toLowerCase() : '';
+
+  const shouldSuppress =
+    SUPPRESSED_PLAYBACK_ERROR_PATTERNS.some((pattern) =>
+      messageLower.includes(pattern)
+    ) || (errorName === 'notallowederror' && messageLower.includes('user agent'));
+
+  if (shouldSuppress) {
+    return '';
+  }
+
+  return message || 'Sprachausgabe fehlgeschlagen.';
+}
+
 export function useSpeechPlayback() {
   const audioRef = useRef(null);
   const audioUrlRef = useRef(null);
@@ -121,7 +143,7 @@ export function useSpeechPlayback() {
         setIsLoading(false);
         setIsPlaying(false);
         setActivePlaybackType(null);
-        setHint(fetchError.message || 'Sprachausgabe fehlgeschlagen.');
+        setHint(normalizePlaybackErrorMessage(fetchError));
       }
     },
     [cleanupAudio, setHint]

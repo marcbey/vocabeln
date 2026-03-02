@@ -65,6 +65,7 @@ Behavior:
 - Backdrop click closes panel.
 - Any action inside panel executes and then closes panel.
 - The same filter disable rules as desktop apply in the panel.
+- On touch devices in landscape orientation, the quiz UI is hidden and replaced by a full-screen blocker message requiring portrait mode.
 
 ## 5. Question Card Specification
 ## 5.1 Top Prompt Area
@@ -148,6 +149,7 @@ Disabled when:
 - label is `Weiter` when solution visible
 - disabled in board mode or without current word
 - desktop action buttons use content-based width so right inset next to shortcut hint chips is visually consistent across `Check!` and `Loesung zeigen`/`Weiter`
+- touch selection for action button labels (`Check!`, `Loesung zeigen`, `Weiter`) is disabled to prevent iOS text-marking while tapping
 
 ## 6.3 Speech Input Button (`Mikrofon`)
 Default label: `Mikrofon`
@@ -262,6 +264,7 @@ Possible messages include:
 - recording too short
 - no speech recognized
 - STT unavailable
+- raw browser permission errors (e.g. iOS "request is not allowed by the user agent...") must be suppressed and not shown to users
 
 Messages from speech hooks auto-expire (~10000ms / 10s) unless replaced.
 

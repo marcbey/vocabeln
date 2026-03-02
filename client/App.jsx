@@ -49,68 +49,80 @@ export default function App() {
   }, []);
 
   return (
-    <div className="flex w-full flex-col items-center gap-4 md:gap-5">
-      <Header
-        headline={activeClass.headline}
-        activeClassId={activeClassId}
-        classOptions={CLASS_OPTIONS}
-        filterMode={quiz.filterMode}
-        pages={quiz.pages}
-        page={quiz.page}
-        units={quiz.units}
-        unit={quiz.unit}
-        direction={quiz.direction}
-        boardMode={quiz.boardMode}
-        completedPages={quiz.completedPages}
-        completedUnits={quiz.completedUnits}
-        isIrregular={quiz.isIrregular}
-        onClassChange={setActiveClassId}
-        onFilterModeChange={quiz.changeFilterMode}
-        onPageChange={quiz.changePage}
-        onUnitChange={quiz.changeUnit}
-        onDirectionChange={quiz.changeDirection}
-        onToggleBoardMode={quiz.toggleBoardMode}
-        onReset={quiz.resetAll}
-      />
-
-      <main
-        ref={mainRef}
-        className="w-full max-w-[1100px] grid grid-cols-1 gap-4"
-        onPointerDownCapture={handleMainPointerDownCapture}
-        onKeyDownCapture={handleMainKeyDownCapture}
-      >
-        <QuestionCard
-          questionText={quiz.questionText}
-          questionLanguage={quiz.questionLanguage}
-          answerLanguage={quiz.answerLanguage}
-          translation={quiz.translation}
-          showingSolution={quiz.showingSolution}
+    <>
+      <div className="app-shell flex w-full flex-col items-center gap-4 md:gap-5">
+        <Header
+          headline={activeClass.headline}
+          activeClassId={activeClassId}
+          classOptions={CLASS_OPTIONS}
+          filterMode={quiz.filterMode}
+          pages={quiz.pages}
+          page={quiz.page}
+          units={quiz.units}
+          unit={quiz.unit}
+          direction={quiz.direction}
           boardMode={quiz.boardMode}
-          pageComplete={quiz.pageComplete}
-          flashClass={quiz.flash}
-          status={quiz.status}
+          completedPages={quiz.completedPages}
+          completedUnits={quiz.completedUnits}
           isIrregular={quiz.isIrregular}
-          currentWord={quiz.currentWord}
-          answerValue={quiz.answerValue}
-          inputRef={quiz.inputRef}
-          counts={quiz.counts}
-          onSubmit={quiz.submitAnswer}
-          onSubmitSpokenAnswer={quiz.submitSpokenAnswer}
-          onShowSolution={quiz.showOrAdvanceSolution}
-          onBoardResult={quiz.applyBoardResult}
-          onAnswerChange={quiz.handleAnswerChange}
-          onRetry={quiz.retryPage}
-          onSpeechPlaybackErrorChange={handleSpeechPlaybackErrorChange}
-          onSpeechInputErrorChange={handleSpeechInputErrorChange}
+          onClassChange={setActiveClassId}
+          onFilterModeChange={quiz.changeFilterMode}
+          onPageChange={quiz.changePage}
+          onUnitChange={quiz.changeUnit}
+          onDirectionChange={quiz.changeDirection}
+          onToggleBoardMode={quiz.toggleBoardMode}
+          onReset={quiz.resetAll}
         />
-      </main>
 
-      <SpeechErrorMessages
-        playbackError={speechPlaybackError}
-        inputError={speechInputError}
-      />
+        <main
+          ref={mainRef}
+          className="w-full max-w-[1100px] grid grid-cols-1 gap-4"
+          onPointerDownCapture={handleMainPointerDownCapture}
+          onKeyDownCapture={handleMainKeyDownCapture}
+        >
+          <QuestionCard
+            questionText={quiz.questionText}
+            questionLanguage={quiz.questionLanguage}
+            answerLanguage={quiz.answerLanguage}
+            translation={quiz.translation}
+            showingSolution={quiz.showingSolution}
+            boardMode={quiz.boardMode}
+            pageComplete={quiz.pageComplete}
+            flashClass={quiz.flash}
+            status={quiz.status}
+            isIrregular={quiz.isIrregular}
+            currentWord={quiz.currentWord}
+            answerValue={quiz.answerValue}
+            inputRef={quiz.inputRef}
+            counts={quiz.counts}
+            onSubmit={quiz.submitAnswer}
+            onSubmitSpokenAnswer={quiz.submitSpokenAnswer}
+            onShowSolution={quiz.showOrAdvanceSolution}
+            onBoardResult={quiz.applyBoardResult}
+            onAnswerChange={quiz.handleAnswerChange}
+            onRetry={quiz.retryPage}
+            onSpeechPlaybackErrorChange={handleSpeechPlaybackErrorChange}
+            onSpeechInputErrorChange={handleSpeechInputErrorChange}
+          />
+        </main>
 
-      <FireworksOverlay bursts={quiz.bursts} />
-    </div>
+        <SpeechErrorMessages
+          playbackError={speechPlaybackError}
+          inputError={speechInputError}
+        />
+
+        <FireworksOverlay bursts={quiz.bursts} />
+      </div>
+
+      <section className="landscape-blocker" aria-live="polite">
+        <div className="landscape-blocker-card">
+          <p>Bitte Geraet drehen</p>
+          <p className="landscape-blocker-copy">
+            Diese App ist im Querformat auf dem Handy deaktiviert. Bitte ins
+            Hochformat wechseln.
+          </p>
+        </div>
+      </section>
+    </>
   );
 }

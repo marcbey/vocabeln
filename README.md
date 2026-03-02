@@ -14,6 +14,8 @@ Interaktiver Vokabeltrainer fuer Klassen 5-7 mit Text-Quiz, Spracheingabe (STT),
 - Seitenweise Lernen mit Fortschrittsanzeige pro Seite
 - Automatischer Wechsel der Richtung, wenn in einer Richtung bereits alle Woerter erledigt sind
 - Loesung anzeigen / naechstes Wort
+- Mobile: Action-Button-Labels (`Check!`, `Loesung zeigen`, `Weiter`) sind nicht markierbar
+- Mobile: Querformat ist deaktiviert (Landscape zeigt einen Hinweis zum Drehen ins Hochformat)
 - `Tafel-Modus` fuer manuelle Richtig/Falsch-Bewertung
 - `Retry` pro Seite
 - Fortschritts-Reset (`Neu anfangen`) mit Bestaetigungsdialog
@@ -30,6 +32,7 @@ Interaktiver Vokabeltrainer fuer Klassen 5-7 mit Text-Quiz, Spracheingabe (STT),
   - uebermittelte STT-Sprache wird vor Upload auf `de` oder `en` normalisiert
 - Fehlermeldungen fuer Playback-/Mikrofon-/STT-Fehler
   - werden unten fuer ca. 10 Sekunden angezeigt
+  - technische Browser-Permission-Texte (z.B. iOS User-Agent-Meldungen) werden nicht angezeigt
 
 ### Persistenz
 - Pro Klasse persistierte Einstellungen und Fortschritte in `localStorage`
