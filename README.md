@@ -29,6 +29,7 @@ Interaktiver Vokabeltrainer fuer Klassen 5-7 mit Text-Quiz, Spracheingabe (STT),
   - loslassen -> transkribieren + Antwort pruefen
   - uebermittelte STT-Sprache wird vor Upload auf `de` oder `en` normalisiert
 - Fehlermeldungen fuer Playback-/Mikrofon-/STT-Fehler
+  - werden unten fuer ca. 10 Sekunden angezeigt
 
 ### Persistenz
 - Pro Klasse persistierte Einstellungen und Fortschritte in `localStorage`

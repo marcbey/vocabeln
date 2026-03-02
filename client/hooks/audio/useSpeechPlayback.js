@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+const SPEECH_ERROR_TTL_MS = 10_000;
+
 function toUserMessage(responseStatus) {
   if (responseStatus >= 500) {
     return 'Sprachausgabe ist gerade nicht verfügbar.';
@@ -18,7 +20,7 @@ export function useSpeechPlayback() {
   const [activePlaybackType, setActivePlaybackType] = useState(null);
   const [error, setError] = useState('');
 
-  const setHint = useCallback((message, ttlMs = 2200) => {
+  const setHint = useCallback((message, ttlMs = SPEECH_ERROR_TTL_MS) => {
     setError(message);
 
     if (hintTimerRef.current) {

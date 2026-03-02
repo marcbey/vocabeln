@@ -263,7 +263,7 @@ Possible messages include:
 - no speech recognized
 - STT unavailable
 
-Messages from speech hooks auto-expire (~2200ms) unless replaced.
+Messages from speech hooks auto-expire (~10000ms / 10s) unless replaced.
 
 ## 9. Visual Design System
 ## 9.1 Fonts

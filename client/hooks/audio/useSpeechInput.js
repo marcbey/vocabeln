@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 const MIN_RECORDING_MS = 300;
+const SPEECH_ERROR_TTL_MS = 10_000;
 const MIME_CANDIDATES = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4'];
 
 function pickMimeType() {
@@ -53,7 +54,7 @@ export function useSpeechInput({ language, onAnswerReady }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
 
-  const setHint = useCallback((message, ttlMs = 2200) => {
+  const setHint = useCallback((message, ttlMs = SPEECH_ERROR_TTL_MS) => {
     setError(message);
 
     if (hintTimerRef.current) {
