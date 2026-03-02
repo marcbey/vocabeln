@@ -1,6 +1,5 @@
 import { DIRECTIONS } from '../../constants.js';
 import { countAnswered } from '../../utils/answers.js';
-import { totalQuestionsForPage } from '../../utils/quiz.js';
 
 export function getQuestionDirection(direction, currentQuestionDir) {
   return direction === 'mixed' ? currentQuestionDir : direction;
@@ -11,7 +10,12 @@ export function getTotalCount(page, direction, vocabData, irregularData) {
     return irregularData.length;
   }
 
-  return totalQuestionsForPage(page, vocabData);
+  const list = vocabData[page] || [];
+  if (direction === 'mixed') {
+    return list.length * DIRECTIONS.length;
+  }
+
+  return list.length;
 }
 
 export function getCorrectCount(answeredCorrect, direction) {

@@ -126,6 +126,11 @@ Placement:
 - desktop: right-aligned inside card
 - mobile: full-width footer section
 
+Total-count rules:
+- `irregular`: `<total> = Anzahl unregelmaessiger Verben der Klasse`.
+- regular + `en-de` or `de-en`: `<total> = Anzahl Vokabeln im aktiven Scope` (Seite oder Unit).
+- regular + `mixed`: `<total> = 2 * Anzahl Vokabeln im aktiven Scope` (beide Richtungen).
+
 ## 6. Button and State Rules
 ## 6.1 `Check!`
 Disabled when:

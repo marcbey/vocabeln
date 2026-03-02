@@ -245,4 +245,28 @@ describe('App', () => {
     expect(pageSelect).not.toBeDisabled();
     expect(unitSelect).toBeDisabled();
   });
+
+  it('shows total question count based on regular direction', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    const directionSelect = screen.getAllByLabelText('Richtung')[0];
+
+    const mixedBadges = await screen.findAllByText(/0 richtig · 0 Versuche · 2 Fragen/i);
+    expect(mixedBadges.length).toBeGreaterThan(0);
+
+    await user.selectOptions(directionSelect, 'de-en');
+    const deEnBadges = await screen.findAllByText(/0 richtig · 0 Versuche · 1 Fragen/i);
+    expect(deEnBadges.length).toBeGreaterThan(0);
+
+    await user.selectOptions(directionSelect, 'en-de');
+    const enDeBadges = await screen.findAllByText(/0 richtig · 0 Versuche · 1 Fragen/i);
+    expect(enDeBadges.length).toBeGreaterThan(0);
+
+    await user.selectOptions(directionSelect, 'mixed');
+    const mixedAgainBadges = await screen.findAllByText(
+      /0 richtig · 0 Versuche · 2 Fragen/i
+    );
+    expect(mixedAgainBadges.length).toBeGreaterThan(0);
+  });
 });
