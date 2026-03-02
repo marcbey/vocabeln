@@ -129,7 +129,7 @@ Authoritative folder:
 - `openai_api_key`
 
 ## 8.3 Important optional variables
-- `service_name` (default `vocabeln-app`)
+- `service_name` (default `vokabeln-app`)
 - `repo_url` (default project GitHub URL)
 - `repo_branch` (default `main`)
 - `plan` (default `starter`)
@@ -138,6 +138,9 @@ Authoritative folder:
 - `openai_tts_model`
 - `openai_stt_model`
 - `openai_text_model`
+
+Note:
+- On Render, changing `service_name` on an existing service does not guarantee a new `onrender.com` slug/URL. The slug is typically fixed after initial creation.
 
 ## 8.4 Persistent disk contract
 - `persistent_disk_enabled` default `true`

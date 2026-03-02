@@ -1,7 +1,7 @@
 render_owner_id = "tea-xxxxxxxxxxxxxxxx"
 
 # Optional overrides
-# service_name      = "vocabeln-app"
+# service_name      = "vokabeln-app"
 # repo_url          = "https://github.com/marcbey/vocabeln"
 # repo_branch       = "main"
 # plan              = "starter"

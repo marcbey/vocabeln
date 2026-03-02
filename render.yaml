@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: vocabeln-app
+    name: vokabeln-app
     env: node
     plan: starter
     buildCommand: npm ci && npm run build

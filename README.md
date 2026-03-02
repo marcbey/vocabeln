@@ -27,6 +27,7 @@ Interaktiver Vokabeltrainer fuer Klassen 5-7 mit Text-Quiz, Spracheingabe (STT),
 - Spracheingabe per Mikrofon (`hold-to-record`):
   - gedrueckt halten -> aufnehmen
   - loslassen -> transkribieren + Antwort pruefen
+  - uebermittelte STT-Sprache wird vor Upload auf `de` oder `en` normalisiert
 - Fehlermeldungen fuer Playback-/Mikrofon-/STT-Fehler
 
 ### Persistenz
@@ -125,6 +126,7 @@ Details: siehe `CACHE.md`.
 - Body: `multipart/form-data`
   - `audio` (Datei, max 5MB)
   - `language` (`de` | `en`)
+    - Client normalisiert den Sprachwert auf `de`/`en` (`deutsch`/`english` Aliase werden akzeptiert, sonst Fallback `en`)
 - Antwort:
   - `200`: `{ transcript, answer }`
   - `400`: ungueltige Payload / ungueltiges Audio
@@ -185,6 +187,7 @@ TTS_CACHE_DIR=/tmp/tts-cache
 - Config: `render.yaml`
 - Build Command: `npm ci && npm run build`
 - Start Command: `NODE_ENV=production npm run start`
+- Default Service-Name: `vokabeln-app` (bei Neuerstellung ergibt das i.d.R. die URL `https://vokabeln-app.onrender.com`; bei bestehenden Services bleibt der bestehende `onrender.com`-Slug erhalten)
 - Mindestens setzen:
   - `OPENAI_API_KEY`
 - Optional setzen:

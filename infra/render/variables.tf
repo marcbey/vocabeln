@@ -18,7 +18,7 @@ variable "openai_api_key" {
 variable "service_name" {
   description = "Render service name"
   type        = string
-  default     = "vocabeln-app"
+  default     = "vokabeln-app"
 }
 
 variable "repo_url" {
