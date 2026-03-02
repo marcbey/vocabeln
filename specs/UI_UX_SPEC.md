@@ -282,6 +282,7 @@ Use Tailwind theme extensions + CSS:
 - `warn #6f3400`
 - `text #101d36`
 - `muted #243a5f`
+- Page background keeps a clearly visible, moderately saturated cool/warm gradient mix while animating.
 
 ## 9.3 Surfaces and Shapes
 - Cards: white panel, 2px border `#3f567e`, radius `22px`, deep shadow
@@ -293,6 +294,7 @@ Use Tailwind theme extensions + CSS:
 - Board-mode `Richtig`/`Falsch` buttons use muted success/error gradients (not highly saturated)
 
 ## 9.4 Motion
+- Background gradient drift: diagonal, linear, slow (~38s, infinite, alternate ping-pong)
 - Feedback flash pulse: ~1100ms
 - Solution reveal flash: ~850ms
 - New-question word glow: ~620ms
