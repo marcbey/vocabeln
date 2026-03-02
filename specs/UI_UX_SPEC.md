@@ -288,7 +288,9 @@ Use Tailwind theme extensions + CSS:
 - Inputs/controls: rounded, bordered, min height 48px
 - Primary buttons: blue gradient
 - Secondary/toggle buttons: light gradient with text color
-- Active toggle: orange gradient
+- Toggle controls are intentionally lower emphasis than primary actions
+- Active toggle: muted amber gradient with reduced contrast
+- Board-mode `Richtig`/`Falsch` buttons use muted success/error gradients (not highly saturated)
 
 ## 9.4 Motion
 - Feedback flash pulse: ~1100ms

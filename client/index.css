@@ -88,13 +88,41 @@ button.secondary {
 }
 
 button.toggle {
-  @apply text-text border border-[#3f567e] shadow-none;
-  background: linear-gradient(145deg, #ffffff 0%, #f5f9ff 100%);
+  @apply border shadow-none;
+  color: #30486d;
+  border-color: #7f95b6;
+  background: linear-gradient(145deg, #fbfdff 0%, #f1f6fd 100%);
 }
 
 button.toggle.active {
-  @apply text-[#1f1300] shadow-glow;
-  background: linear-gradient(135deg, #f3a229 0%, #d86e00 100%);
+  @apply shadow-none;
+  color: #3a2c11;
+  border-color: #c29a65;
+  background: linear-gradient(135deg, #f2dab8 0%, #e1b174 100%);
+  box-shadow: 0 6px 12px rgba(140, 93, 28, 0.14);
+}
+
+button.toggle:hover:not(:disabled) {
+  transform: translateY(0);
+  filter: saturate(1);
+}
+
+button.board-result {
+  border-color: #7c90b0;
+  box-shadow: none;
+}
+
+button.board-result:hover:not(:disabled) {
+  transform: translateY(0);
+  filter: saturate(1);
+}
+
+button.board-correct {
+  background: linear-gradient(135deg, #a8d2bf 0%, #c7e2d5 100%);
+}
+
+button.board-wrong {
+  background: linear-gradient(135deg, #e4b0b0 0%, #edc7b3 100%);
 }
 
 .no-touch-text-select {
