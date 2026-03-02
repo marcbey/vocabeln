@@ -51,7 +51,6 @@ export default function QuestionPrompt({
 
   const exampleDisabled = !canSpeak || isLoading;
   const isExampleActive = activePlaybackType === 'example';
-  const questionLanguageLabel = questionLanguage === 'de' ? 'Deutsch' : 'Englisch';
   const solutionRevealFlash = useSolutionRevealFlash({
     showingSolution,
     translation,
@@ -168,10 +167,7 @@ export default function QuestionPrompt({
   return (
     <div className="mt-1 mb-3 px-3 py-3 md:px-4 md:py-4 bg-[#e0e9f8] border-2 border-[#3f567e] rounded-xl2 shadow-[inset_0_1px_0_rgba(255,255,255,0.85)] flex flex-col gap-3">
       <div className="w-full flex flex-col gap-3 md:flex-row md:items-start">
-        <QuestionWordDisplay
-          questionText={questionText}
-          questionLanguageLabel={questionLanguageLabel}
-        />
+        <QuestionWordDisplay questionText={questionText} />
 
         <QuestionPromptAudioButtons
           exampleDisabled={exampleDisabled}

@@ -68,8 +68,10 @@ Behavior:
 ## 5. Question Card Specification
 ## 5.1 Top Prompt Area
 Contains:
-- Word label: `Wort (Deutsch|Englisch)`
-- Large question word text
+- Large question word text:
+  - rendered in a full-width container
+  - reserved with a two-line minimum height
+  - centered horizontally and vertically
 - Two audio buttons:
   - `Vorlesen: Aus` / `Vorlesen: An` (toggle)
   - `Beispielsatz`
