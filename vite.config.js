@@ -17,7 +17,7 @@ export default defineConfig({
   },
   test: {
     environment: 'jsdom',
-    setupFiles: './src/test/setup.js',
+    setupFiles: './client/test/setup.js',
     coverage: {
       reporter: ['text', 'html'],
     },

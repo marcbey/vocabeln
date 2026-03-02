@@ -46,20 +46,20 @@ flowchart LR
 ```
 
 ### Frontend
-- Einstieg: `src/App.jsx`
-- Quiz-Orchestrierung: `src/hooks/useQuizController.js`
+- Einstieg: `client/App.jsx`
+- Quiz-Orchestrierung: `client/hooks/useQuizController.js`
   - State: `useQuizState`
   - Actions: `useQuizActions`
   - Persistenz: `useQuizPersistence`
   - Status-Flash: `useQuizStatusFlash`
 - Audio:
-  - TTS Playback: `src/hooks/audio/useSpeechPlayback.js`
-  - STT Aufnahme + Upload: `src/hooks/audio/useSpeechInput.js`
+  - TTS Playback: `client/hooks/audio/useSpeechPlayback.js`
+  - STT Aufnahme + Upload: `client/hooks/audio/useSpeechInput.js`
 - Komponenten:
-  - Header/Navigation: `src/components/Header.jsx` + `src/components/header/*`
-  - Fragekarte: `src/components/QuestionCard.jsx`
-  - Antwort-/Mikrofonbereich: `src/components/question/AnswerInputSection.jsx`
-  - Vorlesen/Beispielsatz: `src/components/question/QuestionPrompt.jsx`
+  - Header/Navigation: `client/components/Header.jsx` + `client/components/header/*`
+  - Fragekarte: `client/components/QuestionCard.jsx`
+  - Antwort-/Mikrofonbereich: `client/components/question/AnswerInputSection.jsx`
+  - Vorlesen/Beispielsatz: `client/components/question/QuestionPrompt.jsx`
 
 ### Backend
 - Server/Boot: `server/index.js`
@@ -132,8 +132,8 @@ Details: siehe `CACHE.md`.
 
 ## Datenmodell
 
-- Vokabeldaten liegen statisch in `src/data/*.json`
-- Normalisierte Datasets entstehen in `src/data/index.js`:
+- Vokabeldaten liegen statisch in `client/data/*.json`
+- Normalisierte Datasets entstehen in `client/data/index.js`:
   - `vocabData` (seitenbasiert)
   - `irregularData` (unregelmaessige Verben)
 

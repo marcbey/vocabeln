@@ -32,7 +32,7 @@ Build a vocabulary trainer web app for class levels 5-8 with:
 ### 4.2 Frontend
 - React 19
 - Vite 7
-- Tailwind CSS 3 + custom CSS (`src/index.css`)
+- Tailwind CSS 3 + custom CSS (`client/index.css`)
 - classnames
 
 ### 4.3 Backend
@@ -74,7 +74,7 @@ Single service deployment:
   - L2 disk cache (JSON metadata + MP3 files)
 
 ## 6. Repository Structure (Normative)
-- `src/` frontend app
+- `client/` frontend app
   - `App.jsx` root orchestration
   - `components/` UI composition
   - `hooks/quiz/*` quiz state/actions/persistence/status
@@ -217,7 +217,7 @@ Error:
 - Runtime uses the mapping to build virtual `unit::` scopes.
 
 ## 9.4 Validation
-- Parse datasets with zod on app start through `src/data/schema.js`.
+- Parse datasets with zod on app start through `client/data/schema.js`.
 - Invalid dataset must throw hard error (fail fast).
 
 ## 10. Configuration
