@@ -11,7 +11,7 @@ export default function FilterModeSelect({
       value={value}
       onChange={(event) => onChange(event.target.value)}
       aria-label="Filter"
-      className={classNames('pr-7', className)}
+      className={classNames('pr-8', className)}
       disabled={disabled}
     >
       <option value="page">Seite</option>

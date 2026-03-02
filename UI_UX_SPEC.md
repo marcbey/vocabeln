@@ -45,7 +45,8 @@ Behavior:
 - If filter is `Seite`, page select is enabled and unit select is disabled + dimmed.
 - If filter is `Unit`, unit select is enabled and page select is disabled + dimmed.
 - `Seite` and `Unit` selects use the same control height as other header controls.
-- On desktop, all header selects use compact content-fit widths (not stretched full-width).
+- On desktop, header selects use compact fixed widths tuned for consistent text-to-chevron spacing.
+- All desktop header selects use identical chevron/icon spacing (matching `Seite` select).
 - Completed pages show suffix ` ✅` in page select option text.
 - Completed units show suffix ` ✅` in unit select option text.
 

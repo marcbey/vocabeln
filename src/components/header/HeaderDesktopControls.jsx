@@ -29,7 +29,7 @@ export default function HeaderDesktopControls({
         value={filterMode}
         onChange={onFilterModeChange}
         disabled={isIrregular}
-        className="w-auto shrink-0"
+        className="w-[102px] shrink-0"
       />
 
       <div
@@ -58,14 +58,14 @@ export default function HeaderDesktopControls({
           completedUnits={completedUnits}
           disabled={isIrregular || filterMode === 'page'}
           onChange={onUnitChange}
-          className="h-full w-auto"
+          className="h-full w-[132px]"
         />
       </div>
 
       <DirectionSelect
         direction={direction}
         onChange={onDirectionChange}
-        className="w-auto shrink-0"
+        className="w-[208px] shrink-0"
       />
 
       <div className="md:ml-auto">

@@ -23,7 +23,7 @@ export default function PageSelect({
       value={page}
       onChange={(event) => onChange(event.target.value)}
       aria-label="Seite"
-      className={classNames('pr-6 truncate', className)}
+      className={classNames('pr-8 truncate', className)}
       disabled={disabled}
     >
       {pages.map((item) => (

@@ -13,7 +13,7 @@ export default function UnitSelect({
       value={unit}
       onChange={(event) => onChange(event.target.value)}
       aria-label="Unit"
-      className={classNames('pr-7 truncate', className)}
+      className={classNames('pr-8 truncate', className)}
       disabled={disabled}
     >
       {units.map((item) => (
