@@ -26,7 +26,7 @@ Max content width: 1100px.
 
 ## 4. Header Specification
 ## 4.1 Content
-- Title from selected class headline (e.g. "Vokabeln fuer die Klasse 5").
+ - Title from selected class headline (e.g. "Englisch Vokabeln fuer die Klasse 5").
 - Motivational subtitle: `Jede Runde macht dich besser und fit fuer die naechste Englischarbeit.`
 
 ## 4.2 Desktop Controls (`md` and up)
@@ -72,6 +72,7 @@ Contains:
   - rendered in a full-width container
   - reserved with a two-line minimum height
   - centered horizontally and vertically
+  - in desktop row layout, stretches to the same full height as the audio-button column
 - Two audio buttons:
   - `Vorlesen: Aus` / `Vorlesen: An` (toggle)
   - `Beispielsatz`

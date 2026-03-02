@@ -8,17 +8,17 @@ vi.mock('./data/index.js', () => ({
     {
       id: 'class5',
       label: 'Klasse 5',
-      headline: 'Vokabeln für die Klasse 5',
+      headline: 'Englisch Vokabeln für die Klasse 5',
     },
     {
       id: 'class6',
       label: 'Klasse 6',
-      headline: 'Vokabeln für die Klasse 6',
+      headline: 'Englisch Vokabeln für die Klasse 6',
     },
     {
       id: 'class7',
       label: 'Klasse 7',
-      headline: 'Vokabeln für die Klasse 7',
+      headline: 'Englisch Vokabeln für die Klasse 7',
     },
   ],
   CLASS_DATASETS: {
@@ -133,7 +133,9 @@ describe('App', () => {
     const user = userEvent.setup();
     render(<App />);
 
-    expect(screen.getByText('Vokabeln für die Klasse 5')).toBeInTheDocument();
+    expect(
+      screen.getByText('Englisch Vokabeln für die Klasse 5')
+    ).toBeInTheDocument();
 
     const answerInput = screen.getByPlaceholderText('Deine Antwort...');
     const openClassMenu = async () => {
@@ -148,7 +150,9 @@ describe('App', () => {
 
     const classSelectForClass6 = await openClassMenu();
     await user.selectOptions(classSelectForClass6, 'class6');
-    expect(await screen.findByText('Vokabeln für die Klasse 6')).toBeInTheDocument();
+    expect(
+      await screen.findByText('Englisch Vokabeln für die Klasse 6')
+    ).toBeInTheDocument();
     expect(await screen.findByText('dog')).toBeInTheDocument();
 
     const class6Input = screen.getByPlaceholderText('Deine Antwort...');
@@ -158,7 +162,9 @@ describe('App', () => {
 
     const classSelectForClass7 = await openClassMenu();
     await user.selectOptions(classSelectForClass7, 'class7');
-    expect(await screen.findByText('Vokabeln für die Klasse 7')).toBeInTheDocument();
+    expect(
+      await screen.findByText('Englisch Vokabeln für die Klasse 7')
+    ).toBeInTheDocument();
     expect(await screen.findByText('house')).toBeInTheDocument();
 
     const class7Input = screen.getByPlaceholderText('Deine Antwort...');
@@ -168,7 +174,9 @@ describe('App', () => {
 
     const classSelectForClass5 = await openClassMenu();
     await user.selectOptions(classSelectForClass5, 'class5');
-    expect(await screen.findByText('Vokabeln für die Klasse 5')).toBeInTheDocument();
+    expect(
+      await screen.findByText('Englisch Vokabeln für die Klasse 5')
+    ).toBeInTheDocument();
 
     const progressBadges = await screen.findAllByText(
       /1 richtig · 1 Versuche · 2 Fragen/i

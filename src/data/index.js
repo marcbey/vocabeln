@@ -51,22 +51,22 @@ export const CLASS_OPTIONS = [
   {
     id: 'class5',
     label: 'Klasse 5',
-    headline: 'Vokabeln für die Klasse 5',
+    headline: 'Englisch Vokabeln für die Klasse 5',
   },
   {
     id: 'class6',
     label: 'Klasse 6',
-    headline: 'Vokabeln für die Klasse 6',
+    headline: 'Englisch Vokabeln für die Klasse 6',
   },
   {
     id: 'class7',
     label: 'Klasse 7',
-    headline: 'Vokabeln für die Klasse 7',
+    headline: 'Englisch Vokabeln für die Klasse 7',
   },
   {
     id: 'class8',
     label: 'Klasse 8',
-    headline: 'Vokabeln für die Klasse 8',
+    headline: 'Englisch Vokabeln für die Klasse 8',
   },
 ];
 
