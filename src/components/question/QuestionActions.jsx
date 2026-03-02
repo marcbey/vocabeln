@@ -14,7 +14,7 @@ export default function QuestionActions({
       <button
         type="button"
         className={classNames(
-          'px-4 md:px-5 whitespace-nowrap min-h-[50px] w-full md:w-[120px]',
+          'px-4 md:px-5 whitespace-nowrap min-h-[50px] w-full md:w-auto',
           { secondary: showingSolution }
         )}
         onClick={onSubmit}
@@ -28,7 +28,7 @@ export default function QuestionActions({
       <button
         type="button"
         className={classNames(
-          'px-4 md:px-5 whitespace-nowrap min-h-[50px] w-full md:w-[170px]',
+          'px-4 md:px-5 whitespace-nowrap min-h-[50px] w-full md:w-auto',
           { secondary: !showingSolution }
         )}
         onClick={onShowSolution}

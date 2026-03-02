@@ -146,6 +146,7 @@ Disabled when:
 - label is `Loesung zeigen` when solution hidden
 - label is `Weiter` when solution visible
 - disabled in board mode or without current word
+- desktop action buttons use content-based width so right inset next to shortcut hint chips is visually consistent across `Check!` and `Loesung zeigen`/`Weiter`
 
 ## 6.3 Speech Input Button (`Mikrofon`)
 Default label: `Mikrofon`
