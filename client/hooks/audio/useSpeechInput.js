@@ -18,6 +18,31 @@ function extensionForMime(mimeType) {
   return 'webm';
 }
 
+export function normalizeSpeechInputLanguage(language) {
+  const normalized =
+    typeof language === 'string' ? language.trim().toLowerCase() : '';
+
+  if (
+    normalized === 'de' ||
+    normalized.startsWith('de-') ||
+    normalized === 'deutsch' ||
+    normalized === 'german'
+  ) {
+    return 'de';
+  }
+
+  if (
+    normalized === 'en' ||
+    normalized.startsWith('en-') ||
+    normalized === 'englisch' ||
+    normalized === 'english'
+  ) {
+    return 'en';
+  }
+
+  return 'en';
+}
+
 export function useSpeechInput({ language, onAnswerReady }) {
   const recorderRef = useRef(null);
   const streamRef = useRef(null);
@@ -55,9 +80,10 @@ export function useSpeechInput({ language, onAnswerReady }) {
 
   const submitRecording = useCallback(
     async (blob, mimeType) => {
+      const sttLanguage = normalizeSpeechInputLanguage(language);
       const formData = new FormData();
       formData.append('audio', blob, `recording.${extensionForMime(mimeType)}`);
-      formData.append('language', language);
+      formData.append('language', sttLanguage);
 
       const response = await fetch('/api/stt/check', {
         method: 'POST',

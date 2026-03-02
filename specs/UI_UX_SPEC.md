@@ -197,8 +197,9 @@ Disabled when:
 2. Recording starts.
 3. User releases (`pointerup`, `pointercancel`, `pointerleave` without button press) and recording stops.
 4. If recording < 300ms: show hint `Aufnahme zu kurz.` and abort upload.
-5. Upload to `/api/stt/check`.
-6. If `answer` returned:
+5. Normalize submitted speech language to `de` or `en` (`deutsch`/`english` aliases allowed, unsupported values fallback to `en`).
+6. Upload to `/api/stt/check`.
+7. If `answer` returned:
    - if spoken answer is wrong: submit immediately like typed answer (input preserved)
    - if spoken answer is correct: show text in input for 2000ms preview, then auto-submit and clear
 

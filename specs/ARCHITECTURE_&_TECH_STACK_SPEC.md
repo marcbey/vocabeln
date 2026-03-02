@@ -185,6 +185,7 @@ Error:
 Request multipart:
 - `audio`: file (required)
 - `language`: `de` | `en`
+- frontend normalizes submitted speech language to `de` or `en` before upload (unsupported values fallback to `en`)
 
 Response:
 - `200 { transcript: string, answer: string }`
