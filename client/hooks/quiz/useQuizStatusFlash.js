@@ -1,13 +1,28 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useWebHaptics } from 'web-haptics/react';
 
 const FLASH_TIMEOUT_MS = 1100;
 const STATUS_TIMEOUT_MS = 2800;
+const MOBILE_POINTER_QUERY = '(pointer: coarse)';
+
+function canTriggerMobileHaptics(isSupported) {
+  if (!isSupported) {
+    return false;
+  }
+
+  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
+    return false;
+  }
+
+  return window.matchMedia(MOBILE_POINTER_QUERY).matches;
+}
 
 export function useQuizStatusFlash({ boardMode, showingSolution, onRefocus }) {
   const [status, setStatus] = useState(null);
   const [flash, setFlash] = useState(null);
   const flashTimerRef = useRef(null);
   const statusTimerRef = useRef(null);
+  const { trigger: triggerHaptic, isSupported: hapticsSupported } = useWebHaptics();
 
   const clearTimers = useCallback(() => {
     if (flashTimerRef.current) {
@@ -46,6 +61,14 @@ export function useQuizStatusFlash({ boardMode, showingSolution, onRefocus }) {
       setStatus(nextStatus);
       setFlash(nextStatus === 'correct' ? 'flash-correct' : 'flash-wrong');
 
+      if (canTriggerMobileHaptics(hapticsSupported)) {
+        if (nextStatus === 'correct') {
+          void triggerHaptic('success');
+        } else if (nextStatus === 'wrong') {
+          void triggerHaptic('error');
+        }
+      }
+
       flashTimerRef.current = window.setTimeout(() => {
         setFlash(null);
       }, FLASH_TIMEOUT_MS);
@@ -58,7 +81,15 @@ export function useQuizStatusFlash({ boardMode, showingSolution, onRefocus }) {
         onRefocus?.();
       }
     },
-    [boardMode, clearStatusFlash, clearTimers, onRefocus, showingSolution]
+    [
+      boardMode,
+      clearStatusFlash,
+      clearTimers,
+      hapticsSupported,
+      onRefocus,
+      showingSolution,
+      triggerHaptic,
+    ]
   );
 
   useEffect(() => {

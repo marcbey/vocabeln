@@ -22,6 +22,10 @@ Interaktiver Vokabeltrainer fuer Klassen 5-7 mit Text-Quiz, Spracheingabe (STT),
 - Visuelles Feedback:
   - Gruen/Rot-Status am Input
   - Fireworks-Effekt bei Seitenabschluss
+- Haptisches Feedback (Mobile):
+  - `success`-Vibration bei korrekter Antwort
+  - `error`-Vibration bei falscher Antwort
+  - nur auf Geraeten mit coarse pointer + Vibrations-Support
 
 ### Audio / Sprache
 - `Vorlesen` Button: spricht das aktuelle Wort

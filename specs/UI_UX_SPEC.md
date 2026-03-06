@@ -11,6 +11,7 @@ This spec supersedes UI/behavior content in `FEATURE.md` and `PROTOTYPE_SPEC.md`
 - Low-friction keyboard and touch operation.
 - Equivalent behavior for typed and spoken answers.
 - Clear feedback for correct/wrong outcomes.
+- Mobile haptic feedback for correct/wrong outcomes when supported.
 - Stable progress visibility and persistence per class.
 
 ## 3. Screen Structure
@@ -185,12 +186,14 @@ Disabled when:
 5. If correct:
    - mark answered key as correct
    - set status `correct`
+   - on mobile coarse-pointer devices with supported haptics: trigger `success` haptic pattern
    - clear input
    - persist progress
    - if page complete: trigger fireworks once and keep completion state
    - else move to next question
 6. If wrong:
    - set status `wrong`
+   - on mobile coarse-pointer devices with supported haptics: trigger `error` haptic pattern
    - keep input value
    - persist progress
 
@@ -220,8 +223,8 @@ Disabled when:
 2. Input area replaced by manual correct/wrong buttons.
 3. On manual result:
    - increment `asked`
-   - if correct: mark answered + persist + completion handling
-   - if wrong: persist and move to next word after short delay
+   - if correct: mark answered + status `correct` + mobile `success` haptic (if supported) + persist + completion handling
+   - if wrong: status `wrong` + mobile `error` haptic (if supported) + persist and move to next word after short delay
 
 ## 7.5 Direction Flow
 - Direction options: `en-de`, `de-en`, `mixed`, `irregular`.

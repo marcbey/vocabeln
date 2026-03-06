@@ -34,6 +34,7 @@ Build a vocabulary trainer web app for class levels 5-8 with:
 - Vite 7
 - Tailwind CSS 3 + custom CSS (`client/index.css`)
 - classnames
+- web-haptics (mobile haptic presets for quiz result feedback)
 
 ### 4.3 Backend
 - Express 5
@@ -127,6 +128,7 @@ Backward compatibility rule for class5:
   - in `irregular` direction, filter/page/unit selects are disabled
 - Unit scope vocabulary is composed by merging mapped pages and deduplicating entries by `en::de`.
 - Correct spoken answer in non-board mode is previewed in input and auto-submitted after 2000ms.
+- Correct/wrong status events trigger mobile haptics (`success`/`error`) when vibration is supported and pointer is coarse.
 - Read-aloud toggle behavior:
   - if enabled, auto-read current question text whenever a new question becomes active
   - if enabled, read translation when solution is revealed
