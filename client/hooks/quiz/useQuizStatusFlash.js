@@ -1,20 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useWebHaptics } from 'web-haptics/react';
+import { haptic } from 'ios-haptics';
 
 const FLASH_TIMEOUT_MS = 1100;
 const STATUS_TIMEOUT_MS = 2800;
-const MOBILE_POINTER_QUERY = '(pointer: coarse)';
 
-function canTriggerMobileHaptics(isSupported) {
-  if (!isSupported) {
-    return false;
+function triggerResultHaptic(status) {
+  if (status === 'correct') {
+    haptic.confirm();
+  } else if (status === 'wrong') {
+    haptic.error();
   }
-
-  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
-    return false;
-  }
-
-  return window.matchMedia(MOBILE_POINTER_QUERY).matches;
 }
 
 export function useQuizStatusFlash({ boardMode, showingSolution, onRefocus }) {
@@ -22,7 +17,6 @@ export function useQuizStatusFlash({ boardMode, showingSolution, onRefocus }) {
   const [flash, setFlash] = useState(null);
   const flashTimerRef = useRef(null);
   const statusTimerRef = useRef(null);
-  const { trigger: triggerHaptic, isSupported: hapticsSupported } = useWebHaptics();
 
   const clearTimers = useCallback(() => {
     if (flashTimerRef.current) {
@@ -60,14 +54,7 @@ export function useQuizStatusFlash({ boardMode, showingSolution, onRefocus }) {
       clearTimers();
       setStatus(nextStatus);
       setFlash(nextStatus === 'correct' ? 'flash-correct' : 'flash-wrong');
-
-      if (canTriggerMobileHaptics(hapticsSupported)) {
-        if (nextStatus === 'correct') {
-          void triggerHaptic('success');
-        } else if (nextStatus === 'wrong') {
-          void triggerHaptic('error');
-        }
-      }
+      triggerResultHaptic(nextStatus);
 
       flashTimerRef.current = window.setTimeout(() => {
         setFlash(null);
@@ -85,10 +72,8 @@ export function useQuizStatusFlash({ boardMode, showingSolution, onRefocus }) {
       boardMode,
       clearStatusFlash,
       clearTimers,
-      hapticsSupported,
       onRefocus,
       showingSolution,
-      triggerHaptic,
     ]
   );
 

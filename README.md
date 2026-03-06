@@ -23,9 +23,9 @@ Interaktiver Vokabeltrainer fuer Klassen 5-7 mit Text-Quiz, Spracheingabe (STT),
   - Gruen/Rot-Status am Input
   - Fireworks-Effekt bei Seitenabschluss
 - Haptisches Feedback (Mobile):
-  - `success`-Vibration bei korrekter Antwort
-  - `error`-Vibration bei falscher Antwort
-  - nur auf Geraeten mit coarse pointer + Vibrations-Support
+  - Erfolgshaptik bei korrekter Antwort
+  - Fehlerhaptik bei falscher Antwort
+  - iPhone Safari wird ueber `ios-haptics` mit Safari-`switch`-Fallback unterstuetzt (ab iOS/Safari 17.4)
 
 ### Audio / Sprache
 - `Vorlesen` Button: spricht das aktuelle Wort

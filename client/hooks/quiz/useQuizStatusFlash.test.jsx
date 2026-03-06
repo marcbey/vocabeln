@@ -2,30 +2,21 @@ import { renderHook, act } from '@testing-library/react';
 import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest';
 import { useQuizStatusFlash } from './useQuizStatusFlash.js';
 
-const triggerMock = vi.fn();
-const useWebHapticsMock = vi.fn();
+const confirmMock = vi.fn();
+const errorMock = vi.fn();
 
-vi.mock('web-haptics/react', () => ({
-  useWebHaptics: () => useWebHapticsMock(),
+vi.mock('ios-haptics', () => ({
+  haptic: {
+    confirm: () => confirmMock(),
+    error: () => errorMock(),
+  },
 }));
-
-function mockMatchMedia(matches) {
-  Object.defineProperty(window, 'matchMedia', {
-    configurable: true,
-    writable: true,
-    value: vi.fn().mockReturnValue({ matches }),
-  });
-}
 
 describe('useQuizStatusFlash haptics', () => {
   beforeEach(() => {
     vi.useFakeTimers();
-    triggerMock.mockReset();
-    useWebHapticsMock.mockReturnValue({
-      trigger: triggerMock,
-      isSupported: true,
-    });
-    mockMatchMedia(true);
+    confirmMock.mockReset();
+    errorMock.mockReset();
   });
 
   afterEach(() => {
@@ -46,7 +37,8 @@ describe('useQuizStatusFlash haptics', () => {
       result.current.setStatusFlash('correct');
     });
 
-    expect(triggerMock).toHaveBeenCalledWith('success');
+    expect(confirmMock).toHaveBeenCalledTimes(1);
+    expect(errorMock).not.toHaveBeenCalled();
   });
 
   it('triggers error haptic for wrong answers on mobile', () => {
@@ -62,11 +54,11 @@ describe('useQuizStatusFlash haptics', () => {
       result.current.setStatusFlash('wrong');
     });
 
-    expect(triggerMock).toHaveBeenCalledWith('error');
+    expect(errorMock).toHaveBeenCalledTimes(1);
+    expect(confirmMock).not.toHaveBeenCalled();
   });
 
-  it('does not trigger haptics on non-mobile pointers', () => {
-    mockMatchMedia(false);
+  it('does not trigger haptics for unknown statuses', () => {
     const { result } = renderHook(() =>
       useQuizStatusFlash({
         boardMode: false,
@@ -76,29 +68,10 @@ describe('useQuizStatusFlash haptics', () => {
     );
 
     act(() => {
-      result.current.setStatusFlash('correct');
+      result.current.setStatusFlash('something-else');
     });
 
-    expect(triggerMock).not.toHaveBeenCalled();
-  });
-
-  it('does not trigger haptics when support is unavailable', () => {
-    useWebHapticsMock.mockReturnValue({
-      trigger: triggerMock,
-      isSupported: false,
-    });
-    const { result } = renderHook(() =>
-      useQuizStatusFlash({
-        boardMode: false,
-        showingSolution: false,
-        onRefocus: vi.fn(),
-      })
-    );
-
-    act(() => {
-      result.current.setStatusFlash('wrong');
-    });
-
-    expect(triggerMock).not.toHaveBeenCalled();
+    expect(confirmMock).not.toHaveBeenCalled();
+    expect(errorMock).not.toHaveBeenCalled();
   });
 });

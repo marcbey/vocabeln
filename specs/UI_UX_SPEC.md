@@ -186,14 +186,14 @@ Disabled when:
 5. If correct:
    - mark answered key as correct
    - set status `correct`
-   - on mobile coarse-pointer devices with supported haptics: trigger `success` haptic pattern
+   - on supported mobile devices: trigger success haptic feedback at the same time as the visual status change
    - clear input
    - persist progress
    - if page complete: trigger fireworks once and keep completion state
    - else move to next question
 6. If wrong:
    - set status `wrong`
-   - on mobile coarse-pointer devices with supported haptics: trigger `error` haptic pattern
+   - on supported mobile devices: trigger error haptic feedback at the same time as the visual status change
    - keep input value
    - persist progress
 
@@ -223,8 +223,12 @@ Disabled when:
 2. Input area replaced by manual correct/wrong buttons.
 3. On manual result:
    - increment `asked`
-   - if correct: mark answered + status `correct` + mobile `success` haptic (if supported) + persist + completion handling
-   - if wrong: status `wrong` + mobile `error` haptic (if supported) + persist and move to next word after short delay
+   - if correct: mark answered + status `correct` + success haptic (if supported) + persist + completion handling
+   - if wrong: status `wrong` + error haptic (if supported) + persist and move to next word after short delay
+
+Haptic implementation notes:
+- Haptics must remain supplemental; all states stay fully understandable without them.
+- On iPhone Safari, support depends on Safari 17.4+ because the implementation uses a hidden `switch` control fallback instead of the unavailable Vibration API.
 
 ## 7.5 Direction Flow
 - Direction options: `en-de`, `de-en`, `mixed`, `irregular`.
